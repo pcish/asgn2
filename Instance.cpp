@@ -51,7 +51,7 @@ private:
     int segmentNumber(const string& name);
 
 };
-                                                                                                  
+
 class TruckTerminalRep : public LocationRep {
 public:
 
@@ -63,6 +63,38 @@ public:
 
 };
 
+class SegmentRep : public Instance {
+public:
+
+    SegmentRep(const string& name, ManagerImpl* manager) :
+        Instance(name), manager_(manager)
+    {
+        // Nothing else to do.
+    }
+
+    // Instance method
+    string attribute(const string& name);
+
+    // Instance method
+    void attributeIs(const string& name, const string& v);
+
+private:
+    Ptr<ManagerImpl> manager_;
+
+    int segmentNumber(const string& name);
+
+};
+
+class TruckSegmentRep : public SegmentRep {
+public:
+
+    TruckSegmentRep(const string& name, ManagerImpl *manager) :
+        SegmentRep(name, manager)
+    {
+        // Nothing else to do.
+    }
+
+};
 
 ManagerImpl::ManagerImpl() {
 }
@@ -73,7 +105,11 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
         instance_[name] = t;
         return t;
     }
-
+    if (type == "Truck segment") {
+        Ptr<TruckSegmentRep> t = new TruckSegmentRep(name, this);
+        instance_[name] = t;
+        return t;
+    }
     return NULL;
 }
 
@@ -97,6 +133,19 @@ string LocationRep::attribute(const string& name) {
 
 
 void LocationRep::attributeIs(const string& name, const string& v) {
+    //nothing to do
+}
+
+string SegmentRep::attribute(const string& name) {
+    int i = 1;//segmentNumber(name);
+    if (i != 0) {
+        cout << "Tried to read interface " << i;
+    }
+    return "";
+}
+
+
+void SegmentRep::attributeIs(const string& name, const string& v) {
     //nothing to do
 }
 
