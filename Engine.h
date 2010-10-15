@@ -16,24 +16,31 @@ class Shipment {
   Location source, destination;
   Package *packages;
 };
-class Segment {
-  VehicleType mode;
-  Location source;
-  Distance length;
-  Segment *returnSegment;
-  Difficulty difficulty;
-  ExpediteSupport expediteSupport;
-};
 class Location;
 class CutsomterLocation : public Location;
 class Port : public Location;
 class Terminal : public Location;
 class Fleet;
 */
+class Segment : public Fwk::PtrInterface<Segment> {
+/*  VehicleType mode;
+  Location source;
+  Distance length;
+  Segment *returnSegment;
+  Difficulty difficulty;
+  ExpediteSupport expediteSupport;*/
+};
+
+class TruckSegment : public Segment {
+};
+
 class Engine {
+ public:
   void terminalNew() {
   }
-  void truckSegmentNew() {
+  static Ptr<Segment> truckSegmentNew() {
+    Ptr<Segment> m = new Segment();
+    return m;
   }
 };
 } /* end namespace */

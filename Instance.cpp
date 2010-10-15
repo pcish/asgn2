@@ -92,8 +92,10 @@ public:
         SegmentRep(name, manager)
     {
         // Nothing else to do.
+        s = Engine::truckSegmentNew();
     }
-
+private:
+    Ptr<Segment> s;
 };
 
 ManagerImpl::ManagerImpl() {
@@ -127,6 +129,7 @@ string LocationRep::attribute(const string& name) {
     int i = segmentNumber(name);
     if (i != 0) {
         cout << "Tried to read interface " << i;
+        cout <<
     }
     return "";
 }
