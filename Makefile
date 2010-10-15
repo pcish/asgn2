@@ -1,6 +1,6 @@
 CXXFLAGS = -Wall -g
 
-OBJECTS = Instance.o
+OBJECTS = Instance.o Engine.o
 
 default:	test1
 
