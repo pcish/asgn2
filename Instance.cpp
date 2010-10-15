@@ -118,6 +118,15 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
         instance_[name] = t;
         return t;
     }
+    if (type == "Boat terminal") {}
+    if (type == "Boat segment") {}
+    if (type == "Plane terminal") {}
+    if (type == "Plane segment") {}
+    if (type == "Port") {}
+    if (type == "Customer") {}
+    if (type == "Stats") {}
+    if (type == "Fleet") {}
+    if (type == "Conn") {}
     return NULL;
 }
 

@@ -1,0 +1,18 @@
+Before removing segments from testPort:
+truckSeg1
+boatSeg1
+planeSeg1
+boatSeg2
+truckSeg2
+planeSeg2
+After re-sourcing planeSeg1:
+truckSeg1
+boatSeg1
+boatSeg2
+truckSeg2
+planeSeg2
+After deleting truckSeg2:
+truckSeg1
+boatSeg1
+boatSeg2
+planeSeg2

@@ -1,0 +1,94 @@
+**** explore customer1 : distance 1000 ****
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1
+
+**** explore customer1 : distance 1500 ****
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1
+
+**** explore customer1 : distance 2050 ****
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1
+
+**** explore customer1 : distance 2999 ****
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3
+
+**** explore customer1 : distance 3001 ****
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(planeSeg5:1000.00:planeSeg6) port2
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3(truckSeg4:450.00:truckSeg3) truckTerm1
+
+**** explore customer1 : distance 3201 ****
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(planeSeg5:1000.00:planeSeg6) port2
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3(truckSeg4:450.00:truckSeg3) truckTerm1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3(boatSeg6:650.00:boatSeg5) port2
+
+**** explore customer1 : distance 3251 ****
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(planeSeg5:1000.00:planeSeg6) port2
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3(truckSeg4:450.00:truckSeg3) truckTerm1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3(truckSeg4:450.00:truckSeg3) truckTerm1(truckSeg2:250.00:truckSeg1) customer3
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3(boatSeg6:650.00:boatSeg5) port2
+
+**** explore customer1 : distance 4001 ****
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(planeSeg5:1000.00:planeSeg6) port2
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(planeSeg5:1000.00:planeSeg6) port2(boatSeg4:1000.00:boatSeg3) boatTerm1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(planeSeg5:1000.00:planeSeg6) port2(boatSeg5:650.00:boatSeg6) port3
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3(truckSeg4:450.00:truckSeg3) truckTerm1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3(truckSeg4:450.00:truckSeg3) truckTerm1(truckSeg2:250.00:truckSeg1) customer3
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3(boatSeg6:650.00:boatSeg5) port2
+
+**** explore customer1 : distance 4301 ****
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(planeSeg5:1000.00:planeSeg6) port2
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(planeSeg5:1000.00:planeSeg6) port2(boatSeg4:1000.00:boatSeg3) boatTerm1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(planeSeg5:1000.00:planeSeg6) port2(boatSeg4:1000.00:boatSeg3) boatTerm1(boatSeg2:300.00:boatSeg1) customer2
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(planeSeg5:1000.00:planeSeg6) port2(boatSeg5:650.00:boatSeg6) port3
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(planeSeg5:1000.00:planeSeg6) port2(boatSeg5:650.00:boatSeg6) port3(truckSeg4:450.00:truckSeg3) truckTerm1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3(truckSeg4:450.00:truckSeg3) truckTerm1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3(truckSeg4:450.00:truckSeg3) truckTerm1(truckSeg2:250.00:truckSeg1) customer3
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3(boatSeg6:650.00:boatSeg5) port2
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3(boatSeg6:650.00:boatSeg5) port2(boatSeg4:1000.00:boatSeg3) boatTerm1
+
+**** explore customer1 : distance 4401 ****
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(planeSeg5:1000.00:planeSeg6) port2
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(planeSeg5:1000.00:planeSeg6) port2(boatSeg4:1000.00:boatSeg3) boatTerm1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(planeSeg5:1000.00:planeSeg6) port2(boatSeg4:1000.00:boatSeg3) boatTerm1(boatSeg2:300.00:boatSeg1) customer2
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(planeSeg5:1000.00:planeSeg6) port2(boatSeg5:650.00:boatSeg6) port3
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(planeSeg5:1000.00:planeSeg6) port2(boatSeg5:650.00:boatSeg6) port3(truckSeg4:450.00:truckSeg3) truckTerm1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(planeSeg5:1000.00:planeSeg6) port2(boatSeg5:650.00:boatSeg6) port3(truckSeg4:450.00:truckSeg3) truckTerm1(truckSeg2:250.00:truckSeg1) customer3
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3(truckSeg4:450.00:truckSeg3) truckTerm1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3(truckSeg4:450.00:truckSeg3) truckTerm1(truckSeg2:250.00:truckSeg1) customer3
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3(boatSeg6:650.00:boatSeg5) port2
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3(boatSeg6:650.00:boatSeg5) port2(boatSeg4:1000.00:boatSeg3) boatTerm1
+
+**** explore customer1 : distance 4501 ****
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(planeSeg5:1000.00:planeSeg6) port2
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(planeSeg5:1000.00:planeSeg6) port2(boatSeg4:1000.00:boatSeg3) boatTerm1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(planeSeg5:1000.00:planeSeg6) port2(boatSeg4:1000.00:boatSeg3) boatTerm1(boatSeg2:300.00:boatSeg1) customer2
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(planeSeg5:1000.00:planeSeg6) port2(boatSeg5:650.00:boatSeg6) port3
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(planeSeg5:1000.00:planeSeg6) port2(boatSeg5:650.00:boatSeg6) port3(truckSeg4:450.00:truckSeg3) truckTerm1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(planeSeg5:1000.00:planeSeg6) port2(boatSeg5:650.00:boatSeg6) port3(truckSeg4:450.00:truckSeg3) truckTerm1(truckSeg2:250.00:truckSeg1) customer3
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3(truckSeg4:450.00:truckSeg3) truckTerm1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3(truckSeg4:450.00:truckSeg3) truckTerm1(truckSeg2:250.00:truckSeg1) customer3
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3(boatSeg6:650.00:boatSeg5) port2
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3(boatSeg6:650.00:boatSeg5) port2(boatSeg4:1000.00:boatSeg3) boatTerm1
+customer1(planeSeg1:500.00:planeSeg2) planeTerm1(planeSeg3:1500.00:planeSeg4) port1(truckSeg6:550.00:truckSeg5) port3(boatSeg6:650.00:boatSeg5) port2(boatSeg4:1000.00:boatSeg3) boatTerm1(boatSeg2:300.00:boatSeg1) customer2

@@ -1,0 +1,28 @@
+===== Stats attributes (before disabling expedite support) =====
+ --- Segments --- 
+# Truck segments : 10
+# Boat segments  : 10
+# Plane segments : 10
+Expediting %     : 23.33
+ --- Terminals --- 
+# Truck terminals: 10
+# Boat terminals : 10
+# Plane terminals: 10
+ --- Ports and customers --- 
+# Ports          : 10
+# Customers      : 10
+===== Stats attributes (after disabling expedite support) =====
+Expediting %     : 16.67
+===== Stats attributes (after deleting instances) =====
+ --- Segments --- 
+# Truck segments : 9
+# Boat segments  : 7
+# Plane segments : 10
+Expediting %     : 11.54
+ --- Terminals --- 
+# Truck terminals: 8
+# Boat terminals : 5
+# Plane terminals: 3
+ --- Ports and customers --- 
+# Ports          : 4
+# Customers      : 6

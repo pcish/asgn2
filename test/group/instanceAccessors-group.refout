@@ -1,0 +1,44 @@
+Segment: US101N
+SFO
+32.57
+2.33
+yes
+US101S
+Segment: US101S
+PA
+32.61
+2.46
+yes
+US101N
+Segment: BoatSeg1
+SF
+45.67
+3.01
+no
+BoatSeg2
+Segment: BoatSeg2
+Gates
+55.88
+3.02
+yes
+BoatSeg1
+Segment: PlaneSeg3
+LAX
+413.97
+1.00
+yes
+Segment: PlaneSeg4
+SJC
+415.62
+2.56
+no
+Segment: PlaneSeg5
+SJC
+20.13
+3.30
+no
+Segment: PlaneSeg6
+Stanford
+20.58
+2.89
+yes

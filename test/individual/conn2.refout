@@ -1,0 +1,18 @@
+**** explore customer1 : distance 450 ****
+customer1(truckSeg1:100.00:truckSeg2) port1
+customer1(truckSeg1:100.00:truckSeg2) port1(boatSeg1:200.00:boatSeg2) port2
+customer1(truckSeg1:100.00:truckSeg2) port1(truckSeg3:100.00:truckSeg4) port2
+customer1(truckSeg1:100.00:truckSeg2) port1(truckSeg3:100.00:truckSeg4) port2(boatSeg3:200.00:boatSeg4) customer2
+
+**** explore customer1 : distance 1000 ****
+customer1(truckSeg1:100.00:truckSeg2) port1
+customer1(truckSeg1:100.00:truckSeg2) port1(planeSeg1:400.00:planeSeg2) port2
+customer1(truckSeg1:100.00:truckSeg2) port1(planeSeg1:400.00:planeSeg2) port2(planeSeg3:400.00:planeSeg4) customer2
+customer1(truckSeg1:100.00:truckSeg2) port1(planeSeg1:400.00:planeSeg2) port2(boatSeg3:200.00:boatSeg4) customer2
+customer1(truckSeg1:100.00:truckSeg2) port1(boatSeg1:200.00:boatSeg2) port2
+customer1(truckSeg1:100.00:truckSeg2) port1(boatSeg1:200.00:boatSeg2) port2(planeSeg3:400.00:planeSeg4) customer2
+customer1(truckSeg1:100.00:truckSeg2) port1(boatSeg1:200.00:boatSeg2) port2(boatSeg3:200.00:boatSeg4) customer2
+customer1(truckSeg1:100.00:truckSeg2) port1(truckSeg3:100.00:truckSeg4) port2
+customer1(truckSeg1:100.00:truckSeg2) port1(truckSeg3:100.00:truckSeg4) port2(planeSeg3:400.00:planeSeg4) customer2
+customer1(truckSeg1:100.00:truckSeg2) port1(truckSeg3:100.00:truckSeg4) port2(boatSeg3:200.00:boatSeg4) customer2
+
