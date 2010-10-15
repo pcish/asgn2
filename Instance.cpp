@@ -45,9 +45,12 @@ public:
     // Instance method
     void attributeIs(const string& name, const string& v);
 
+protected:
+    Ptr<Location> location_;
+
 private:
     Ptr<ManagerImpl> manager_;
-
+    map<string, Segment> segments;
     int segmentNumber(const string& name);
 
 };
@@ -59,6 +62,7 @@ public:
         LocationRep(name, manager)
     {
         // Nothing else to do.
+        location_ = Engine::truckTerminalNew();
     }
 
 };
@@ -78,6 +82,9 @@ public:
     // Instance method
     void attributeIs(const string& name, const string& v);
 
+protected:
+    Ptr<Segment> segment_;
+
 private:
     Ptr<ManagerImpl> manager_;
 
@@ -92,10 +99,9 @@ public:
         SegmentRep(name, manager)
     {
         // Nothing else to do.
-        s = Engine::truckSegmentNew();
+        segment_ = Engine::truckSegmentNew();
     }
-private:
-    Ptr<Segment> s;
+
 };
 
 ManagerImpl::ManagerImpl() {
@@ -129,7 +135,6 @@ string LocationRep::attribute(const string& name) {
     int i = segmentNumber(name);
     if (i != 0) {
         cout << "Tried to read interface " << i;
-        cout <<
     }
     return "";
 }
@@ -150,6 +155,9 @@ string SegmentRep::attribute(const string& name) {
 
 void SegmentRep::attributeIs(const string& name, const string& v) {
     //nothing to do
+    if (name == "source") {
+        //segment_.sourceIs();
+    }
 }
 
 static const string segmentStr = "segment";
