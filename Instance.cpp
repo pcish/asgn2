@@ -62,7 +62,7 @@ public:
         LocationRep(name, manager)
     {
         // Nothing else to do.
-        location_ = Engine::truckTerminalNew();
+//        location_ = Engine::truckTerminalNew();
     }
 
 };
@@ -99,7 +99,7 @@ public:
         SegmentRep(name, manager)
     {
         // Nothing else to do.
-        segment_ = Engine::truckSegmentNew();
+        //segment_ = Engine::truckSegmentNew();
     }
 
 };
