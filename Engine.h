@@ -10,15 +10,6 @@
 namespace Shipping {
 
 // Create your rep/engine interface here.
-class Engine {
- public:
-  class Location;
-
-  class Segment;
-
-  static Ptr<Terminal> terminalNew();  
-  static Ptr<TruckSegment> truckSegmentNew();
-};
 /*
 class Package;
 class Shipment {
@@ -31,13 +22,20 @@ class Port : public Location;
 class Terminal : public Location;
 class Fleet;
 */
-
-class Engine::Terminal {
-public:
+enum TransportationMode {
+    truck, boat, plane    
+};
+class Location : public Fwk::PtrInterface<Location>{
+};
+class Customer : public Location {
+};
+class Port : public Location {
 
 };
-class Segment : public Fwk::PtrInterface<Segment> {
+class Terminal : public Location {
+};
 
+class Segment : public Fwk::PtrInterface<Segment> {
 /*  VehicleType mode;
   Location source;
   Distance length;
@@ -45,8 +43,19 @@ class Segment : public Fwk::PtrInterface<Segment> {
   Difficulty difficulty;
   ExpediteSupport expediteSupport;*/
 };
+class Fleet {
 
-class Engine::TruckSegment : public Engine::Segment {
+};
+
+
+class Engine {
+public:
+  static Ptr<Customer> customerNew();
+  static Ptr<Port> portNew ();
+  static Ptr<Terminal> terminalNew ();
+  static Ptr<Segment> segmentNew();
+  static Ptr<Fleet> fleetNew ();
+
 };
 
 } /* end namespace */
