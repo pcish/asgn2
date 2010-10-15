@@ -1,0 +1,13 @@
+**** explore customer1 : distance 1500 ****
+customer1(truckSeg1:900.00:truckSeg2) port1
+customer1(truckSeg1:900.00:truckSeg2) port1(boatSeg2:400.00:boatSeg1) customer2
+
+**** explore customer1 : distance 2000 ****
+customer1(truckSeg1:900.00:truckSeg2) port1
+customer1(truckSeg1:900.00:truckSeg2) port1(boatSeg2:400.00:boatSeg1) customer2
+customer1(truckSeg1:900.00:truckSeg2) port1(planeSeg2:1000.00:planeSeg1) customer3
+
+**** explore customer5 : distance 5000 ****
+customer5(truckSeg5:200.00:truckSeg6) truckTerm1
+customer5(truckSeg5:200.00:truckSeg6) truckTerm1(truckSeg4:100.00:truckSeg3) customer4
+

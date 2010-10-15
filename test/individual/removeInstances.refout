@@ -1,0 +1,39 @@
+Segment found: US101N
+Segment found: US101S
+Segment found: BoatSeg1
+Segment found: BoatSeg2
+Segment found: PlaneSeg3
+Segment found: PlaneSeg4
+Location found: SFO
+Location found: LAX
+Location found: SJC
+Location found: SF
+Location found: PA
+Location found: Stanford
+Location found: Gates
+Segment found: US101N
+Segment found: US101S
+Segment not found: BoatSeg1
+Segment found: BoatSeg2
+Segment found: PlaneSeg3
+Segment not found: PlaneSeg4
+Location found: SFO
+Location found: LAX
+Location found: SJC
+Location not found: SF
+Location not found: PA
+Location found: Stanford
+Location found: Gates
+Segment found: US101N
+Segment not found: US101S
+Segment not found: BoatSeg1
+Segment not found: BoatSeg2
+Segment found: PlaneSeg3
+Segment not found: PlaneSeg4
+Location found: SFO
+Location found: LAX
+Location not found: SJC
+Location not found: SF
+Location not found: PA
+Location not found: Stanford
+Location found: Gates

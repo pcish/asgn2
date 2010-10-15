@@ -1,0 +1,10 @@
+===== Fleet attributes =====
+[Truck]
+Speed: 80.00
+Capacity: 50
+[Boat]
+Speed: 60.00
+Capacity: 600
+[Plane]
+Speed: 400.00
+Capacity: 150

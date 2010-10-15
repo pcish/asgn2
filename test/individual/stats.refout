@@ -1,0 +1,24 @@
+===== Stats attributes (before deleting instances) =====
+ --- Segments --- 
+# Truck segments : 10
+# Boat segments  : 10
+# Plane segments : 10
+ --- Terminals --- 
+# Truck terminals: 10
+# Boat terminals : 10
+# Plane terminals: 10
+ --- Ports and customers --- 
+# Ports          : 10
+# Customers      : 10
+===== Stats attributes (after deleting instances) =====
+ --- Segments --- 
+# Truck segments : 9
+# Boat segments  : 7
+# Plane segments : 10
+ --- Terminals --- 
+# Truck terminals: 8
+# Boat terminals : 5
+# Plane terminals: 3
+ --- Ports and customers --- 
+# Ports          : 4
+# Customers      : 6

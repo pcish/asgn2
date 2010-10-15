@@ -1,0 +1,22 @@
+**** explore customer1 : distance 1000 ****
+customer1(truckSeg1:100.00:truckSeg2) port1
+customer1(truckSeg1:100.00:truckSeg2) port1(planeSeg1:400.00:planeSeg2) port2
+customer1(truckSeg1:100.00:truckSeg2) port1(planeSeg1:400.00:planeSeg2) port2(planeSeg3:400.00:planeSeg4) customer2
+customer1(truckSeg1:100.00:truckSeg2) port1(planeSeg1:400.00:planeSeg2) port2(boatSeg3:200.00:boatSeg4) customer2
+customer1(truckSeg1:100.00:truckSeg2) port1(boatSeg1:200.00:boatSeg2) port2
+customer1(truckSeg1:100.00:truckSeg2) port1(boatSeg1:200.00:boatSeg2) port2(planeSeg3:400.00:planeSeg4) customer2
+customer1(truckSeg1:100.00:truckSeg2) port1(boatSeg1:200.00:boatSeg2) port2(boatSeg3:200.00:boatSeg4) customer2
+customer1(truckSeg1:100.00:truckSeg2) port1(truckSeg3:100.00:truckSeg4) port2
+customer1(truckSeg1:100.00:truckSeg2) port1(truckSeg3:100.00:truckSeg4) port2(planeSeg3:400.00:planeSeg4) customer2
+customer1(truckSeg1:100.00:truckSeg2) port1(truckSeg3:100.00:truckSeg4) port2(boatSeg3:200.00:boatSeg4) customer2
+
+**** connect customer1 : customer2 ****
+16600.00 3.25 no; customer1(truckSeg1:100.00:truckSeg2) port1(planeSeg1:400.00:planeSeg2) port2(planeSeg3:400.00:planeSeg4) customer2
+9400.00 6.25 no; customer1(truckSeg1:100.00:truckSeg2) port1(planeSeg1:400.00:planeSeg2) port2(boatSeg3:200.00:boatSeg4) customer2
+9400.00 6.25 no; customer1(truckSeg1:100.00:truckSeg2) port1(boatSeg1:200.00:boatSeg2) port2(planeSeg3:400.00:planeSeg4) customer2
+2200.00 9.25 no; customer1(truckSeg1:100.00:truckSeg2) port1(boatSeg1:200.00:boatSeg2) port2(boatSeg3:200.00:boatSeg4) customer2
+9200.00 3.50 no; customer1(truckSeg1:100.00:truckSeg2) port1(truckSeg3:100.00:truckSeg4) port2(planeSeg3:400.00:planeSeg4) customer2
+2000.00 6.50 no; customer1(truckSeg1:100.00:truckSeg2) port1(truckSeg3:100.00:truckSeg4) port2(boatSeg3:200.00:boatSeg4) customer2
+24900.00 2.50 yes; customer1(truckSeg1:100.00:truckSeg2) port1(planeSeg1:400.00:planeSeg2) port2(planeSeg3:400.00:planeSeg4) customer2
+13800.00 2.69 yes; customer1(truckSeg1:100.00:truckSeg2) port1(truckSeg3:100.00:truckSeg4) port2(planeSeg3:400.00:planeSeg4) customer2
+

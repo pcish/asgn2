@@ -1,0 +1,12 @@
+**** explore customer1 : distance 1500 ****
+customer1(truckSeg1:900.00:truckSeg2) port1
+customer1(truckSeg1:900.00:truckSeg2) port1(boatSeg2:400.00:boatSeg1) customer2
+
+**** explore customer5 : distance 5000 ****
+customer5(truckSeg5:200.00:truckSeg6) truckTerm1
+customer5(truckSeg5:200.00:truckSeg6) truckTerm1(truckSeg4:100.00:truckSeg3) customer4
+
+*** connect customer3 : customer1 ****
+25400.00 13.75 no; customer3(planeSeg1:1000.00:planeSeg2) port1(truckSeg2:900.00:truckSeg1) customer1
+38100.00 10.58 yes; customer3(planeSeg1:1000.00:planeSeg2) port1(truckSeg2:900.00:truckSeg1) customer1
+
