@@ -3,13 +3,15 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include <list>
+#include <exception>
 
 using namespace std;
 #include "Ptr.h"
 #include "PtrInterface.h"
 #include "Instance.h"
-
+#include "Nominal.h"
 
 namespace Shipping {
 
@@ -27,75 +29,52 @@ class Terminal : public Location;
 class Fleet;
 */
 
-//I'm not sure if this is needed to detect invalid attribute values (negative values), or maybe it's ok to put the detection work to rep layer?
-class UF32 {
-private:
-    float value_;
-    bool validValue (float _value) {
-        if (_value < 0){
-            cerr << "Invalid Value for UF32: " << _value << " < 0" << endl;
-            return false;
-        }
-        return true;
+class Error : public std::exception {
+  public:
+    Error(string errorMessage) : std::exception() {
+        errorMessage_ = errorMessage;
     }
-public:
-    UF32 (float _value = 0) {
-        if (validValue (_value))
-           value_ = _value;
-        else
-           value_ = 0;
+    ~Error() throw();
+    virtual const char* what() const throw() {
+        return errorMessage_.c_str();
     }
-    float value() {return value_;}
-    UF32 operator=(float _value) {
-        if (validValue(_value) ) 
-            value_ = _value;
-        return *this;
-    }
-    bool operator<(UF32 target){ return value_ < target.value_; } 
-    bool operator==(UF32 target){ return value_ == target.value_; } 
-    bool operator!=(UF32 target){ return value_ != target.value_; } 
-    bool operator>(UF32 target){ return value_ > target.value_; } 
-    UF32 operator+(UF32 target){ 
-        float result = value_ + target.value_; 
-        if (validValue(result) ) {
-            return result;
-        }
-        return 0;
-    }
-    UF32 operator-(UF32 target){ 
-        float result = value_ + target.value_; 
-        if (validValue(result) ) {
-            return result;
-        }
-        return 0;
-    }
-    UF32 operator*(UF32 target){ 
-        float result = value_ * target.value_; 
-        if (validValue(result) ) {
-            return result;
-        }
-        return 0;
-    }
-    UF32 operator/(UF32 target){   // / won't over/under flow
-        float result = value_ / target.value_; 
-        return result;
-    }
-    UF32 operator++() {
-        if (validValue (value_ + 1) ){
-            value_++;            
-        }
-        return *this;
-    }
-    UF32 operator--() {
-        if (validValue (value_ - 1) ){
-            value_--;            
-        }
-        return *this;
+  private:
+    string errorMessage_;
+};
+
+class ValueError : public Error {
+  public:
+    ValueError(string errorMessage) : Error(errorMessage) {
     }
 };
-//typedef unsigned float UF32;
+
+class Mile : public Ordinal<Mile, unsigned int> {
+  public:
+    Mile(unsigned int num) : Ordinal<Mile, unsigned int>(num) {
+    }
+};
+
+class USD : public Ordinal<USD, double> {
+  public:
+    USD(double num) : Ordinal<USD, double>(num) {
+    }
+};
+
+class PackageUnit : public Ordinal<PackageUnit, unsigned int> {
+  public:
+    PackageUnit(unsigned int num) : Ordinal<PackageUnit, unsigned int>(num) {
+    }
+};
+
+class SegmentDifficultyUnit : public Ordinal<SegmentDifficultyUnit, float> {
+  public:
+    SegmentDifficultyUnit(float num) : Ordinal<SegmentDifficultyUnit, float>(num) {
+        if (num < 1.0 || num > 5.0) throw ValueError("Segment Difficulty must lie between 1.0 and 5.0");
+    }
+};
+
 enum TransportationMode {
-    truck, boat, plane    
+    truck, boat, plane
 };
 //store name in each entity?
 
@@ -110,8 +89,9 @@ public:
     Segment segment (unsigned int index);
     
 protected:
-    vector <Segment*> segments_;    
+    vector<Segment *> segments_;    
 };
+
 class Customer : public Location {
 };
 class Port : public Location {
@@ -132,30 +112,28 @@ private:
 class Segment : public Fwk::PtrInterface<Segment> {
 public:
     Segment (TransportationMode _transMode);
-    TransportationMode transportationMode ();
-    void transportationModeIs (TransportationMode _transMode);
+    TransportationMode transportationMode () {return transMode_;}
+//    void transportationModeIs (TransportationMode _transMode);
 private:
     TransportationMode transMode_;
     Ptr<Location> source_;
-    UF32 length_; // need to be modified
+    Mile length_; // need to be modified
     Ptr<Segment> returnSegment_;
-    UF32 difficulty_;
+    SegmentDifficultyUnit difficulty_;
     bool expediteSupport_;
-/*  VehicleType mode;
-  Location source;
-  Distance length;
-  Segment *returnSegment;
-  Difficulty difficulty;
-  ExpediteSupport expediteSupport;*/
 };
 class Fleet {
 public:
-    Fleet (TransportationMode _transMode);
-    TransportationMode transportationMode ();
+    static Fleet* instance();
+
+    TransportationMode transportationMode();
     void transportationModeIs (TransportationMode _transMode);
 private:
+    Fleet(TransportationMode _transMode);
     TransportationMode transMode_;
-    UF32 speed, capacity, cost;
+    Mile speed;
+    PackageUnit capacity;
+    USD cost;
 
 };
 

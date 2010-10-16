@@ -31,7 +31,7 @@ void Terminal::segmentIs (Segment *seg) {
         cerr << "Can't add NULL segment" << endl;
         return;
     }
-    else if (seg->TransportationMode() != transMode_ ) {
+    else if (seg->transportationMode() != transMode_ ) {
         cerr << "Terminal must connect two segments with the same transportation mode" << endl;
         return;
     }
