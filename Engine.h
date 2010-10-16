@@ -3,11 +3,12 @@
 
 #include <string>
 #include <list>
+#include <exception>
 
 #include "Ptr.h"
 #include "PtrInterface.h"
 #include "Instance.h"
-
+#include "Nominal.h"
 
 namespace Shipping {
 
@@ -24,17 +25,62 @@ class Port : public Location;
 class Terminal : public Location;
 class Fleet;
 */
-typedef unsigned int U32;
+
+class Error : public std::exception {
+  public:
+    Error(string errorMessage) : std::exception() {
+        errorMessage_ = errorMessage;
+    }
+    ~Error() throw();
+    virtual const char* what() const throw() {
+        return errorMessage_.c_str();
+    }
+  private:
+    string errorMessage_;
+};
+
+class ValueError : public Error {
+  public:
+    ValueError(string errorMessage) : Error(errorMessage) {
+    }
+};
+
+class Mile : public Ordinal<Mile, unsigned int> {
+  public:
+    Mile(unsigned int num) : Ordinal<Mile, unsigned int>(num) {
+    }
+};
+
+class USD : public Ordinal<USD, double> {
+  public:
+    USD(double num) : Ordinal<USD, double>(num) {
+    }
+};
+
+class PackageUnit : public Ordinal<PackageUnit, unsigned int> {
+  public:
+    PackageUnit(unsigned int num) : Ordinal<PackageUnit, unsigned int>(num) {
+    }
+};
+
+class SegmentDifficultyUnit : public Ordinal<SegmentDifficultyUnit, float> {
+  public:
+    SegmentDifficultyUnit(float num) : Ordinal<SegmentDifficultyUnit, float>(num) {
+        if (num < 1.0 || num > 5.0) throw ValueError("Segment Difficulty must lie between 1.0 and 5.0");
+    }
+};
+
 enum TransportationMode {
-    truck, boat, plane    
+    truck, boat, plane
 };
 
 class Segment;
 class Location : public Fwk::PtrInterface<Location>{
 
-protected:
+  protected:
     List<Segment> segments_;
 };
+
 class Customer : public Location {
 };
 class Port : public Location {
@@ -57,9 +103,9 @@ public:
 private:
     TransportationMode transMode_;
     Ptr<Location> source_;
-    U32 length_; // need to be modified
+    Mile length_; // need to be modified
     Ptr<Segment> returnSegment_;
-    U32 difficulty_;
+    SegmentDifficultyUnit difficulty_;
     bool expediteSupport_;
 /*  VehicleType mode;
   Location source;
@@ -70,12 +116,16 @@ private:
 };
 class Fleet {
 public:
-    Fleet (TransportationMode _transMode);
-    TransportationMode transportationMode ();
+    static Fleet* instance();
+
+    TransportationMode transportationMode();
     void transportationModeIs (TransportationMode _transMode);
 private:
+    Fleet(TransportationMode _transMode);
     TransportationMode transMode_;
-    U32 speed, capacity, cost;
+    Mile speed;
+    PackageUnit capacity;
+    USD cost;
 
 };
 
