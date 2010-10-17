@@ -151,6 +151,7 @@ ManagerImpl::ManagerImpl() {
 Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
     if (instance_.find(name) != instance_.end() ){
         cerr << "Attempt to new instances of the same names!" << endl;
+        return NULL;
     }
     if (type == "Truck terminal") {
         Ptr<TerminalRep> t = new TerminalRep(name, this, Segment::truck() );
