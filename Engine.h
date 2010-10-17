@@ -32,12 +32,29 @@ class Fleet;
 
 
 
-enum TransportationMode {
-    truck, boat, plane
-};
 //store name in each entity?
 
-class Segment;
+class Location;
+
+class Segment : public Fwk::PtrInterface<Segment> {
+public:
+    enum TransportationMode {
+        truck_, boat_, plane_
+    };
+    static inline TransportationMode truck () {return truck_; }
+    static inline TransportationMode boat () {return boat_; }
+    static inline TransportationMode plane () {return plane_; }
+    Segment (TransportationMode _transMode);
+    TransportationMode transportationMode () {return transMode_;}
+
+private:
+    Segment::TransportationMode transMode_;
+    Ptr<Location> source_;
+    Mile length_; // need to be modified
+    Ptr<Segment> returnSegment_;
+    SegmentDifficultyUnit difficulty_;
+    bool expediteSupport_;
+};
 
 class Location : public Fwk::PtrInterface<Location>{
 public:
@@ -59,38 +76,25 @@ class Port : public Location {
 };
 class Terminal : public Location {
 public:
-    Terminal (TransportationMode _transMode) : transMode_ (_transMode) {}
-    TransportationMode transportationMode () { return transMode_; }
+    Terminal (Segment::TransportationMode _transMode) : transMode_ (_transMode) {}
+    Segment::TransportationMode transportationMode () { return transMode_; }
     //a terminal's type should be assigned at the beginning and cannot withstand changing after instantiated
-    //void transportationModeIs (TransportationMode _transMode);
+    //void transportationModeIs (Segment::TransportationMode _transMode);
     virtual void segmentIs (Ptr<Segment> seg);
     virtual void segmentIs (unsigned int index, Ptr<Segment> seg);
 private:
-    TransportationMode transMode_;
+    Segment::TransportationMode transMode_;
 };
 
-class Segment : public Fwk::PtrInterface<Segment> {
-public:
-    Segment (TransportationMode _transMode);
-    TransportationMode transportationMode () {return transMode_;}
-//    void transportationModeIs (TransportationMode _transMode);
-private:
-    TransportationMode transMode_;
-    Ptr<Location> source_;
-    Mile length_; // need to be modified
-    Ptr<Segment> returnSegment_;
-    SegmentDifficultyUnit difficulty_;
-    bool expediteSupport_;
-};
 class Fleet {
 public:
     static Ptr<Fleet> instance();
 
-    TransportationMode transportationMode();
-    void transportationModeIs (TransportationMode _transMode);
+    Segment::TransportationMode transportationMode();
+    void transportationModeIs (Segment::TransportationMode _transMode);
 private:
-    Fleet(TransportationMode _transMode);
-    TransportationMode transMode_;
+    Fleet(Segment::TransportationMode _transMode);
+    Segment::TransportationMode transMode_;
     Mile speed;
     PackageUnit capacity;
     USD cost;
@@ -102,7 +106,7 @@ class Engine {
 public:
   static Ptr<Customer> customerNew();
   static Ptr<Port> portNew ();
-  static Ptr<Terminal> terminalNew (TransportationMode);
+  static Ptr<Terminal> terminalNew (Segment::TransportationMode);
   static Ptr<Segment> segmentNew();
   static Ptr<Fleet> fleetNew ();
 

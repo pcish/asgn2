@@ -74,20 +74,20 @@ public:
 class TerminalRep : public LocationRep {
 public:
 
-    TerminalRep(const string& name, ManagerImpl *manager, TransportationMode _mode) :
+    TerminalRep(const string& name, ManagerImpl *manager, Segment::TransportationMode _mode) :
         LocationRep(name, manager), mode_(_mode)
     {
 //        location_ = Engine::truckTerminalNew();
     }
 protected:
-    TransportationMode mode_;
+    Segment::TransportationMode mode_;
 };
 
 class SegmentRep : public Instance {
 public:
 
-    SegmentRep(const string& name, ManagerImpl* manager) :
-        Instance(name), manager_(manager)
+    SegmentRep(const string& name, ManagerImpl* manager, Segment::TransportationMode _mode) :
+        Instance(name), manager_(manager), mode_ (_mode)
     {
         // Nothing else to do.
     }
@@ -103,18 +103,7 @@ protected:
 private:
     Ptr<ManagerImpl> manager_;
     int segmentNumber(const string& name);
-
-};
-
-class TruckSegmentRep : public SegmentRep {
-public:
-
-    TruckSegmentRep(const string& name, ManagerImpl *manager) :
-        SegmentRep(name, manager)
-    {
-        // Nothing else to do.
-        //segment_ = Engine::truckSegmentNew();
-    }
+    Segment::TransportationMode mode_;
 
 };
 
@@ -164,34 +153,22 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
         cerr << "Attempt to new instances of the same names!" << endl;
     }
     if (type == "Truck terminal") {
-        Ptr<TruckTerminalRep> t = new TruckTerminalRep(name, this);
+        Ptr<TerminalRep> t = new TerminalRep(name, this, Segment::truck() );
         instance_[name] = t;
         return t;
     }
     if (type == "Truck segment") {
-        Ptr<TruckSegmentRep> t = new TruckSegmentRep(name, this);
+        Ptr<SegmentRep> t = new SegmentRep(name, this, Segment::truck());
         instance_[name] = t;
         return t;
     }
     if (type == "Boat terminal") {
-        Ptr<BoatTerminalRep> t = new BoatTerminalRep(name, this);
-        instance_[name] = t;
-        return t;
     }
     if (type == "Boat segment") {
-        Ptr<BoatSegmentRep> t = new BoatSegmentRep(name, this);
-        instance_[name] = t;
-        return t;
     }
     if (type == "Plane terminal") {
-        Ptr<PlaneTerminalRep> t = new PlaneTerminalRep(name, this);
-        instance_[name] = t;
-        return t;
     }
     if (type == "Plane segment") {
-        Ptr<PlaneSegmentRep> t = new PlaneSegmentRep(name, this);
-        instance_[name] = t;
-        return t;
     }
     if (type == "Port") {}
     if (type == "Customer") {}
