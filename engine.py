@@ -4,26 +4,43 @@ import ConfigParser
 class Attr(object):
     type = None
     name = None
-    collection = None
-    def __init__(self, type, name, collection=None):
+    collection = False
+    readonly = False
+    def __init__(self, type, name):
         self.type = type
         self.name = name
-        self.collection = collection
 
     def declaration_str(self):
         ret = StringIO()
-        ret.write('%s %s_;' % (self.type, self.name))
+        if self.collection:
+            ret.write('std::vector<%s> %ss_;' % (self.type, self.name))
+        else:
+            ret.write('%s %s_;' % (self.type, self.name))
         return ret.getvalue()
 
     def mutator_str(self):
+        if self.readonly:
+            return ''
         ret = StringIO()
-        ret.write('void {name}Is(const {type} {name}) {{ {name}_ = {name}; }}'.format(type=self.type, name=self.name));
+        if self.collection:
+            ret.write('void {name}Is(const {type} {name}) {{ {name}s_.push_back({name}); }}'.format(type=self.type, name=self.name));
+        else:
+            ret.write('void {name}Is(const {type} {name}) {{ {name}_ = {name}; }}'.format(type=self.type, name=self.name));
         return ret.getvalue()
 
     def accessor_str(self):
         ret = StringIO()
-        ret.write('{type} {name} const() {{ return {name}_; }}'.format(type=self.type, name=self.name));
+        if self.collection:
+            ret.write('{type} {name} const(const unsigned int index) {{ return {name}s_.at(index); }}'.format(type=self.type, name=self.name));
+        else:
+            ret.write('{type} {name} const() {{ return {name}_; }}'.format(type=self.type, name=self.name));
         return ret.getvalue()
+
+    def isReadonly(self):
+        self.readonly = True
+
+    def isCollection(self):
+        self.collection = True
 
 class Entity(object):
     attrs = []
@@ -46,8 +63,9 @@ class Entity(object):
         ret.write('  public:\n')
         for attr in self.attrs:
             ret.write('    %s\n' % attr.accessor_str())
-            ret.write('    %s\n' % attr.mutator_str())
-        ret.write('  private:\n')
+            if not attr.readonly:
+                ret.write('    %s\n' % attr.mutator_str())
+        ret.write('\n  private:\n')
         for attr in self.attrs:
             ret.write('    %s\n' % attr.declaration_str())
         ret.write('};\n')
@@ -67,5 +85,11 @@ if __name__ == "__main__":
         for attr, type in config.items(section):
             if attr == baseclassOpt:
                 continue
-            c.attrIs(Attr(type, attr))
+            (type, _, modifiers) = type.partition('$')
+            a = Attr(type, attr)
+            if modifiers.find('R') >= 0:
+                a.isReadonly()
+            if modifiers.find('C') >= 0:
+                a.isCollection()
+            c.attrIs(a)
         print c
