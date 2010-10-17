@@ -103,43 +103,43 @@ public:
     }
 
 };
-class Stats : public Instance {
+class StatsRep : public Instance {
 public:
     string attribute (const string &name) {}
     void attributeIs(const string& name, const string& v) {}
-    static Ptr<Stats> instance (const string& name, ManagerImpl *manager) {
+    static Ptr<StatsRep> instance (const string& name, ManagerImpl *manager) {
         if (instance_ == NULL)
-            instance_ = new Stats (name, manager);
+            instance_ = new StatsRep (name, manager);
         return instance_;
     }
 protected:
-    Stats (const string& name, ManagerImpl *manager) : 
+    StatsRep (const string& name, ManagerImpl *manager) : 
         Instance(name), manager_(manager)
         { instance_ = this; }
 private:
     Ptr<ManagerImpl> manager_;
-    static Ptr<Stats> instance_;
+    static Ptr<StatsRep> instance_;
 };
-Ptr<Stats> Stats::instance_ = NULL;
+Ptr<StatsRep> StatsRep::instance_ = NULL;
 
-class Conn : public Instance {
+class ConnRep : public Instance {
 public:
     string attribute(const string& name) {}
     void attributeIs(const string& name, const string& v) {}
-    static Ptr<Conn> instance (const string &name, ManagerImpl *manager) {
+    static Ptr<ConnRep> instance (const string &name, ManagerImpl *manager) {
         if (instance_ == NULL) 
-            instance_ = new Conn (name, manager);
+            instance_ = new ConnRep (name, manager);
         return instance_;
     }
 protected:
-    Conn (const string& name, ManagerImpl *manager) :
+    ConnRep (const string& name, ManagerImpl *manager) :
         Instance(name), manager_(manager)
     { instance_ = this;   }
 private:
     Ptr<ManagerImpl> manager_;
-    static Ptr<Conn> instance_;
+    static Ptr<ConnRep> instance_;
 };
-Ptr<Conn> Conn::instance_ = NULL;
+Ptr<ConnRep> ConnRep::instance_ = NULL;
 
 ManagerImpl::ManagerImpl() {
 }
@@ -164,14 +164,14 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
     if (type == "Plane segment") {}
     if (type == "Port") {}
     if (type == "Customer") {}
-    if (type == "Stats") {
-        Ptr<Stats> t = Stats::instance (name, this);
+    if (type == "StatsRep") {
+        Ptr<StatsRep> t = StatsRep::instance (name, this);
         instance_[name] = t;
         return t;    
     }
     if (type == "Fleet") {}
-    if (type == "Conn") {
-        Ptr<Conn> t = Conn::instance (name, this);
+    if (type == "ConnRep") {
+        Ptr<ConnRep> t = ConnRep::instance (name, this);
         instance_[name] = t;
         return t;
     }
