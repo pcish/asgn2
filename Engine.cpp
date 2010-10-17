@@ -5,14 +5,14 @@
 
 namespace Shipping {
 
-void Location::segmentIs (Segment *seg) {
+void Location::segmentIs (Ptr<Segment> seg) {
     if (seg == NULL) {
         cerr << "Can't add NULL segment" << endl;
         return;
     }
     segments_.push_back (seg);
 }
-void Location::segmentIs (unsigned int index, Segment *seg) {    
+void Location::segmentIs (unsigned int index, Ptr<Segment> seg) {    
     if (index < 0 || index >= segments_.size() ) {
         cerr <<  "Index out of bound exception" << endl;
         return;
@@ -26,7 +26,7 @@ void Location::segmentIs (unsigned int index, Segment *seg) {
 }
 unsigned int Location::segments () { return segments_.size(); }
 
-void Terminal::segmentIs (Segment *seg) {
+void Terminal::segmentIs (Ptr<Segment> seg) {
     if (seg == NULL) {// empty
         cerr << "Can't add NULL segment" << endl;
         return;
@@ -37,7 +37,7 @@ void Terminal::segmentIs (Segment *seg) {
     }
     Location::segmentIs (seg);
 }
-void Terminal::segmentIs (unsigned int index, Segment *seg) {
+void Terminal::segmentIs (unsigned int index, Ptr<Segment> seg) {
     if (seg != NULL && seg->transportationMode() != transMode_ ) {// insert node rather than delete
         cerr << "Terminal must connect two segments with the same transportation mode" << endl;
         return;

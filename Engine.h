@@ -41,14 +41,15 @@ class Segment;
 
 class Location : public Fwk::PtrInterface<Location>{
 public:
+    
     //declared virtual because subclasses may have additional contraints on the type of segment that connects
-    virtual void segmentIs (Segment *seg);
-    virtual void segmentIs (unsigned int index, Segment *seg); // assign segment for nth segment
+    virtual void segmentIs (Ptr<Segment> seg);
+    virtual void segmentIs (unsigned int index, Ptr<Segment> seg); // assign segment for nth segment
     unsigned int segments ();
     Segment segment (unsigned int index);
 
 protected:
-    vector<Segment *> segments_;
+    vector<Ptr<Segment> > segments_;
 };
 
 class Customer : public Location {
@@ -62,8 +63,8 @@ public:
     TransportationMode transportationMode () { return transMode_; }
     //a terminal's type should be assigned at the beginning and cannot withstand changing after instantiated
     //void transportationModeIs (TransportationMode _transMode);
-    virtual void segmentIs (Segment *seg);
-    virtual void segmentIs (unsigned int index, Segment *seg);
+    virtual void segmentIs (Ptr<Segment> seg);
+    virtual void segmentIs (unsigned int index, Ptr<Segment> seg);
 private:
     TransportationMode transMode_;
 };
@@ -83,7 +84,7 @@ private:
 };
 class Fleet {
 public:
-    static Fleet* instance();
+    static Ptr<Fleet> instance();
 
     TransportationMode transportationMode();
     void transportationModeIs (TransportationMode _transMode);

@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include <iostream>
+#include <stdlib.h>
 #include <map>
 #include <vector>
 #include "Instance.h"
@@ -34,10 +34,7 @@ class LocationRep : public Instance {
 public:
 
     LocationRep(const string& name, ManagerImpl* manager) :
-        Instance(name), manager_(manager)
-    {
-        // Nothing else to do.
-    }
+        Instance(name), manager_(manager) {}
 
     // Instance method
     string attribute(const string& name);
@@ -50,21 +47,40 @@ protected:
 
 private:
     Ptr<ManagerImpl> manager_;
-    map<string, Segment> segments;
+    map<string, Segment> segments; // do we need segment here or in Location?
     int segmentNumber(const string& name);
 
 };
-
-class TruckTerminalRep : public LocationRep {
+class PortRep : public LocationRep {
 public:
-
-    TruckTerminalRep(const string& name, ManagerImpl *manager) :
+    PortRep(const string& name, ManagerImpl *manager) :
         LocationRep(name, manager)
     {
-        // Nothing else to do.
 //        location_ = Engine::truckTerminalNew();
     }
 
+};
+class CustomerRep : public LocationRep {
+public:
+    CustomerRep(const string& name, ManagerImpl *manager) :
+        LocationRep(name, manager)
+    {
+//        location_ = Engine::truckTerminalNew();
+    }
+
+};
+
+
+class TerminalRep : public LocationRep {
+public:
+
+    TerminalRep(const string& name, ManagerImpl *manager, TransportationMode _mode) :
+        LocationRep(name, manager), mode_(_mode)
+    {
+//        location_ = Engine::truckTerminalNew();
+    }
+protected:
+    TransportationMode mode_;
 };
 
 class SegmentRep : public Instance {
@@ -83,11 +99,9 @@ public:
     void attributeIs(const string& name, const string& v);
 
 protected:
-    Ptr<Segment> segment_;
-
+    Ptr<Segment> segment_;    
 private:
     Ptr<ManagerImpl> manager_;
-
     int segmentNumber(const string& name);
 
 };
@@ -103,6 +117,7 @@ public:
     }
 
 };
+
 class StatsRep : public Instance {
 public:
     string attribute (const string &name) {}
@@ -158,10 +173,26 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
         instance_[name] = t;
         return t;
     }
-    if (type == "Boat terminal") {}
-    if (type == "Boat segment") {}
-    if (type == "Plane terminal") {}
-    if (type == "Plane segment") {}
+    if (type == "Boat terminal") {
+        Ptr<BoatTerminalRep> t = new BoatTerminalRep(name, this);
+        instance_[name] = t;
+        return t;
+    }
+    if (type == "Boat segment") {
+        Ptr<BoatSegmentRep> t = new BoatSegmentRep(name, this);
+        instance_[name] = t;
+        return t;
+    }
+    if (type == "Plane terminal") {
+        Ptr<PlaneTerminalRep> t = new PlaneTerminalRep(name, this);
+        instance_[name] = t;
+        return t;
+    }
+    if (type == "Plane segment") {
+        Ptr<PlaneSegmentRep> t = new PlaneSegmentRep(name, this);
+        instance_[name] = t;
+        return t;
+    }
     if (type == "Port") {}
     if (type == "Customer") {}
     if (type == "StatsRep") {
