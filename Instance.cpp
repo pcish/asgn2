@@ -103,11 +103,51 @@ public:
     }
 
 };
+class StatsRep : public Instance {
+public:
+    string attribute (const string &name) {}
+    void attributeIs(const string& name, const string& v) {}
+    static Ptr<StatsRep> instance (const string& name, ManagerImpl *manager) {
+        if (instance_ == NULL)
+            instance_ = new StatsRep (name, manager);
+        return instance_;
+    }
+protected:
+    StatsRep (const string& name, ManagerImpl *manager) : 
+        Instance(name), manager_(manager)
+        { instance_ = this; }
+private:
+    Ptr<ManagerImpl> manager_;
+    static Ptr<StatsRep> instance_;
+};
+Ptr<StatsRep> StatsRep::instance_ = NULL;
+
+class ConnRep : public Instance {
+public:
+    string attribute(const string& name) {}
+    void attributeIs(const string& name, const string& v) {}
+    static Ptr<ConnRep> instance (const string &name, ManagerImpl *manager) {
+        if (instance_ == NULL) 
+            instance_ = new ConnRep (name, manager);
+        return instance_;
+    }
+protected:
+    ConnRep (const string& name, ManagerImpl *manager) :
+        Instance(name), manager_(manager)
+    { instance_ = this;   }
+private:
+    Ptr<ManagerImpl> manager_;
+    static Ptr<ConnRep> instance_;
+};
+Ptr<ConnRep> ConnRep::instance_ = NULL;
 
 ManagerImpl::ManagerImpl() {
 }
 
 Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
+    if (instance_.find(name) != instance_.end() ){
+        cerr << "Attempt to new instances of the same names!" << endl;
+    }
     if (type == "Truck terminal") {
         Ptr<TruckTerminalRep> t = new TruckTerminalRep(name, this);
         instance_[name] = t;
@@ -124,9 +164,17 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
     if (type == "Plane segment") {}
     if (type == "Port") {}
     if (type == "Customer") {}
-    if (type == "Stats") {}
+    if (type == "StatsRep") {
+        Ptr<StatsRep> t = StatsRep::instance (name, this);
+        instance_[name] = t;
+        return t;    
+    }
     if (type == "Fleet") {}
-    if (type == "Conn") {}
+    if (type == "ConnRep") {
+        Ptr<ConnRep> t = ConnRep::instance (name, this);
+        instance_[name] = t;
+        return t;
+    }
     return NULL;
 }
 
