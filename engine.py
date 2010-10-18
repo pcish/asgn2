@@ -128,6 +128,7 @@ if __name__ == "__main__":
                 for i in enumitems:
                     e.append(i)
                 c.enumIs(e)
+                continue
             (type, _, modifiers) = type.partition('$')
             a = Attr(type, attr)
             if modifiers.find('R') >= 0:
