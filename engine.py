@@ -87,6 +87,51 @@ class Entity(object):
     def enumIs(self, enum):
         self.enums.append(enum)
 
+    def constructorStr(self):
+        ret = StringIO()
+        roattrs = []
+        for attr in self.attrs:
+            if attr.readonly:
+                roattrs.append(attr)
+        ret.write('%s(' % self.classname)
+        for i in range(len(roattrs)):
+            ret.write('const %s %s' % (roattrs[i].type, roattrs[i].name))
+            if i < len(roattrs) - 1:
+                ret.write(', ')
+        ret.write(')')
+        if len(roattrs) > 0:
+            ret.write(' : ')
+            for i in range(len(roattrs)):
+                ret.write('%s_(%s)' % (roattrs[i].name, roattrs[i].name))
+                if i < len(roattrs) - 1:
+                    ret.write(', ')
+        ret.write(' {}')
+        return ret.getvalue()
+
+    def newInstanceMethodStr(self):
+        ret = StringIO()
+        roattrs = []
+        for attr in self.attrs:
+            if attr.readonly:
+                roattrs.append(attr)
+        ret.write('    static Ptr<%s> %sNew(' % (
+            self.classname,
+            ''.join((self.classname[0].lower(), self.classname[1:]))
+        ))
+        for i in range(len(roattrs)):
+            ret.write('const %s %s' % (roattrs[i].type, roattrs[i].name))
+            if i < len(roattrs) - 1:
+                ret.write(', ')
+        ret.write(') {\n')
+        ret.write('        Ptr<%s> m = new %s(' % (self.classname, self.classname))
+        if len(roattrs) > 0:
+            for i in range(len(roattrs)):
+                ret.write('%s' % (roattrs[i].name,))
+                if i < len(roattrs) - 1:
+                    ret.write(', ')
+        ret.write(');\n        return m;\n    }')
+        return ret.getvalue()
+
     def __str__(self):
         ret = StringIO()
         ret.write('class %s ' % (self.classname,))
@@ -94,12 +139,16 @@ class Entity(object):
             ret.write(': public %s ' % (self.parent,))
         ret.write('{\n')
         ret.write('  public:\n')
+        ret.write('    ~%s();\n' % self.classname)
         for enum in self.enums:
             ret.write('%s' % enum.__str__(4))
         for attr in self.attrs:
             ret.write('    %s\n' % attr.accessor_str())
             if not attr.readonly:
                 ret.write('    %s\n' % attr.mutator_str())
+        ret.write('%s' % self.newInstanceMethodStr())
+        ret.write('\n  protected:\n')
+        ret.write('    %s' % self.constructorStr())
         ret.write('\n  private:\n')
         for attr in self.attrs:
             ret.write('    %s\n' % attr.declaration_str())
