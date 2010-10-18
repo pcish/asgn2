@@ -2,8 +2,12 @@
 #include <stdlib.h>
 #include <map>
 #include <vector>
+#include <sstream>
+
+
 #include "Instance.h"
 #include "Engine.h"
+
 
 namespace Shipping {
 
@@ -111,6 +115,7 @@ class StatsRep : public Instance {
 public:
     string attribute (const string &name) {}
     void attributeIs(const string& name, const string& v) {}
+    
     static Ptr<StatsRep> instance (const string& name, ManagerImpl *manager) {
         if (instance_ == NULL)
             instance_ = new StatsRep (name, manager);
@@ -119,7 +124,8 @@ public:
 protected:
     StatsRep (const string& name, ManagerImpl *manager) : 
         Instance(name), manager_(manager)
-        { instance_ = this; }
+        { }
+        
 private:
     Ptr<ManagerImpl> manager_;
     static Ptr<StatsRep> instance_;
@@ -129,21 +135,40 @@ Ptr<StatsRep> StatsRep::instance_ = NULL;
 class ConnRep : public Instance {
 public:
     string attribute(const string& name) {}
-    void attributeIs(const string& name, const string& v) {}
+    void attributeIs(const string& name, const string& v) {}    
     static Ptr<ConnRep> instance (const string &name, ManagerImpl *manager) {
         if (instance_ == NULL) 
             instance_ = new ConnRep (name, manager);
         return instance_;
     }
+    
 protected:
     ConnRep (const string& name, ManagerImpl *manager) :
         Instance(name), manager_(manager)
-    { instance_ = this;   }
+    {}
+
 private:
     Ptr<ManagerImpl> manager_;
     static Ptr<ConnRep> instance_;
 };
 Ptr<ConnRep> ConnRep::instance_ = NULL;
+
+class FleetRep : public Instance {
+public:
+    FleetRep(const string& name, ManagerImpl* manager) :
+        Instance(name), manager_(manager) {}
+
+    // Instance method
+    string attribute(const string& name);
+
+    // Instance method
+    void attributeIs(const string& name, const string& v);
+
+protected:
+    Ptr<Fleet> fleet_;
+private:
+    Ptr<ManagerImpl> manager_;
+};
 
 ManagerImpl::ManagerImpl() {
 }
@@ -164,15 +189,35 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
         return t;
     }
     if (type == "Boat terminal") {
+        Ptr<TerminalRep> t = new TerminalRep(name, this, Segment::boat());
+        instance_[name] = t;
+        return t;
     }
     if (type == "Boat segment") {
+        Ptr<SegmentRep> t = new SegmentRep(name, this, Segment::boat());
+        instance_[name] = t;
+        return t;
     }
     if (type == "Plane terminal") {
+        Ptr<TerminalRep> t = new TerminalRep(name, this, Segment::plane());
+        instance_[name] = t;
+        return t;
     }
     if (type == "Plane segment") {
+        Ptr<SegmentRep> t = new SegmentRep(name, this, Segment::plane());
+        instance_[name] = t;
+        return t;
     }
-    if (type == "Port") {}
-    if (type == "Customer") {}
+    if (type == "Port") {
+        Ptr<PortRep> t = new PortRep(name, this);
+        instance_[name] = t;
+        return t;
+    }
+    if (type == "Customer") {
+        Ptr<CustomerRep> t = new CustomerRep(name, this);
+        instance_[name] = t;
+        return t;
+    }
     if (type == "StatsRep") {
         Ptr<StatsRep> t = StatsRep::instance (name, this);
         instance_[name] = t;
@@ -237,6 +282,62 @@ int LocationRep::segmentNumber(const string& name) {
     return 0;
 }
 
+string FleetRep::attribute (const string& name) {
+    int commaPos = name.find_first_of (',');
+    string mode = name.substr (0, commaPos), property = name.substr (commaPos + 1);
+    //trim the string
+    mode = mode.substr (mode.find_first_not_of(' '));  
+    mode = mode.substr (0, mode.find_last_not_of (' ') + 1);  
+    property = property.substr (property.find_first_not_of(' ') );
+    property = property.substr (0, property.find_first_not_of(' ') + 1);
+    Segment::TransportationMode transMode;
+    if (mode == "Truck") transMode = Segment::truck();
+    if (mode == "Boat") transMode = Segment::boat();
+    if (mode == "Plane") transMode = Segment::boat();
+    
+    if (property == "speed") {
+        ostringstream os;
+        os << fleet_->speed (transMode).value();
+        return os.str();
+    }
+    if (property == "cost"){
+        ostringstream os;
+        os << fleet_->cost (transMode).value();
+        return os.str();
+    }
+    if (property == "capacity"){
+        ostringstream os;
+        os << fleet_->capacity (transMode).value();
+        return os.str();
+    }
+    return "";
+}
+void FleetRep::attributeIs (const string& name, const string& v) {
+    int commaPos = name.find_first_of (',');
+    string mode = name.substr (0, commaPos), property = name.substr (commaPos + 1);
+    //trim the string
+    mode = mode.substr (mode.find_first_not_of(' '));  
+    mode = mode.substr (0, mode.find_last_not_of (' ') + 1);  
+    property = property.substr (property.find_first_not_of(' ') );
+    property = property.substr (0, property.find_first_not_of(' ') + 1);
+    Segment::TransportationMode transMode;
+    if (mode == "Truck") transMode = Segment::truck();
+    if (mode == "Boat") transMode = Segment::boat();
+    if (mode == "Plane") transMode = Segment::boat();
+    
+    istringstream is(v);
+    int propertyValue;
+    is >> propertyValue;
+    if (property == "speed") {
+        fleet_->speedIs (transMode, Mile(propertyValue) );
+    }
+    if (property == "cost") {
+        fleet_->costIs (transMode, USD(propertyValue) );
+    }
+    if (property == "capacity") {
+        fleet_->capacityIs (transMode, PackageUnit(propertyValue) );
+    }
+}
 
 }
 

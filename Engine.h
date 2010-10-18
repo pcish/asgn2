@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <list>
+#include <map>
 #include <exception>
 
 using namespace std;
@@ -86,19 +86,24 @@ private:
     Segment::TransportationMode transMode_;
 };
 
-class Fleet {
+class Fleet : public Fwk::PtrInterface<Fleet> {
 public:
     static Ptr<Fleet> instance();
-
-    Segment::TransportationMode transportationMode();
-    void transportationModeIs (Segment::TransportationMode _transMode);
+    
+    Mile speed (const Segment::TransportationMode _mode) { return speed_.find(_mode)->second; }
+    void speedIs (const Segment::TransportationMode _mode, const Mile& v) { speed_.find(_mode)->second = v; }
+    PackageUnit capacity (const Segment::TransportationMode _mode) { return capacity_.find(_mode)->second; }
+    void capacityIs (const Segment::TransportationMode _mode, const PackageUnit& v) { capacity_.find(_mode)->second = v; }
+    USD cost(const Segment::TransportationMode _mode) { return cost_.find(_mode)->second; }
+    void costIs (const Segment::TransportationMode _mode, const USD& v) { cost_.find(_mode)->second = v; }
+    
 private:
-    Fleet(Segment::TransportationMode _transMode);
-    Segment::TransportationMode transMode_;
-    Mile speed;
-    PackageUnit capacity;
-    USD cost;
-
+    Fleet();
+    //Segment::TransportationMode transMode_;
+    map<Segment::TransportationMode, Mile> speed_;
+    map<Segment::TransportationMode, PackageUnit> capacity_;
+    map<Segment::TransportationMode, USD> cost_;
+    static Ptr<Fleet> instance_;
 };
 
 

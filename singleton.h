@@ -1,6 +1,7 @@
 #ifndef SINGLETON_H
 #define SINGLETON_H
 
+
 namespace Shipping {
 
 template <typename SingletonType>
@@ -20,6 +21,7 @@ class Singleton {
     static SingletonType* m_pInstance;
 };
 
-template <class SingletonType> SingletonType* Singleton<SingletonType>::m_pInstance=NULL;
+template <class SingletonType> 
+SingletonType* Singleton<SingletonType>::m_pInstance=NULL;
 
 #endif

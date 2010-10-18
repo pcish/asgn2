@@ -45,11 +45,23 @@ void Terminal::segmentIs (unsigned int index, Ptr<Segment> seg) {
     Location::segmentIs (index, seg);
 }
 
-
-/*
-static Ptr<Terminal> Engine::terminalNew () {
-    return new Engine::Terminal ();
+Ptr<Fleet> Fleet::instance() {
+    if (Fleet::instance_ == NULL) 
+        instance_ = new Fleet ();
+    return instance_;
+    
 }
-*/
+Fleet::Fleet () {
+    speed_.insert (make_pair(Segment::truck(), Mile(0) ) );
+    cost_.insert (make_pair(Segment::truck(), USD(0) ) );
+    capacity_.insert (make_pair(Segment::truck(), PackageUnit(0) ) );
+    speed_.insert (make_pair(Segment::boat(), Mile(0) ) );
+    cost_.insert (make_pair(Segment::boat(), USD(0) ) );
+    capacity_.insert (make_pair(Segment::boat(), PackageUnit(0) ) );
+    speed_.insert (make_pair(Segment::plane(), Mile(0) ) );
+    cost_.insert (make_pair(Segment::plane(), USD(0) ) );
+    capacity_.insert (make_pair(Segment::plane(), PackageUnit(0) ) );
+}
+Ptr<Fleet> Fleet::instance_ = NULL;
 } /* end namespace */
 
