@@ -18,7 +18,14 @@ namespace Shipping {
 
 // Create your rep/engine interface here.
 //store name in each entity?
+/*
+TODO list:
+1. Add destructor for every class 
+2. Delete segment from Location
 
+
+
+*/
 class Location;
 
 class Segment : public Fwk::PtrInterface<Segment> {
@@ -44,10 +51,8 @@ public:
     void difficultyIs (const SegmentDifficultyUnit& _difficulty) { difficulty_ = _difficulty; }
     bool expediteSupport() const { return expediteSupport_; }
     void expediteSupportIs (const bool _expediteSupport) { expediteSupport_ = _expediteSupport; }
-    
 protected:
     string name_;
-
 private:
     Segment (const string& _name, const TransportationMode& _transMode) : name_(_name), transMode_(_transMode) {}
     TransportationMode transMode_;
@@ -66,7 +71,6 @@ public:
     virtual void segmentIs (Ptr<Segment> seg);
     virtual void segmentIs (unsigned int index, Ptr<Segment> seg); // assign segment for nth segment
     //unsigned int segments ();
-
     string name() { return name_; }
 protected:
     Location (const string& _name) : name_(_name) {}
@@ -118,17 +122,6 @@ private:
     map<Segment::TransportationMode, PackageUnit> capacity_;
     map<Segment::TransportationMode, USD> cost_;
     static Ptr<Fleet> instance_;
-};
-
-
-class Engine {
-public:
-  static Ptr<Customer> customerNew();
-  static Ptr<Port> portNew ();
-  static Ptr<Terminal> terminalNew (Segment::TransportationMode);
-  static Ptr<Segment> segmentNew();
-  static Ptr<Fleet> fleetNew ();
-
 };
 
 } /* end namespace */
