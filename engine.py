@@ -110,10 +110,13 @@ if __name__ == "__main__":
     baseclassOpt = 'BASECLASS'
     enumOpt = 'ENUM'
     config = ConfigParser.ConfigParser()
-    config.optionxform = str
+    config.optionxform = lambda x: x
     config.read('engine.conf')
+    print config.get('HEADER', 'content').replace('\\t', '    ').replace('\\n', '')
     sections = config.sections()
     for section in sections:
+        if section == 'HEADER' or section == 'FOOTER':
+            continue
         if config.has_option(section, baseclassOpt):
             c = Entity(section, config.get(section, baseclassOpt))
         else:
@@ -137,3 +140,4 @@ if __name__ == "__main__":
                 a.isCollection()
             c.attrIs(a)
         print c
+    print config.get('FOOTER', 'content').replace('\\t', '    ').replace('\\n', '')
