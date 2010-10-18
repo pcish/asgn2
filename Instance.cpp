@@ -34,11 +34,13 @@ private:
     map<string,Ptr<Instance> > instance_;
 };
 
+class SegmentRep;
+
 class LocationRep : public Instance {
 public:
 
     LocationRep(const string& name, ManagerImpl* manager) :
-        Instance(name), manager_(manager) {}
+        Instance(name), manager_(manager) { }
 
     // Instance method
     string attribute(const string& name);
@@ -51,8 +53,13 @@ protected:
 
 private:
     Ptr<ManagerImpl> manager_;
-    map<string, Segment> segments; // do we need segment here or in Location?
+    //map<string, Segment> segments; // do we need segment here or in Location?
+    //vector<string> segmentNames_;
     int segmentNumber(const string& name);
+
+//    void segmentRepIs (Ptr<SegmentRep> segRep);
+//    unsigned int segments () { return segmentName.size(); }
+
 
 };
 class PortRep : public LocationRep {
@@ -113,18 +120,17 @@ private:
 
 class StatsRep : public Instance {
 public:
-    string attribute (const string &name) {}
-    void attributeIs(const string& name, const string& v) {}
+    string attribute (const string &name);
+    void attributeIs(const string& name, const string& v) {} // do nothing: quietly ignore the write function
     
-    static Ptr<StatsRep> instance (const string& name, ManagerImpl *manager) {
+    static Ptr<StatsRep> instance (const string& name, ManagerImpl *_manager) {
         if (instance_ == NULL)
-            instance_ = new StatsRep (name, manager);
+            instance_ = new StatsRep (name, _manager);
         return instance_;
     }
 protected:
     StatsRep (const string& name, ManagerImpl *manager) : 
-        Instance(name), manager_(manager)
-        { }
+        Instance(name), manager_(manager) { }
         
 private:
     Ptr<ManagerImpl> manager_;
@@ -134,8 +140,8 @@ Ptr<StatsRep> StatsRep::instance_ = NULL;
 
 class ConnRep : public Instance {
 public:
-    string attribute(const string& name) {}
-    void attributeIs(const string& name, const string& v) {}    
+    string attribute(const string& name);
+    void attributeIs(const string& name, const string& v) {} //do nothing: quitely ignore the write function
     static Ptr<ConnRep> instance (const string &name, ManagerImpl *manager) {
         if (instance_ == NULL) 
             instance_ = new ConnRep (name, manager);
@@ -245,7 +251,12 @@ void ManagerImpl::instanceDel(const string& name) {
 string LocationRep::attribute(const string& name) {
     int i = segmentNumber(name);
     if (i != 0) {
-        cout << "Tried to read interface " << i;
+        //cout << "Tried to read interface " << i;
+        //if (i < 0 || i >= segmentNames_.size() ){
+        //    cerr << "Segment # out of bound" << endl;
+        //}
+        //return segmentNames_[i];
+        return location_->segment(i)->name();
     }
     return "";
 }
@@ -280,6 +291,13 @@ int LocationRep::segmentNumber(const string& name) {
         return atoi(t);
     }
     return 0;
+}
+
+string StatsRep::attribute(const string& name) {
+    return "";
+}
+string ConnRep::attribute(const string& name) {
+    return "";
 }
 
 string FleetRep::attribute (const string& name) {

@@ -17,21 +17,6 @@ using namespace std;
 namespace Shipping {
 
 // Create your rep/engine interface here.
-/*
-class Package;
-class Shipment {
-  Location source, destination;
-  Package *packages;
-};
-class Location;
-class CutsomterLocation : public Location;
-class Port : public Location;
-class Terminal : public Location;
-class Fleet;
-*/
-
-
-
 //store name in each entity?
 
 class Location;
@@ -41,16 +26,33 @@ public:
     enum TransportationMode {
         truck_, boat_, plane_
     };
-    static inline TransportationMode truck () {return truck_; }
-    static inline TransportationMode boat () {return boat_; }
-    static inline TransportationMode plane () {return plane_; }
-    Segment (TransportationMode _transMode);
-    TransportationMode transportationMode () {return transMode_;}
+    static inline TransportationMode truck() { return truck_; }
+    static inline TransportationMode boat() { return boat_; }
+    static inline TransportationMode plane() { return plane_; }
+
+    static Ptr<Segment> SegmentNew (const string& _name, const TransportationMode& _transMode) { return new Segment(_name, _transMode); } 
+
+    string name() const { return name_; }
+    TransportationMode const transportationMode() { return transMode_; }
+    Ptr<Location> source() const { return source_; }
+    void sourceIs(const Ptr<Location> _source) { source_ = _source; }
+    Mile length() const { return length_; }
+    void lengthIs(const Mile& _length) { length_ = _length; } 
+    Ptr<Segment> returnSegment() const { return returnSegment_; }
+    void returnSegmentIs(const Ptr<Segment>& _returnSegment) { returnSegment_ = _returnSegment; }
+    SegmentDifficultyUnit difficulty() const { return difficulty_; }
+    void difficultyIs (const SegmentDifficultyUnit& _difficulty) { difficulty_ = _difficulty; }
+    bool expediteSupport() const { return expediteSupport_; }
+    void expediteSupportIs (const bool _expediteSupport) { expediteSupport_ = _expediteSupport; }
+    
+protected:
+    string name_;
 
 private:
-    Segment::TransportationMode transMode_;
+    Segment (const string& _name, const TransportationMode& _transMode) : name_(_name), transMode_(_transMode) {}
+    TransportationMode transMode_;
     Ptr<Location> source_;
-    Mile length_; // need to be modified
+    Mile length_; 
     Ptr<Segment> returnSegment_;
     SegmentDifficultyUnit difficulty_;
     bool expediteSupport_;
@@ -58,30 +60,42 @@ private:
 
 class Location : public Fwk::PtrInterface<Location>{
 public:
-    
+    //static Ptr<Location> LocationNew (const string _name) { } 
     //declared virtual because subclasses may have additional contraints on the type of segment that connects
+    Ptr<Segment> segment (unsigned int index);
     virtual void segmentIs (Ptr<Segment> seg);
     virtual void segmentIs (unsigned int index, Ptr<Segment> seg); // assign segment for nth segment
-    unsigned int segments ();
-    Segment segment (unsigned int index);
+    //unsigned int segments ();
 
+    string name() { return name_; }
 protected:
+    Location (const string& _name) : name_(_name) {}
     vector<Ptr<Segment> > segments_;
+    string name_;
 };
 
 class Customer : public Location {
+public:
+    static Ptr<Customer> CustomerNew(const string& _name) { return new Customer(_name); }
+protected:
+    Customer(string _name) : Location(_name) {}
 };
 class Port : public Location {
-
+public:
+    static Ptr<Port> CustomerNew(const string& _name) { return new Port(_name); }
+protected:
+    Port(string _name) : Location(_name) {}
 };
 class Terminal : public Location {
 public:
-    Terminal (Segment::TransportationMode _transMode) : transMode_ (_transMode) {}
+    static Ptr<Terminal> TerminalNew(const string& _name, Segment::TransportationMode _transMode) { return new Terminal(_name, _transMode); }
     Segment::TransportationMode transportationMode () { return transMode_; }
     //a terminal's type should be assigned at the beginning and cannot withstand changing after instantiated
     //void transportationModeIs (Segment::TransportationMode _transMode);
     virtual void segmentIs (Ptr<Segment> seg);
     virtual void segmentIs (unsigned int index, Ptr<Segment> seg);
+protected:
+    Terminal (string _name, Segment::TransportationMode _transMode) : Location(_name), transMode_ (_transMode) {}
 private:
     Segment::TransportationMode transMode_;
 };
