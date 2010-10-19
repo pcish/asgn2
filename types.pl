@@ -1,8 +1,9 @@
 @types = (
-  ['Mile', 'Ordinal', 'unsigned int', ''],
-  ['USD', 'Ordinal', 'double', ''],
-  ['PackageUnit', 'Ordinal', 'unsigned int', ''],
-  ['SegmentDifficultyUnit', 'Ordinal', 'float', 'if (num < 1.0 || num > 5.0) throw ValueError("Segment Difficulty must lie between 1.0 and 5.0");']
+  {'name'=>'Mile', 'parent'=>'Ordinal', 'base'=>'unsigned int', 'default'=>'0', 'constructor'=>''},
+  {'name'=>'USD', 'parent'=>'Ordinal', 'base'=>'double', 'default'=>'0.0', 'constructor'=>''},
+  {'name'=>'PackageUnit', 'parent'=>'Ordinal', 'base'=>'unsigned int', 'default'=>'0', 'constructor'=>''},
+  {'name'=>'SegmentDifficultyUnit', 'parent'=>'Ordinal', 'base'=>'float', 'default'=>'1.0',
+  'constructor'=>'if (num < 1.0 || num > 5.0) throw ValueError("Segment Difficulty must lie between 1.0 and 5.0");'}
 );
 
 
@@ -16,11 +17,11 @@ print FILE "#include \"Engine.h\"\n\n";
 print FILE "namespace Shipping {\n\n";
 
 foreach $type (@types) {
-  print FILE "class @{$type}[0] : public @{$type}[1]<@{$type}[0], @{$type}[2]> {\n";
+  print FILE "class $type->{'name'} : public $type->{'parent'}<$type->{'name'}, $type->{'base'}> {\n";
   print FILE "  public:\n";
-  print FILE "    @{$type}[0](@{$type}[2] num) : @{$type}[1]<@{$type}[0], @{$type}[2]>(num) {\n";
-  if (@{$type}[3] ne '') {
-    print FILE "        @{$type}[3]\n";
+  print FILE "    $type->{'name'}($type->{'base'} num = $type->{'default'}) : $type->{'parent'}<$type->{'name'}, $type->{'base'}>(num) {\n";
+  if ($type->{'constructor'} ne '') {
+    print FILE "        $type->{'constructor'}\n";
   }
   print FILE "    }\n";
   print FILE "};\n\n";
