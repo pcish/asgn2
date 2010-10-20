@@ -12,7 +12,7 @@ open FILE, ">types.h";
 print FILE "#ifndef ENGINE_TYPES_H\n";
 print FILE "#define ENGINE_TYPES_H\n\n";
 
-print FILE "#include \"Engine.h\"\n\n";
+print FILE "#include \"error.h\"\n\n";
 
 print FILE "namespace Shipping {\n\n";
 
