@@ -50,7 +50,7 @@ class Attr(object):
         if self.collection:
             ret.write('{type} {name} const(const unsigned int index) {{ return {name}s_.at(index); }}'.format(type=self.type, name=self.name));
         else:
-            ret.write('{type} {name} const() {{ return {name}_; }}'.format(type=self.type, name=self.name));
+            ret.write('{type} {name}() const {{ return {name}_; }}'.format(type=self.type, name=self.name));
         return ret.getvalue()
 
     def isReadonly(self):
