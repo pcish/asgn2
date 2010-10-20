@@ -1,6 +1,23 @@
 from cStringIO import StringIO
 import ConfigParser
 
+class IndentedString(object):
+    string = None
+    indent = 0
+    def __init__(self, indent=0):
+        self.string = StringIO()
+        self.indent = indent
+
+    def write(self, string):
+        self.string.write(' ' * indent)
+        self.string.write(string)
+
+    def getvalue(self):
+        return self.string.getvalue()
+
+    def set_indent(self, new_indent):
+        self.indent = new_indent
+
 class Attr(object):
     type = None
     name = None

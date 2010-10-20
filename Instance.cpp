@@ -8,7 +8,6 @@
 #include "Instance.h"
 #include "Engine.h"
 
-
 namespace Shipping {
 
 using namespace std;
@@ -110,7 +109,7 @@ public:
     void attributeIs(const string& name, const string& v);
 
 protected:
-    Ptr<Segment> segment_;    
+    Ptr<Segment> segment_;
 private:
     Ptr<ManagerImpl> manager_;
     int segmentNumber(const string& name);
@@ -122,16 +121,16 @@ class StatsRep : public Instance {
 public:
     string attribute (const string &name);
     void attributeIs(const string& name, const string& v) {} // do nothing: quietly ignore the write function
-    
+
     static Ptr<StatsRep> instance (const string& name, ManagerImpl *_manager) {
         if (instance_ == NULL)
             instance_ = new StatsRep (name, _manager);
         return instance_;
     }
 protected:
-    StatsRep (const string& name, ManagerImpl *manager) : 
+    StatsRep (const string& name, ManagerImpl *manager) :
         Instance(name), manager_(manager) { }
-        
+
 private:
     Ptr<ManagerImpl> manager_;
     static Ptr<StatsRep> instance_;
@@ -143,11 +142,11 @@ public:
     string attribute(const string& name);
     void attributeIs(const string& name, const string& v) {} //do nothing: quitely ignore the write function
     static Ptr<ConnRep> instance (const string &name, ManagerImpl *manager) {
-        if (instance_ == NULL) 
+        if (instance_ == NULL)
             instance_ = new ConnRep (name, manager);
         return instance_;
     }
-    
+
 protected:
     ConnRep (const string& name, ManagerImpl *manager) :
         Instance(name), manager_(manager)
@@ -227,7 +226,7 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
     if (type == "StatsRep") {
         Ptr<StatsRep> t = StatsRep::instance (name, this);
         instance_[name] = t;
-        return t;    
+        return t;
     }
     if (type == "Fleet") {}
     if (type == "ConnRep") {
@@ -304,15 +303,15 @@ string FleetRep::attribute (const string& name) {
     int commaPos = name.find_first_of (',');
     string mode = name.substr (0, commaPos), property = name.substr (commaPos + 1);
     //trim the string
-    mode = mode.substr (mode.find_first_not_of(' '));  
-    mode = mode.substr (0, mode.find_last_not_of (' ') + 1);  
+    mode = mode.substr (mode.find_first_not_of(' '));
+    mode = mode.substr (0, mode.find_last_not_of (' ') + 1);
     property = property.substr (property.find_first_not_of(' ') );
     property = property.substr (0, property.find_first_not_of(' ') + 1);
     Segment::TransportationMode transMode;
     if (mode == "Truck") transMode = Segment::truck();
     if (mode == "Boat") transMode = Segment::boat();
     if (mode == "Plane") transMode = Segment::boat();
-    
+
     if (property == "speed") {
         ostringstream os;
         os << fleet_->speed (transMode).value();
@@ -334,15 +333,15 @@ void FleetRep::attributeIs (const string& name, const string& v) {
     int commaPos = name.find_first_of (',');
     string mode = name.substr (0, commaPos), property = name.substr (commaPos + 1);
     //trim the string
-    mode = mode.substr (mode.find_first_not_of(' '));  
-    mode = mode.substr (0, mode.find_last_not_of (' ') + 1);  
+    mode = mode.substr (mode.find_first_not_of(' '));
+    mode = mode.substr (0, mode.find_last_not_of (' ') + 1);
     property = property.substr (property.find_first_not_of(' ') );
     property = property.substr (0, property.find_first_not_of(' ') + 1);
     Segment::TransportationMode transMode;
     if (mode == "Truck") transMode = Segment::truck();
     if (mode == "Boat") transMode = Segment::boat();
     if (mode == "Plane") transMode = Segment::boat();
-    
+
     istringstream is(v);
     int propertyValue;
     is >> propertyValue;
