@@ -11,6 +11,8 @@ void Location::segmentIs(const Ptr<Segment> seg) {
         return;
     }
     segments_.push_back (seg);
+    if (notifiee_)
+        notifiee_->onSegment (seg);
 }
 /*void Location::segmentIs (unsigned int index, Ptr<Segment> seg) {
     if (index < 0 || index >= segments_.size() ) {
