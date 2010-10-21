@@ -23,6 +23,8 @@ class Attr(object):
     name = None
     collection = False
     readonly = False
+    virtual = False
+    complex = False
     def __init__(self, type, name):
         self.type = type
         self.name = name
@@ -39,18 +41,32 @@ class Attr(object):
         if self.readonly:
             return ''
         ret = StringIO()
-        if self.collection:
-            ret.write('void {name}Is(const {type} {name}) {{ {name}s_.push_back({name}); }}'.format(type=self.type, name=self.name));
+        if self.virtual:
+            ret.write('virtual ')
+        ret.write('void {name}Is(const {type} {name})'.format(type=self.type, name=self.name))
+        if self.complex:
+            ret.write(';')
+        elif self.collection:
+            ret.write('{{ {name}s_.push_back({name}); }}'.format(type=self.type, name=self.name))
         else:
-            ret.write('void {name}Is(const {type} {name}) {{ {name}_ = {name}; }}'.format(type=self.type, name=self.name));
+            ret.write('{{ {name}_ = {name}; }}'.format(type=self.type, name=self.name))
         return ret.getvalue()
 
     def accessor_str(self):
         ret = StringIO()
+        if self.virtual:
+            ret.write('virtual ')
         if self.collection:
-            ret.write('{type} {name}(const unsigned int index) const {{ return {name}s_.at(index); }}'.format(type=self.type, name=self.name));
+            ret.write('{type} {name}(const unsigned int index) const'.format(type=self.type, name=self.name))
         else:
-            ret.write('{type} {name}() const {{ return {name}_; }}'.format(type=self.type, name=self.name));
+            ret.write('{type} {name}() const'.format(type=self.type, name=self.name))
+
+        if self.complex:
+            ret.write(';')
+        elif self.collection:
+            ret.write('{{ return {name}s_.at(index); }}'.format(type=self.type, name=self.name))
+        else:
+            ret.write('{{ return {name}_; }}'.format(type=self.type, name=self.name))
         return ret.getvalue()
 
     def isReadonly(self):
@@ -58,6 +74,12 @@ class Attr(object):
 
     def isCollection(self):
         self.collection = True
+
+    def isVirtual(self):
+        self.virtual = True
+
+    def isComplex(self):
+        self.complex = True
 
 class Enum(object):
     name = None
@@ -235,6 +257,10 @@ if __name__ == "__main__":
                 a.isReadonly()
             if modifiers.find('C') >= 0:
                 a.isCollection()
+            if modifiers.find('V') >= 0:
+                a.isVirtual()
+            if modifiers.find('X') >= 0:
+                a.isComplex()
             c.attrIs(a)
         classes[section] = c
 

@@ -43,18 +43,18 @@ class Segment : public Fwk::PtrInterface<Segment> {
     static inline ExpediteSupport available() { return available_; }
     static inline ExpediteSupport unavailable() { return unavailable_; }
 
-    ExpediteSupport expediteSupport() const { return expediteSupport_; }
-    void expediteSupportIs(const ExpediteSupport expediteSupport) { expediteSupport_ = expediteSupport; }
-    TransportationMode transportationMode() const { return transportationMode_; }
-    Ptr<Location> source() const { return source_; }
-    void sourceIs(const Ptr<Location> source) { source_ = source; }
-    Ptr<Segment> returnSegment() const { return returnSegment_; }
-    void returnSegmentIs(const Ptr<Segment> returnSegment) { returnSegment_ = returnSegment; }
-    SegmentDifficultyUnit difficulty() const { return difficulty_; }
-    void difficultyIs(const SegmentDifficultyUnit difficulty) { difficulty_ = difficulty; }
-    Mile length() const { return length_; }
-    void lengthIs(const Mile length) { length_ = length; }
-    string name() const { return name_; }
+    ExpediteSupport expediteSupport() const{ return expediteSupport_; }
+    void expediteSupportIs(const ExpediteSupport expediteSupport){ expediteSupport_ = expediteSupport; }
+    TransportationMode transportationMode() const{ return transportationMode_; }
+    Ptr<Location> source() const{ return source_; }
+    void sourceIs(const Ptr<Location> source){ source_ = source; }
+    Ptr<Segment> returnSegment() const{ return returnSegment_; }
+    void returnSegmentIs(const Ptr<Segment> returnSegment){ returnSegment_ = returnSegment; }
+    SegmentDifficultyUnit difficulty() const{ return difficulty_; }
+    void difficultyIs(const SegmentDifficultyUnit difficulty){ difficulty_ = difficulty; }
+    Mile length() const{ return length_; }
+    void lengthIs(const Mile length){ length_ = length; }
+    string name() const{ return name_; }
     static Ptr<Segment> segmentNew(const TransportationMode transportationMode, const string name) {
         Ptr<Segment> m = new Segment(transportationMode, name);
         return m;
@@ -74,9 +74,9 @@ class Segment : public Fwk::PtrInterface<Segment> {
 class Location : public Fwk::PtrInterface<Location> {
   public:
     ~Location();
-    Ptr<Segment> segment(const unsigned int index) const { return segments_.at(index); }
-    void segmentIs(const Ptr<Segment> segment) { segments_.push_back(segment); }
-    string name() const { return name_; }
+    virtual Ptr<Segment> segment(const unsigned int index) const;
+    virtual void segmentIs(const Ptr<Segment> segment);
+    string name() const{ return name_; }
     static Ptr<Location> locationNew(const string name) {
         Ptr<Location> m = new Location(name);
         return m;
@@ -115,7 +115,7 @@ class Port : public Location {
 class Terminal : public Location {
   public:
     ~Terminal();
-    Segment::TransportationMode transportationMode() const { return transportationMode_; }
+    Segment::TransportationMode transportationMode() const{ return transportationMode_; }
     static Ptr<Terminal> terminalNew(const string name, const Segment::TransportationMode transportationMode) {
         Ptr<Terminal> m = new Terminal(name, transportationMode);
         return m;
@@ -129,14 +129,14 @@ class Terminal : public Location {
 class Fleet : public Fwk::PtrInterface<Fleet> {
   public:
     ~Fleet();
-    USD cost() const { return cost_; }
-    void costIs(const USD cost) { cost_ = cost; }
-    PackageUnit capacity() const { return capacity_; }
-    void capacityIs(const PackageUnit capacity) { capacity_ = capacity; }
-    Segment::TransportationMode transportationMode() const { return transportationMode_; }
-    void transportationModeIs(const Segment::TransportationMode transportationMode) { transportationMode_ = transportationMode; }
-    Mile speed() const { return speed_; }
-    void speedIs(const Mile speed) { speed_ = speed; }
+    USD cost() const{ return cost_; }
+    void costIs(const USD cost){ cost_ = cost; }
+    PackageUnit capacity() const{ return capacity_; }
+    void capacityIs(const PackageUnit capacity){ capacity_ = capacity; }
+    Segment::TransportationMode transportationMode() const{ return transportationMode_; }
+    void transportationModeIs(const Segment::TransportationMode transportationMode){ transportationMode_ = transportationMode; }
+    Mile speed() const{ return speed_; }
+    void speedIs(const Mile speed){ speed_ = speed; }
     static Ptr<Fleet> fleetNew() {
         Ptr<Fleet> m = new Fleet();
         return m;
