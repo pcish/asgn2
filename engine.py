@@ -167,8 +167,8 @@ class Entity(object):
                 if i < len(roattrs) - 1:
                     ret.write(', ')
         ret.write(' {\n')
-        ret.write('    if (notifiee_) notifiee_->on%s();\n' % self.classname)
-        ret.write('}\n')
+        ret.write('        if (notifiee_) notifiee_->on%s();\n' % self.classname)
+        ret.write('    }\n')
         return ret.getvalue()
 
     def newCallStr(self):
@@ -241,8 +241,8 @@ class Entity(object):
         ret = IndentedString(4)
         ret.write('Ptr<%s::Notifiee> notifiee_;\n' % self.classname)
         ret.write('void notifieeIs(%s::Notifiee* n) const {\n' % self.classname)
-        ret.write('  {name}* me = const_cast<{name}*>(this);\n'.format(name=self.classname))
-        ret.write('  me->notifiee_ = n;\n')
+        ret.write('    {name}* me = const_cast<{name}*>(this);\n'.format(name=self.classname))
+        ret.write('    me->notifiee_ = n;\n')
         ret.write('}\n')
         return ret.getvalue()
 
