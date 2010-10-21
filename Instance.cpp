@@ -96,12 +96,23 @@ protected:
 
 class SegmentRep : public Instance {
 public:
+    class SegmentReactor : public Segment::Notifiee {
+        public:
+            void onExpediteSupport () {
+                cout << "Expedite Support changed" << endl;
+            }
+    };
 
     SegmentRep(const string& name, ManagerImpl* manager, Segment::TransportationMode _mode) :
         Instance(name), manager_(manager), mode_ (_mode)
     {
         // Nothing else to do.
         segment_ = Segment::segmentNew(_mode, name);
+        /* test code */
+        SegmentReactor *t = new SegmentReactor ();
+        t->notifierIs(segment_);
+        segment_->expediteSupportIs(Segment::available());
+        /**/
     }
 
     // Instance method
@@ -132,7 +143,6 @@ public:
 protected:
     StatsRep (const string& name, ManagerImpl *manager) :
         Instance(name), manager_(manager) { }
-
 private:
     Ptr<ManagerImpl> manager_;
     static Ptr<StatsRep> instance_;
@@ -177,8 +187,7 @@ private:
     Ptr<ManagerImpl> manager_;
 };
 
-ManagerImpl::ManagerImpl() {
-}
+ManagerImpl::ManagerImpl() {}
 
 Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
     if (instance_.find(name) != instance_.end() ){

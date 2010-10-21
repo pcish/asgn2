@@ -1,11 +1,12 @@
 CXXFLAGS = -Wall -g
+LIB = fwk/BaseNotifiee.o fwk/Exception.o
 
 OBJECTS = Instance.o Engine.o
 
 default:	test1
 
 test1:	test1.o $(OBJECTS)
-	$(CXX) $(CXXFLAGS) -o $@ $^
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIB)
 
 clean:
 	rm -f test1 test1.o $(OBJECTS) *~
