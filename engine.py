@@ -23,6 +23,8 @@ class Attr(object):
     name = None
     collection = False
     readonly = False
+    virtual = False
+    complex = False
     def __init__(self, type, name):
         self.type = type
         self.name = name
@@ -30,7 +32,7 @@ class Attr(object):
     def declaration_str(self):
         ret = StringIO()
         if self.collection:
-            ret.write('std::vector<%s> %ss_;' % (self.type, self.name))
+            ret.write('std::vector<%s > %ss_;' % (self.type, self.name))
         else:
             ret.write('%s %s_;' % (self.type, self.name))
         return ret.getvalue()
@@ -39,18 +41,32 @@ class Attr(object):
         if self.readonly:
             return ''
         ret = StringIO()
-        if self.collection:
-            ret.write('void {name}Is(const {type} {name}) {{ {name}s_.push_back({name}); }}'.format(type=self.type, name=self.name));
+        if self.virtual:
+            ret.write('virtual ')
+        ret.write('void {name}Is(const {type} {name})'.format(type=self.type, name=self.name))
+        if self.complex:
+            ret.write(';')
+        elif self.collection:
+            ret.write('{{ {name}s_.push_back({name}); }}'.format(type=self.type, name=self.name))
         else:
-            ret.write('void {name}Is(const {type} {name}) {{ {name}_ = {name}; }}'.format(type=self.type, name=self.name));
+            ret.write('{{ {name}_ = {name}; }}'.format(type=self.type, name=self.name))
         return ret.getvalue()
 
     def accessor_str(self):
         ret = StringIO()
+        if self.virtual:
+            ret.write('virtual ')
         if self.collection:
-            ret.write('{type} {name} const(const unsigned int index) {{ return {name}s_.at(index); }}'.format(type=self.type, name=self.name));
+            ret.write('{type} {name}(const unsigned int index) const'.format(type=self.type, name=self.name))
         else:
-            ret.write('{type} {name}() const {{ return {name}_; }}'.format(type=self.type, name=self.name));
+            ret.write('{type} {name}() const'.format(type=self.type, name=self.name))
+
+        if self.complex:
+            ret.write(';')
+        elif self.collection:
+            ret.write('{{ return {name}s_.at(index); }}'.format(type=self.type, name=self.name))
+        else:
+            ret.write('{{ return {name}_; }}'.format(type=self.type, name=self.name))
         return ret.getvalue()
 
     def isReadonly(self):
@@ -59,11 +75,18 @@ class Attr(object):
     def isCollection(self):
         self.collection = True
 
+    def isVirtual(self):
+        self.virtual = True
+
+    def isComplex(self):
+        self.complex = True
+
 class Enum(object):
     name = None
     enumitems = []
     def __init__(self, name):
         self.name = name;
+        self.enumitems = []
 
     def append(self, enumitem):
         self.enumitems.append(enumitem)
@@ -185,7 +208,7 @@ class Entity(object):
             ret.write(': public %s ' % (self.parent,))
         ret.write('{\n')
         ret.write('  public:\n')
-        ret.write('    ~%s();\n' % self.classname)
+        ret.write('    ~%s(){}\n' % self.classname)
         for enum in self.enums:
             ret.write('%s' % enum.__str__(4))
         for attr in self.attrs:
@@ -211,7 +234,7 @@ if __name__ == "__main__":
     sections = config.sections()
 
     for section in sections:
-        if section == 'HEADER' or section == 'FOOTER':
+        if section == 'HEADER' or section == 'FOOTER' or section == 'META':
             continue
         if config.has_option(section, baseclassOpt):
             c = Entity(section, config.get(section, baseclassOpt))
@@ -220,7 +243,7 @@ if __name__ == "__main__":
         for attr, type in config.items(section):
             if attr == baseclassOpt:
                 continue
-            if attr == enumOpt:
+            if attr.startswith(enumOpt):
                 enumname, enumitems = type.split(' ', 1)
                 enumitems = enumitems.split()
                 e = Enum(enumname)
@@ -234,10 +257,16 @@ if __name__ == "__main__":
                 a.isReadonly()
             if modifiers.find('C') >= 0:
                 a.isCollection()
+            if modifiers.find('V') >= 0:
+                a.isVirtual()
+            if modifiers.find('X') >= 0:
+                a.isComplex()
             c.attrIs(a)
         classes[section] = c
 
     print config.get('HEADER', 'content').replace('\\t', '    ').replace('\\n', '')
     for c in classes.values():
-        print c
+        print 'class %s;' % c.classname
+    for cn in config.get('META', 'ORDER').split():
+        print classes[cn]
     print config.get('FOOTER', 'content').replace('\\t', '    ').replace('\\n', '')

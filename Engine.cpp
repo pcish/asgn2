@@ -5,35 +5,35 @@
 
 namespace Shipping {
 
-void Location::segmentIs (Ptr<Segment> seg) {
+void Location::segmentIs(const Ptr<Segment> seg) {
     if (seg == NULL) {
         cerr << "Can't add NULL segment" << endl;
         return;
     }
     segments_.push_back (seg);
 }
-void Location::segmentIs (unsigned int index, Ptr<Segment> seg) {    
+/*void Location::segmentIs (unsigned int index, Ptr<Segment> seg) {
     if (index < 0 || index >= segments_.size() ) {
         cerr <<  "Index out of bound exception" << endl;
         return;
     }
     if (seg == NULL) { //delete segment
-        
+
     }
     else { //put segment at that position
-        
+
     }
 }
 //unsigned int Location::segments () { return segments_.size(); }
-
-Ptr<Segment> Location::segment (unsigned int index) {
-    if (index < 0 || index >= segments_.size () ){
+*/
+Ptr<Segment> Location::segment(const unsigned int index) const {
+    if (index-1 < 0 || index-1 >= segments_.size () ){
          cerr << "Segment # out of bound exception" << endl;
          return NULL;
     }
-    return segments_[index];
+    return segments_[index-1];
 }
-
+/*
 void Terminal::segmentIs (Ptr<Segment> seg) {
     if (seg == NULL) {// empty
         cerr << "Can't add NULL segment" << endl;
@@ -45,7 +45,7 @@ void Terminal::segmentIs (Ptr<Segment> seg) {
     }
     Location::segmentIs (seg);
 }
-void Terminal::segmentIs (unsigned int index, Ptr<Segment> seg) {
+/*void Terminal::segmentIs (unsigned int index, Ptr<Segment> seg) {
     if (seg != NULL && seg->transportationMode() != transMode_ ) {// insert node rather than delete
         cerr << "Terminal must connect two segments with the same transportation mode" << endl;
         return;
@@ -54,10 +54,10 @@ void Terminal::segmentIs (unsigned int index, Ptr<Segment> seg) {
 }
 
 Ptr<Fleet> Fleet::instance() {
-    if (Fleet::instance_ == NULL) 
+    if (Fleet::instance_ == NULL)
         instance_ = new Fleet ();
     return instance_;
-    
+
 }
 Fleet::Fleet () {
     speed_.insert (make_pair(Segment::truck(), Mile(0) ) );
@@ -70,6 +70,6 @@ Fleet::Fleet () {
     cost_.insert (make_pair(Segment::plane(), USD(0) ) );
     capacity_.insert (make_pair(Segment::plane(), PackageUnit(0) ) );
 }
-Ptr<Fleet> Fleet::instance_ = NULL;
+Ptr<Fleet> Fleet::instance_ = NULL;*/
 } /* end namespace */
 
