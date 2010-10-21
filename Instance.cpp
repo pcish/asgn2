@@ -170,7 +170,7 @@ public:
     void attributeIs(const string& name, const string& v);
 
 protected:
-    Ptr<Fleet> fleet_;
+    Ptr<Fleet> truckfleet_, boatfleet_, planefleet_;
 private:
     Ptr<ManagerImpl> manager_;
 };
@@ -307,24 +307,24 @@ string FleetRep::attribute (const string& name) {
     mode = mode.substr (0, mode.find_last_not_of (' ') + 1);
     property = property.substr (property.find_first_not_of(' ') );
     property = property.substr (0, property.find_first_not_of(' ') + 1);
-    Segment::TransportationMode transMode;
-    if (mode == "Truck") transMode = Segment::truck();
-    if (mode == "Boat") transMode = Segment::boat();
-    if (mode == "Plane") transMode = Segment::boat();
+    Ptr<Fleet> fleet_;
+    if (mode == "Truck") fleet_ = truckfleet_;
+    if (mode == "Boat") fleet_ = boatfleet_;
+    if (mode == "Plane") fleet_ = planefleet_;
 
     if (property == "speed") {
         ostringstream os;
-        os << fleet_->speed (transMode).value();
+        os << fleet_->speed ().value();
         return os.str();
     }
     if (property == "cost"){
         ostringstream os;
-        os << fleet_->cost (transMode).value();
+        os << fleet_->cost ().value();
         return os.str();
     }
     if (property == "capacity"){
         ostringstream os;
-        os << fleet_->capacity (transMode).value();
+        os << fleet_->capacity ().value();
         return os.str();
     }
     return "";
@@ -337,22 +337,22 @@ void FleetRep::attributeIs (const string& name, const string& v) {
     mode = mode.substr (0, mode.find_last_not_of (' ') + 1);
     property = property.substr (property.find_first_not_of(' ') );
     property = property.substr (0, property.find_first_not_of(' ') + 1);
-    Segment::TransportationMode transMode;
-    if (mode == "Truck") transMode = Segment::truck();
-    if (mode == "Boat") transMode = Segment::boat();
-    if (mode == "Plane") transMode = Segment::boat();
+    Ptr<Fleet> fleet_;
+    if (mode == "Truck") fleet_ = truckfleet_;
+    if (mode == "Boat") fleet_ = boatfleet_;
+    if (mode == "Plane") fleet_ = planefleet_;
 
     istringstream is(v);
     int propertyValue;
     is >> propertyValue;
     if (property == "speed") {
-        fleet_->speedIs (transMode, Mile(propertyValue) );
+        fleet_->speedIs (Mile(propertyValue) );
     }
     if (property == "cost") {
-        fleet_->costIs (transMode, USD(propertyValue) );
+        fleet_->costIs (USD(propertyValue) );
     }
     if (property == "capacity") {
-        fleet_->capacityIs (transMode, PackageUnit(propertyValue) );
+        fleet_->capacityIs (PackageUnit(propertyValue) );
     }
 }
 
