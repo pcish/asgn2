@@ -11,7 +11,7 @@ using namespace std;
 #include "Ptr.h"
 #include "PtrInterface.h"
 //#include "fwk/BaseNotifiee.h"
-//#include "fwk/NamedInterface.h"
+#include "fwk/NamedInterface.h"
 #include "Instance.h"
 #include "Nominal.h"
 #include "types.h"
@@ -63,7 +63,7 @@ public:
     bool expediteSupport() const { return expediteSupport_; }
     void expediteSupportIs (const bool _expediteSupport) { expediteSupport_ = _expediteSupport; }
     
-    class Notifiee {
+    class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
         public:
             virtual void onExpediteSupport() {}
             virtual void onSegment() {}
@@ -74,20 +74,19 @@ public:
                     notifier_->notifieeIs(0);
                 notifier_ = _notifier;
             }
-            static Notifiee* notifieeNew () {
-                Notifiee* n = new Notifiee ();
+            static Fwk::Ptr<Segment::Notifiee> notifieeNew () {
+                Fwk::Ptr<Segment::Notifiee> n = new Notifiee ();
                 return n;
             }
         protected:
             Segment* notifier_;
             Notifiee () : notifier_(0) {}
     };
-    Segment::Notifiee* notifiee() const { return notifiee_; }
-    
+    Ptr<Segment::Notifiee> notifiee() const { return notifiee_; }
 
 protected:
     string name_;
-    Segment::Notifiee* notifiee_;
+    Ptr<Segment::Notifiee> notifiee_;
     void notifieeIs( Segment::Notifiee* n) const {
         Segment* me = const_cast<Segment*>(this);
         me->notifiee_ = n;
