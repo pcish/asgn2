@@ -9,7 +9,7 @@ class IndentedString(object):
         self.indent = indent
 
     def write(self, string):
-        self.string.write(' ' * indent)
+        self.string.write(' ' * self.indent)
         self.string.write(string)
 
     def getvalue(self):
@@ -166,7 +166,9 @@ class Entity(object):
                 ret.write('%s_(%s)' % (roattrs[i].name, roattrs[i].name))
                 if i < len(roattrs) - 1:
                     ret.write(', ')
-        ret.write(' {}')
+        ret.write(' {\n')
+        ret.write('    if (notifiee_) notifiee_->on%s();\n' % self.classname)
+        ret.write('}\n')
         return ret.getvalue()
 
     def newCallStr(self):
@@ -198,7 +200,50 @@ class Entity(object):
                 ret.write(', ')
         ret.write(') {\n')
         ret.write('        Ptr<%s> m = new %s;' % (self.classname, self.newCallStr()))
-        ret.write('\n        return m;\n    }')
+        ret.write('\n        return m;\n    }\n')
+        return ret.getvalue()
+
+    def notifiee_str(self):
+        ret = IndentedString(4)
+        ret.write('class Notifiee : public virtual Fwk::NamedInterface::Notifiee {\n')
+        ret.write('  public:\n')
+        ret.set_indent(8)
+        ret.write('virtual void notifierIs(Fwk::Ptr<%s> notifier) {\n' % self.classname)
+        ret.set_indent(12)
+        ret.write('if (notifier_ == notifier) return;\n')
+        ret.write('if (notifier_) notifier->notifieeIs(0);\n')
+        ret.write('notifier_ = notifier;\n')
+        ret.write('notifier_->notifieeIs(this);\n')
+        ret.set_indent(8)
+        ret.write('}\n')
+        ret.write('static Fwk::Ptr<%s::Notifiee> notifieeNew() {\n' % self.classname)
+        ret.set_indent(12)
+        ret.write('Fwk::Ptr<%s::Notifiee> n = new Notifiee();\n' % self.classname)
+        ret.write('return n;\n')
+        ret.set_indent(8)
+        ret.write('}\n')
+        ret.write('virtual void on%s() {}\n' % self.classname)
+        for attr in self.attrs:
+            if attr.readonly:
+                continue
+            ret.write('virtual void on%s() {}\n' % ''.join((attr.name[0].upper(), attr.name[1:])))
+        ret.set_indent(4)
+        ret.write('  protected:\n')
+        ret.set_indent(8)
+        ret.write('Fwk::Ptr<%s> notifier_;\n' % self.classname)
+        ret.write('Notifiee() : notifier_(0) {}\n')
+        ret.set_indent(4)
+        ret.write('};\n')
+        ret.write('Ptr<%s::Notifiee> notifiee() const { return notifiee_; }\n' % self.classname)
+        return ret.getvalue()
+
+    def notifiee_protected_str(self):
+        ret = IndentedString(4)
+        ret.write('Ptr<%s::Notifiee> notifiee_;\n' % self.classname)
+        ret.write('void notifieeIs(%s::Notifiee* n) const {\n' % self.classname)
+        ret.write('  {name}* me = const_cast<{name}*>(this);\n'.format(name=self.classname))
+        ret.write('  me->notifiee_ = n;\n')
+        ret.write('}\n')
         return ret.getvalue()
 
     def __str__(self):
@@ -216,8 +261,10 @@ class Entity(object):
             if not attr.readonly:
                 ret.write('    %s\n' % attr.mutator_str())
         ret.write('%s' % self.newInstanceMethodStr())
-        ret.write('\n  protected:\n')
+        ret.write(self.notifiee_str())
+        ret.write('  protected:\n')
         ret.write('    %s' % self.constructorStr())
+        ret.write(self.notifiee_protected_str())
         ret.write('\n  private:\n')
         for attr in self.attrs:
             ret.write('    %s\n' % attr.declaration_str())
