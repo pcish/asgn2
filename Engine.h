@@ -10,33 +10,13 @@
 using namespace std;
 #include "Ptr.h"
 #include "PtrInterface.h"
-#include "fwk/BaseNotifiee.h"
-#include "fwk/NamedInterface.h"
 #include "Instance.h"
 #include "Nominal.h"
 #include "types.h"
+#include "fwk/BaseNotifiee.h"
+#include "fwk/NamedInterface.h"
 
 namespace Shipping {
-
-// Create your rep/engine interface here.
-//store name in each entity?
-/*
-TODO list:
-1. Add destructor for every class 
-2. Delete segment from Location
-*/
-/*
-template <class T>
-class BaseNotifiee {
-    public:
-        BaseNotifiee(T* _notifier) {  notifier_ = _notifier; }
-        void notifierIs (T* _notifier) {
-        }
-    protected:
-        T* notifier_;
-};
-*/
-
 class Customer;
 class PlaneFleet;
 class TruckFleet;
@@ -64,34 +44,9 @@ class Segment : public Fwk::PtrInterface<Segment> {
     };
     static inline ExpediteSupport available() { return available_; }
     static inline ExpediteSupport unavailable() { return unavailable_; }
-/*
-<<<<<<< HEAD
-    string name() const { return name_; }
-    TransportationMode const transportationMode() { return transMode_; }
-    Ptr<Location> source() const { return source_; }
-    void sourceIs(const Ptr<Location> _source) { source_ = _source; }
-    Mile length() const { return length_; }
-    void lengthIs(const Mile& _length) { length_ = _length; } 
-    Ptr<Segment> returnSegment() const { return returnSegment_; }
-    void returnSegmentIs(const Ptr<Segment>& _returnSegment) { returnSegment_ = _returnSegment; }
-    SegmentDifficultyUnit difficulty() const { return difficulty_; }
-    void difficultyIs (const SegmentDifficultyUnit& _difficulty) { difficulty_ = _difficulty; }
-    bool expediteSupport() const { return expediteSupport_; }
-    void expediteSupportIs (const bool _expediteSupport) { expediteSupport_ = _expediteSupport; }
-    
 
-protected:
-    string name_;
-private:
-    Segment (const string& _name, const TransportationMode& _transMode) : name_(_name), transMode_(_transMode) {}
-    TransportationMode transMode_;
-=======
-*/
     ExpediteSupport expediteSupport() const{ return expediteSupport_; }
-    void expediteSupportIs(const ExpediteSupport expediteSupport){ expediteSupport_ = expediteSupport; 
-        if (notifiee_)
-            notifiee_->onExpediteSupport();
-    }
+    void expediteSupportIs(const ExpediteSupport expediteSupport){ expediteSupport_ = expediteSupport; }
     TransportationMode transportationMode() const{ return transportationMode_; }
     Ptr<Location> source() const{ return source_; }
     void sourceIs(const Ptr<Location> source){ source_ = source; }
@@ -107,40 +62,41 @@ private:
         return m;
     }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
-        public:
-            virtual void onExpediteSupport() {}
-            virtual void onSegment() {}
-            virtual void notifierIs(Fwk::Ptr<Segment> _notifier) {
-                if (notifier_ == _notifier)
-                    return;
-                if (notifier_) 
-                    notifier_->notifieeIs(0);
-                notifier_ = _notifier;
-                notifier_->notifieeIs(this);
-            }
-            static Fwk::Ptr<Segment::Notifiee> notifieeNew () {
-                Fwk::Ptr<Segment::Notifiee> n = new Notifiee ();
-                return n;
-            }
-        protected:
-            Fwk::Ptr<Segment> notifier_;
-            Notifiee () : notifier_(0) {}
+      public:
+        virtual void notifierIs(Fwk::Ptr<Segment> notifier) {
+            if (notifier_ == notifier) return;
+            if (notifier_) notifier->notifieeIs(0);
+            notifier_ = notifier;
+            notifier_->notifieeIs(this);
+        }
+        static Fwk::Ptr<Segment::Notifiee> notifieeNew() {
+            Fwk::Ptr<Segment::Notifiee> n = new Notifiee();
+            return n;
+        }
+        virtual void onSegment() {}
+        virtual void onExpediteSupport() {}
+        virtual void onSource() {}
+        virtual void onReturnSegment() {}
+        virtual void onDifficulty() {}
+        virtual void onLength() {}
+      protected:
+        Fwk::Ptr<Segment> notifier_;
+        Notifiee() : notifier_(0) {}
     };
     Ptr<Segment::Notifiee> notifiee() const { return notifiee_; }
   protected:
     Segment(const TransportationMode transportationMode, const string name) : transportationMode_(transportationMode), name_(name) {
-        if (notifiee_)
-            notifiee_->onSegment();
-    }
+    if (notifiee_) notifiee_->onSegment();
+}
     Ptr<Segment::Notifiee> notifiee_;
-    void notifieeIs( Segment::Notifiee* n) const {
-        Segment* me = const_cast<Segment*>(this);
-        me->notifiee_ = n;
+    void notifieeIs(Segment::Notifiee* n) const {
+      Segment* me = const_cast<Segment*>(this);
+      me->notifiee_ = n;
     }
+
   private:
     ExpediteSupport expediteSupport_;
     TransportationMode transportationMode_;
-//>>>>>>> 2387774f5e204824112b78c020628b670849d652
     Ptr<Location> source_;
     Ptr<Segment> returnSegment_;
     SegmentDifficultyUnit difficulty_;
@@ -159,36 +115,34 @@ class Location : public Fwk::PtrInterface<Location> {
         return m;
     }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
-        public:
-            virtual void onSegment(const Fwk::Ptr<Segment> segment){}
-            virtual void onLocation() {}
-            virtual void notifierIs(Fwk::Ptr<Location> _notifier) {
-                if (notifier_ == _notifier)
-                    return;
-                if (notifier_) 
-                    notifier_->notifieeIs(0);
-                notifier_ = _notifier;
-                notifier_->notifieeIs(this);
-            }
-            static Fwk::Ptr<Location::Notifiee> notifieeNew () {
-                Fwk::Ptr<Location::Notifiee> n = new Notifiee ();
-                return n;
-            }
-        protected:
-            Fwk::Ptr<Location> notifier_;
-            Notifiee () : notifier_(0) {}
+      public:
+        virtual void notifierIs(Fwk::Ptr<Location> notifier) {
+            if (notifier_ == notifier) return;
+            if (notifier_) notifier->notifieeIs(0);
+            notifier_ = notifier;
+            notifier_->notifieeIs(this);
+        }
+        static Fwk::Ptr<Location::Notifiee> notifieeNew() {
+            Fwk::Ptr<Location::Notifiee> n = new Notifiee();
+            return n;
+        }
+        virtual void onLocation() {}
+        virtual void onSegment() {}
+      protected:
+        Fwk::Ptr<Location> notifier_;
+        Notifiee() : notifier_(0) {}
     };
     Ptr<Location::Notifiee> notifiee() const { return notifiee_; }
   protected:
     Location(const string name) : name_(name) {
-        if (notifiee_)
-            notifiee_->onLocation();
-    }
+    if (notifiee_) notifiee_->onLocation();
+}
     Ptr<Location::Notifiee> notifiee_;
-    void notifieeIs( Location::Notifiee* n) const {
-        Location* me = const_cast<Location*>(this);
-        me->notifiee_ = n;
+    void notifieeIs(Location::Notifiee* n) const {
+      Location* me = const_cast<Location*>(this);
+      me->notifiee_ = n;
     }
+
   private:
     std::vector<Ptr<Segment> > segments_;
     string name_;
@@ -201,8 +155,34 @@ class Customer : public Location {
         Ptr<Customer> m = new Customer(name);
         return m;
     }
+    class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
+      public:
+        virtual void notifierIs(Fwk::Ptr<Customer> notifier) {
+            if (notifier_ == notifier) return;
+            if (notifier_) notifier->notifieeIs(0);
+            notifier_ = notifier;
+            notifier_->notifieeIs(this);
+        }
+        static Fwk::Ptr<Customer::Notifiee> notifieeNew() {
+            Fwk::Ptr<Customer::Notifiee> n = new Notifiee();
+            return n;
+        }
+        virtual void onCustomer() {}
+      protected:
+        Fwk::Ptr<Customer> notifier_;
+        Notifiee() : notifier_(0) {}
+    };
+    Ptr<Customer::Notifiee> notifiee() const { return notifiee_; }
   protected:
-    Customer(const string name) : Location(name) {}
+    Customer(const string name) : Location(name) {
+    if (notifiee_) notifiee_->onCustomer();
+}
+    Ptr<Customer::Notifiee> notifiee_;
+    void notifieeIs(Customer::Notifiee* n) const {
+      Customer* me = const_cast<Customer*>(this);
+      me->notifiee_ = n;
+    }
+
   private:
 };
 
@@ -213,8 +193,34 @@ class Port : public Location {
         Ptr<Port> m = new Port(name);
         return m;
     }
+    class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
+      public:
+        virtual void notifierIs(Fwk::Ptr<Port> notifier) {
+            if (notifier_ == notifier) return;
+            if (notifier_) notifier->notifieeIs(0);
+            notifier_ = notifier;
+            notifier_->notifieeIs(this);
+        }
+        static Fwk::Ptr<Port::Notifiee> notifieeNew() {
+            Fwk::Ptr<Port::Notifiee> n = new Notifiee();
+            return n;
+        }
+        virtual void onPort() {}
+      protected:
+        Fwk::Ptr<Port> notifier_;
+        Notifiee() : notifier_(0) {}
+    };
+    Ptr<Port::Notifiee> notifiee() const { return notifiee_; }
   protected:
-    Port(const string name) : Location(name) {}
+    Port(const string name) : Location(name) {
+    if (notifiee_) notifiee_->onPort();
+}
+    Ptr<Port::Notifiee> notifiee_;
+    void notifieeIs(Port::Notifiee* n) const {
+      Port* me = const_cast<Port*>(this);
+      me->notifiee_ = n;
+    }
+
   private:
 };
 
@@ -226,8 +232,34 @@ class Terminal : public Location {
         Ptr<Terminal> m = new Terminal(name, transportationMode);
         return m;
     }
+    class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
+      public:
+        virtual void notifierIs(Fwk::Ptr<Terminal> notifier) {
+            if (notifier_ == notifier) return;
+            if (notifier_) notifier->notifieeIs(0);
+            notifier_ = notifier;
+            notifier_->notifieeIs(this);
+        }
+        static Fwk::Ptr<Terminal::Notifiee> notifieeNew() {
+            Fwk::Ptr<Terminal::Notifiee> n = new Notifiee();
+            return n;
+        }
+        virtual void onTerminal() {}
+      protected:
+        Fwk::Ptr<Terminal> notifier_;
+        Notifiee() : notifier_(0) {}
+    };
+    Ptr<Terminal::Notifiee> notifiee() const { return notifiee_; }
   protected:
-    Terminal(const string name, const Segment::TransportationMode transportationMode) : Location(name), transportationMode_(transportationMode) {}
+    Terminal(const string name, const Segment::TransportationMode transportationMode) : Location(name), transportationMode_(transportationMode) {
+    if (notifiee_) notifiee_->onTerminal();
+}
+    Ptr<Terminal::Notifiee> notifiee_;
+    void notifieeIs(Terminal::Notifiee* n) const {
+      Terminal* me = const_cast<Terminal*>(this);
+      me->notifiee_ = n;
+    }
+
   private:
     Segment::TransportationMode transportationMode_;
 };
@@ -247,8 +279,38 @@ class Fleet : public Fwk::PtrInterface<Fleet> {
         Ptr<Fleet> m = new Fleet();
         return m;
     }
+    class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
+      public:
+        virtual void notifierIs(Fwk::Ptr<Fleet> notifier) {
+            if (notifier_ == notifier) return;
+            if (notifier_) notifier->notifieeIs(0);
+            notifier_ = notifier;
+            notifier_->notifieeIs(this);
+        }
+        static Fwk::Ptr<Fleet::Notifiee> notifieeNew() {
+            Fwk::Ptr<Fleet::Notifiee> n = new Notifiee();
+            return n;
+        }
+        virtual void onFleet() {}
+        virtual void onCost() {}
+        virtual void onCapacity() {}
+        virtual void onTransportationMode() {}
+        virtual void onSpeed() {}
+      protected:
+        Fwk::Ptr<Fleet> notifier_;
+        Notifiee() : notifier_(0) {}
+    };
+    Ptr<Fleet::Notifiee> notifiee() const { return notifiee_; }
   protected:
-    Fleet() {}
+    Fleet() {
+    if (notifiee_) notifiee_->onFleet();
+}
+    Ptr<Fleet::Notifiee> notifiee_;
+    void notifieeIs(Fleet::Notifiee* n) const {
+      Fleet* me = const_cast<Fleet*>(this);
+      me->notifiee_ = n;
+    }
+
   private:
     USD cost_;
     PackageUnit capacity_;
@@ -263,8 +325,34 @@ class TruckFleet : public Fleet {
         Ptr<TruckFleet> m = new TruckFleet();
         return m;
     }
+    class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
+      public:
+        virtual void notifierIs(Fwk::Ptr<TruckFleet> notifier) {
+            if (notifier_ == notifier) return;
+            if (notifier_) notifier->notifieeIs(0);
+            notifier_ = notifier;
+            notifier_->notifieeIs(this);
+        }
+        static Fwk::Ptr<TruckFleet::Notifiee> notifieeNew() {
+            Fwk::Ptr<TruckFleet::Notifiee> n = new Notifiee();
+            return n;
+        }
+        virtual void onTruckFleet() {}
+      protected:
+        Fwk::Ptr<TruckFleet> notifier_;
+        Notifiee() : notifier_(0) {}
+    };
+    Ptr<TruckFleet::Notifiee> notifiee() const { return notifiee_; }
   protected:
-    TruckFleet() : Fleet() {}
+    TruckFleet() : Fleet() {
+    if (notifiee_) notifiee_->onTruckFleet();
+}
+    Ptr<TruckFleet::Notifiee> notifiee_;
+    void notifieeIs(TruckFleet::Notifiee* n) const {
+      TruckFleet* me = const_cast<TruckFleet*>(this);
+      me->notifiee_ = n;
+    }
+
   private:
 };
 
@@ -275,8 +363,34 @@ class BoatFleet : public Fleet {
         Ptr<BoatFleet> m = new BoatFleet();
         return m;
     }
+    class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
+      public:
+        virtual void notifierIs(Fwk::Ptr<BoatFleet> notifier) {
+            if (notifier_ == notifier) return;
+            if (notifier_) notifier->notifieeIs(0);
+            notifier_ = notifier;
+            notifier_->notifieeIs(this);
+        }
+        static Fwk::Ptr<BoatFleet::Notifiee> notifieeNew() {
+            Fwk::Ptr<BoatFleet::Notifiee> n = new Notifiee();
+            return n;
+        }
+        virtual void onBoatFleet() {}
+      protected:
+        Fwk::Ptr<BoatFleet> notifier_;
+        Notifiee() : notifier_(0) {}
+    };
+    Ptr<BoatFleet::Notifiee> notifiee() const { return notifiee_; }
   protected:
-    BoatFleet() : Fleet() {}
+    BoatFleet() : Fleet() {
+    if (notifiee_) notifiee_->onBoatFleet();
+}
+    Ptr<BoatFleet::Notifiee> notifiee_;
+    void notifieeIs(BoatFleet::Notifiee* n) const {
+      BoatFleet* me = const_cast<BoatFleet*>(this);
+      me->notifiee_ = n;
+    }
+
   private:
 };
 
@@ -287,8 +401,34 @@ class PlaneFleet : public Fleet {
         Ptr<PlaneFleet> m = new PlaneFleet();
         return m;
     }
+    class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
+      public:
+        virtual void notifierIs(Fwk::Ptr<PlaneFleet> notifier) {
+            if (notifier_ == notifier) return;
+            if (notifier_) notifier->notifieeIs(0);
+            notifier_ = notifier;
+            notifier_->notifieeIs(this);
+        }
+        static Fwk::Ptr<PlaneFleet::Notifiee> notifieeNew() {
+            Fwk::Ptr<PlaneFleet::Notifiee> n = new Notifiee();
+            return n;
+        }
+        virtual void onPlaneFleet() {}
+      protected:
+        Fwk::Ptr<PlaneFleet> notifier_;
+        Notifiee() : notifier_(0) {}
+    };
+    Ptr<PlaneFleet::Notifiee> notifiee() const { return notifiee_; }
   protected:
-    PlaneFleet() : Fleet() {}
+    PlaneFleet() : Fleet() {
+    if (notifiee_) notifiee_->onPlaneFleet();
+}
+    Ptr<PlaneFleet::Notifiee> notifiee_;
+    void notifieeIs(PlaneFleet::Notifiee* n) const {
+      PlaneFleet* me = const_cast<PlaneFleet*>(this);
+      me->notifiee_ = n;
+    }
+
   private:
 };
 
