@@ -312,6 +312,9 @@ string StatsRep::attribute(const string& name) {
     return "";
 }
 string ConnRep::attribute(const string& name) {
+    istringstream os(name);
+  //  string temp
+//    while
     return "";
 }
 
