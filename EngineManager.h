@@ -4,8 +4,7 @@
 #include "Ptr.h"
 #include "PtrInterface.h"
 namespace Shipping {
-
-class EngineManager {
+class Engine {
   public:
      Ptr<Customer> customerNew(const string name){
         Ptr<Customer> m = new Customer(name);
