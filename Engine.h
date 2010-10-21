@@ -15,8 +15,10 @@ using namespace std;
 #include "types.h"
 #include "fwk/BaseNotifiee.h"
 #include "fwk/NamedInterface.h"
+#include "EngineManager.h"
 
 namespace Shipping {
+
 class Customer;
 class PlaneFleet;
 class TruckFleet;
@@ -27,6 +29,7 @@ class Fleet;
 class Segment;
 class Port;
 class Segment : public Fwk::PtrInterface<Segment> {
+    friend Ptr<Segment> Engine::segmentNew(const TransportationMode transportationMode, const string name);
   public:
     ~Segment(){}
     enum TransportationMode {
@@ -57,10 +60,6 @@ class Segment : public Fwk::PtrInterface<Segment> {
     Mile length() const{ return length_; }
     void lengthIs(const Mile length){ length_ = length; }
     string name() const{ return name_; }
-    static Ptr<Segment> segmentNew(const TransportationMode transportationMode, const string name) {
-        Ptr<Segment> m = new Segment(transportationMode, name);
-        return m;
-    }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<Segment> notifier) {
@@ -102,15 +101,12 @@ class Segment : public Fwk::PtrInterface<Segment> {
 };
 
 class Location : public Fwk::PtrInterface<Location> {
+    friend Ptr<Location> Engine::locationNew(const string name);
   public:
     ~Location(){}
     virtual Ptr<Segment> segment(const unsigned int index) const;
     virtual void segmentIs(const Ptr<Segment> segment);
     string name() const{ return name_; }
-    static Ptr<Location> locationNew(const string name) {
-        Ptr<Location> m = new Location(name);
-        return m;
-    }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<Location> notifier) {
@@ -143,12 +139,9 @@ class Location : public Fwk::PtrInterface<Location> {
 };
 
 class Customer : public Location {
+    friend Ptr<Customer> Engine::customerNew(const string name);
   public:
     ~Customer(){}
-    static Ptr<Customer> customerNew(const string name) {
-        Ptr<Customer> m = new Customer(name);
-        return m;
-    }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<Customer> notifier) {
@@ -178,12 +171,9 @@ class Customer : public Location {
 };
 
 class Port : public Location {
+    friend Ptr<Port> Engine::portNew(const string name);
   public:
     ~Port(){}
-    static Ptr<Port> portNew(const string name) {
-        Ptr<Port> m = new Port(name);
-        return m;
-    }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<Port> notifier) {
@@ -213,13 +203,10 @@ class Port : public Location {
 };
 
 class Terminal : public Location {
+    friend Ptr<Terminal> Engine::terminalNew(const string name, const Segment::TransportationMode transportationMode);
   public:
     ~Terminal(){}
     Segment::TransportationMode transportationMode() const{ return transportationMode_; }
-    static Ptr<Terminal> terminalNew(const string name, const Segment::TransportationMode transportationMode) {
-        Ptr<Terminal> m = new Terminal(name, transportationMode);
-        return m;
-    }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<Terminal> notifier) {
@@ -250,6 +237,7 @@ class Terminal : public Location {
 };
 
 class Fleet : public Fwk::PtrInterface<Fleet> {
+    friend Ptr<Fleet> Engine::fleetNew();
   public:
     ~Fleet(){}
     USD cost() const{ return cost_; }
@@ -260,10 +248,6 @@ class Fleet : public Fwk::PtrInterface<Fleet> {
     void transportationModeIs(const Segment::TransportationMode transportationMode){ transportationMode_ = transportationMode; }
     Mile speed() const{ return speed_; }
     void speedIs(const Mile speed){ speed_ = speed; }
-    static Ptr<Fleet> fleetNew() {
-        Ptr<Fleet> m = new Fleet();
-        return m;
-    }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<Fleet> notifier) {
@@ -301,12 +285,9 @@ class Fleet : public Fwk::PtrInterface<Fleet> {
 };
 
 class TruckFleet : public Fleet {
+    friend Ptr<TruckFleet> Engine::truckFleetNew();
   public:
     ~TruckFleet(){}
-    static Ptr<TruckFleet> truckFleetNew() {
-        Ptr<TruckFleet> m = new TruckFleet();
-        return m;
-    }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<TruckFleet> notifier) {
@@ -336,12 +317,9 @@ class TruckFleet : public Fleet {
 };
 
 class BoatFleet : public Fleet {
+    friend Ptr<BoatFleet> Engine::boatFleetNew();
   public:
     ~BoatFleet(){}
-    static Ptr<BoatFleet> boatFleetNew() {
-        Ptr<BoatFleet> m = new BoatFleet();
-        return m;
-    }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<BoatFleet> notifier) {
@@ -371,12 +349,9 @@ class BoatFleet : public Fleet {
 };
 
 class PlaneFleet : public Fleet {
+    friend Ptr<PlaneFleet> Engine::planeFleetNew();
   public:
     ~PlaneFleet(){}
-    static Ptr<PlaneFleet> planeFleetNew() {
-        Ptr<PlaneFleet> m = new PlaneFleet();
-        return m;
-    }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<PlaneFleet> notifier) {
