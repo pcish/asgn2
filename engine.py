@@ -166,9 +166,10 @@ class Entity(object):
                 ret.write('%s_(%s)' % (roattrs[i].name, roattrs[i].name))
                 if i < len(roattrs) - 1:
                     ret.write(', ')
-        ret.write(' {\n')
-        ret.write('        if (notifiee_) notifiee_->on%s();\n' % self.classname)
-        ret.write('    }\n')
+        ret.write(' {}\n')
+        #ret.write(' {\n')
+        #ret.write('        if (notifiee_) notifiee_->on%s();\n' % self.classname)
+        #ret.write('    }\n')
         return ret.getvalue()
 
     def newCallStr(self):
@@ -222,7 +223,7 @@ class Entity(object):
         ret.write('return n;\n')
         ret.set_indent(8)
         ret.write('}\n')
-        ret.write('virtual void on%s() {}\n' % self.classname)
+        #ret.write('virtual void on%s() {}\n' % self.classname)
         for attr in self.attrs:
             if attr.readonly:
                 continue
