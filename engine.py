@@ -186,22 +186,30 @@ class Entity(object):
         ret.write(')')
         return ret.getvalue()
 
-    def newInstanceMethodStr(self):
-        ret = StringIO()
+    def newInstanceMethodStr(self, base_indent=0, modifier='', prefix='', body=True):
+        ret = IndentedString(base_indent)
         roattrs = self.roattrs()
         constructor_args = self.parent_ro_attrs()
         constructor_args.extend(roattrs)
-        ret.write('    static Ptr<%s> %sNew(' % (
-            self.classname,
+        ret.write('%s Ptr<%s> %s%sNew(' % (
+            modifier, self.classname, prefix,
             ''.join((self.classname[0].lower(), self.classname[1:]))
         ))
+        ret.set_indent(0)
         for i in range(len(constructor_args)):
             ret.write('const %s %s' % (constructor_args[i].type, constructor_args[i].name))
             if i < len(constructor_args) - 1:
                 ret.write(', ')
-        ret.write(') {\n')
-        ret.write('        Ptr<%s> m = new %s;' % (self.classname, self.newCallStr()))
-        ret.write('\n        return m;\n    }\n')
+        ret.write(')')
+        if not body:
+            ret.write(';\n')
+            return ret.getvalue()
+        ret.write('{\n')
+        ret.set_indent(base_indent + 4)
+        ret.write('Ptr<%s> m = new %s;\n' % (self.classname, self.newCallStr()))
+        ret.write('return m;\n')
+        ret.set_indent(base_indent)
+        ret.write('}\n')
         return ret.getvalue()
 
     def notifiee_str(self):
@@ -253,6 +261,7 @@ class Entity(object):
         if self.parent is not None:
             ret.write(': public %s ' % (self.parent,))
         ret.write('{\n')
+        ret.write('    %s' % self.newInstanceMethodStr(0, 'friend', 'Engine::', False))
         ret.write('  public:\n')
         ret.write('    ~%s(){}\n' % self.classname)
         for enum in self.enums:
@@ -261,7 +270,7 @@ class Entity(object):
             ret.write('    %s\n' % attr.accessor_str())
             if not attr.readonly:
                 ret.write('    %s\n' % attr.mutator_str())
-        ret.write('%s' % self.newInstanceMethodStr())
+        #ret.write('%s' % self.newInstanceMethodStr(4))
         ret.write(self.notifiee_str())
         ret.write('  protected:\n')
         ret.write('    %s' % self.constructorStr())
@@ -269,6 +278,18 @@ class Entity(object):
         ret.write('\n  private:\n')
         for attr in self.attrs:
             ret.write('    %s\n' % attr.declaration_str())
+        ret.write('};\n')
+        return ret.getvalue()
+
+class EngineClass(object):
+    def __str__(self):
+        ret = IndentedString()
+        ret.write('class Engine {\n')
+        ret.write('  public:\n')
+        ret.set_indent(0)
+        for c in classes.values():
+            ret.write(c.newInstanceMethodStr(4))
+        ret.set_indent(0)
         ret.write('};\n')
         return ret.getvalue()
 
@@ -313,8 +334,22 @@ if __name__ == "__main__":
         classes[section] = c
 
     print config.get('HEADER', 'content').replace('\\t', '    ').replace('\\n', '')
+
     for c in classes.values():
         print 'class %s;' % c.classname
+
     for cn in config.get('META', 'ORDER').split():
         print classes[cn]
+
     print config.get('FOOTER', 'content').replace('\\t', '    ').replace('\\n', '')
+
+    mng_file = open('EngineManager.h', 'w')
+    mng_file.write('#ifndef ENGINE_MNG_H\n')
+    mng_file.write('#define ENGINE_MNG_H\n')
+    mng_file.write('#include "Engine.h"\n')
+    mng_file.write('#include "Ptr.h"\n')
+    mng_file.write('#include "PtrInterface.h"\n')
+    mng_file.write('namespace Shipping {\n')
+    mng_file.write('%s' % EngineClass())
+    mng_file.write('}\n#endif\n')
+    mng_file.close()
