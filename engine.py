@@ -261,7 +261,7 @@ class Entity(object):
         if self.parent is not None:
             ret.write(': public %s ' % (self.parent,))
         ret.write('{\n')
-        ret.write('    %s' % self.newInstanceMethodStr(0, 'friend', 'Engine::', False))
+        ret.write('    %s' % self.newInstanceMethodStr(0, 'friend', 'EngineManager::', False))
         ret.write('  public:\n')
         ret.write('    ~%s(){}\n' % self.classname)
         for enum in self.enums:

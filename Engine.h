@@ -29,7 +29,7 @@ class Fleet;
 class Segment;
 class Port;
 class Segment : public Fwk::PtrInterface<Segment> {
-    friend Ptr<Segment> Engine::segmentNew(const TransportationMode transportationMode, const string name);
+    friend Ptr<Segment> EngineManager::segmentNew(const TransportationMode transportationMode, const string name);
   public:
     ~Segment(){}
     enum TransportationMode {
@@ -101,7 +101,7 @@ class Segment : public Fwk::PtrInterface<Segment> {
 };
 
 class Location : public Fwk::PtrInterface<Location> {
-    friend Ptr<Location> Engine::locationNew(const string name);
+    friend Ptr<Location> EngineManager::locationNew(const string name);
   public:
     ~Location(){}
     virtual Ptr<Segment> segment(const unsigned int index) const;
@@ -139,7 +139,7 @@ class Location : public Fwk::PtrInterface<Location> {
 };
 
 class Customer : public Location {
-    friend Ptr<Customer> Engine::customerNew(const string name);
+    friend Ptr<Customer> EngineManager::customerNew(const string name);
   public:
     ~Customer(){}
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
@@ -171,7 +171,7 @@ class Customer : public Location {
 };
 
 class Port : public Location {
-    friend Ptr<Port> Engine::portNew(const string name);
+    friend Ptr<Port> EngineManager::portNew(const string name);
   public:
     ~Port(){}
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
@@ -203,7 +203,7 @@ class Port : public Location {
 };
 
 class Terminal : public Location {
-    friend Ptr<Terminal> Engine::terminalNew(const string name, const Segment::TransportationMode transportationMode);
+    friend Ptr<Terminal> EngineManager::terminalNew(const string name, const Segment::TransportationMode transportationMode);
   public:
     ~Terminal(){}
     Segment::TransportationMode transportationMode() const{ return transportationMode_; }
@@ -237,7 +237,7 @@ class Terminal : public Location {
 };
 
 class Fleet : public Fwk::PtrInterface<Fleet> {
-    friend Ptr<Fleet> Engine::fleetNew();
+    friend Ptr<Fleet> EngineManager::fleetNew();
   public:
     ~Fleet(){}
     USD cost() const{ return cost_; }
@@ -285,7 +285,7 @@ class Fleet : public Fwk::PtrInterface<Fleet> {
 };
 
 class TruckFleet : public Fleet {
-    friend Ptr<TruckFleet> Engine::truckFleetNew();
+    friend Ptr<TruckFleet> EngineManager::truckFleetNew();
   public:
     ~TruckFleet(){}
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
@@ -317,7 +317,7 @@ class TruckFleet : public Fleet {
 };
 
 class BoatFleet : public Fleet {
-    friend Ptr<BoatFleet> Engine::boatFleetNew();
+    friend Ptr<BoatFleet> EngineManager::boatFleetNew();
   public:
     ~BoatFleet(){}
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
@@ -349,7 +349,7 @@ class BoatFleet : public Fleet {
 };
 
 class PlaneFleet : public Fleet {
-    friend Ptr<PlaneFleet> Engine::planeFleetNew();
+    friend Ptr<PlaneFleet> EngineManager::planeFleetNew();
   public:
     ~PlaneFleet(){}
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
