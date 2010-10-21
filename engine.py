@@ -30,7 +30,7 @@ class Attr(object):
     def declaration_str(self):
         ret = StringIO()
         if self.collection:
-            ret.write('std::vector<%s> %ss_;' % (self.type, self.name))
+            ret.write('std::vector<%s > %ss_;' % (self.type, self.name))
         else:
             ret.write('%s %s_;' % (self.type, self.name))
         return ret.getvalue()
@@ -48,7 +48,7 @@ class Attr(object):
     def accessor_str(self):
         ret = StringIO()
         if self.collection:
-            ret.write('{type} {name} const(const unsigned int index) {{ return {name}s_.at(index); }}'.format(type=self.type, name=self.name));
+            ret.write('{type} {name}(const unsigned int index) const {{ return {name}s_.at(index); }}'.format(type=self.type, name=self.name));
         else:
             ret.write('{type} {name}() const {{ return {name}_; }}'.format(type=self.type, name=self.name));
         return ret.getvalue()
@@ -64,6 +64,7 @@ class Enum(object):
     enumitems = []
     def __init__(self, name):
         self.name = name;
+        self.enumitems = []
 
     def append(self, enumitem):
         self.enumitems.append(enumitem)
@@ -211,7 +212,7 @@ if __name__ == "__main__":
     sections = config.sections()
 
     for section in sections:
-        if section == 'HEADER' or section == 'FOOTER':
+        if section == 'HEADER' or section == 'FOOTER' or section == 'META':
             continue
         if config.has_option(section, baseclassOpt):
             c = Entity(section, config.get(section, baseclassOpt))
@@ -220,7 +221,7 @@ if __name__ == "__main__":
         for attr, type in config.items(section):
             if attr == baseclassOpt:
                 continue
-            if attr == enumOpt:
+            if attr.startswith(enumOpt):
                 enumname, enumitems = type.split(' ', 1)
                 enumitems = enumitems.split()
                 e = Enum(enumname)
@@ -239,5 +240,7 @@ if __name__ == "__main__":
 
     print config.get('HEADER', 'content').replace('\\t', '    ').replace('\\n', '')
     for c in classes.values():
-        print c
+        print 'class %s;' % c.classname
+    for cn in config.get('META', 'ORDER').split():
+        print classes[cn]
     print config.get('FOOTER', 'content').replace('\\t', '    ').replace('\\n', '')
