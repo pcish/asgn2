@@ -47,7 +47,7 @@ public:
     // Instance method
     void attributeIs(const string& name, const string& v);
 
-protected:
+
     Ptr<Location> location_;
 
 private:
@@ -88,6 +88,7 @@ public:
         LocationRep(name, manager), mode_(_mode)
     {
 //        location_ = Engine::truckTerminalNew();
+        location_ = Terminal::terminalNew(name, _mode);
     }
 protected:
     Segment::TransportationMode mode_;
@@ -100,6 +101,7 @@ public:
         Instance(name), manager_(manager), mode_ (_mode)
     {
         // Nothing else to do.
+        segment_ = Segment::segmentNew(_mode, name);
     }
 
     // Instance method
@@ -277,7 +279,12 @@ string SegmentRep::attribute(const string& name) {
 void SegmentRep::attributeIs(const string& name, const string& v) {
     //nothing to do
     if (name == "source") {
-        //segment_.sourceIs();
+        Ptr<Instance> instance = manager_->instance(v);
+        if (instance == NULL)
+            cerr << "instance lookup for " << v << " failed" << endl;
+        Ptr<Location> location = Ptr<LocationRep>((LocationRep*) instance.ptr())->location_;
+        segment_->sourceIs(location);
+        location->segmentIs(segment_);
     }
 }
 

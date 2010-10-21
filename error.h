@@ -11,7 +11,7 @@ class Error : public std::exception {
     Error(string errorMessage) : std::exception() {
         errorMessage_ = errorMessage;
     }
-    ~Error() throw();
+    ~Error() throw() {}
     virtual const char* what() const throw() {
         return errorMessage_.c_str();
     }
@@ -23,6 +23,7 @@ class ValueError : public Error {
   public:
     ValueError(string errorMessage) : Error(errorMessage) {
     }
+    ~ValueError() throw() {}
 };
 
 }

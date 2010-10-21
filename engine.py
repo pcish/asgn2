@@ -208,7 +208,7 @@ class Entity(object):
             ret.write(': public %s ' % (self.parent,))
         ret.write('{\n')
         ret.write('  public:\n')
-        ret.write('    ~%s();\n' % self.classname)
+        ret.write('    ~%s(){}\n' % self.classname)
         for enum in self.enums:
             ret.write('%s' % enum.__str__(4))
         for attr in self.attrs:

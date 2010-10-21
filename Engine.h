@@ -26,7 +26,7 @@ class Segment;
 class Port;
 class Segment : public Fwk::PtrInterface<Segment> {
   public:
-    ~Segment();
+    ~Segment(){}
     enum TransportationMode {
         truck_,
         boat_,
@@ -73,7 +73,7 @@ class Segment : public Fwk::PtrInterface<Segment> {
 
 class Location : public Fwk::PtrInterface<Location> {
   public:
-    ~Location();
+    ~Location(){}
     virtual Ptr<Segment> segment(const unsigned int index) const;
     virtual void segmentIs(const Ptr<Segment> segment);
     string name() const{ return name_; }
@@ -90,7 +90,7 @@ class Location : public Fwk::PtrInterface<Location> {
 
 class Customer : public Location {
   public:
-    ~Customer();
+    ~Customer(){}
     static Ptr<Customer> customerNew(const string name) {
         Ptr<Customer> m = new Customer(name);
         return m;
@@ -102,7 +102,7 @@ class Customer : public Location {
 
 class Port : public Location {
   public:
-    ~Port();
+    ~Port(){}
     static Ptr<Port> portNew(const string name) {
         Ptr<Port> m = new Port(name);
         return m;
@@ -114,7 +114,7 @@ class Port : public Location {
 
 class Terminal : public Location {
   public:
-    ~Terminal();
+    ~Terminal(){}
     Segment::TransportationMode transportationMode() const{ return transportationMode_; }
     static Ptr<Terminal> terminalNew(const string name, const Segment::TransportationMode transportationMode) {
         Ptr<Terminal> m = new Terminal(name, transportationMode);
@@ -128,7 +128,7 @@ class Terminal : public Location {
 
 class Fleet : public Fwk::PtrInterface<Fleet> {
   public:
-    ~Fleet();
+    ~Fleet(){}
     USD cost() const{ return cost_; }
     void costIs(const USD cost){ cost_ = cost; }
     PackageUnit capacity() const{ return capacity_; }
@@ -152,7 +152,7 @@ class Fleet : public Fwk::PtrInterface<Fleet> {
 
 class TruckFleet : public Fleet {
   public:
-    ~TruckFleet();
+    ~TruckFleet(){}
     static Ptr<TruckFleet> truckFleetNew() {
         Ptr<TruckFleet> m = new TruckFleet();
         return m;
@@ -164,7 +164,7 @@ class TruckFleet : public Fleet {
 
 class BoatFleet : public Fleet {
   public:
-    ~BoatFleet();
+    ~BoatFleet(){}
     static Ptr<BoatFleet> boatFleetNew() {
         Ptr<BoatFleet> m = new BoatFleet();
         return m;
@@ -176,7 +176,7 @@ class BoatFleet : public Fleet {
 
 class PlaneFleet : public Fleet {
   public:
-    ~PlaneFleet();
+    ~PlaneFleet(){}
     static Ptr<PlaneFleet> planeFleetNew() {
         Ptr<PlaneFleet> m = new PlaneFleet();
         return m;
