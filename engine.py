@@ -261,7 +261,8 @@ class Entity(object):
         if self.parent is not None:
             ret.write(': public %s ' % (self.parent,))
         ret.write('{\n')
-        ret.write('    %s' % self.newInstanceMethodStr(0, 'friend', 'EngineManager::', False))
+        #ret.write('    %s' % self.newInstanceMethodStr(0, 'friend', 'EngineManager::', False))
+        ret.write('   friend class EngineManager;\n')
         ret.write('  public:\n')
         ret.write('    ~%s(){}\n' % self.classname)
         for enum in self.enums:
@@ -284,7 +285,7 @@ class Entity(object):
 class EngineClass(object):
     def __str__(self):
         ret = IndentedString()
-        ret.write('class Engine {\n')
+        ret.write('class EngineManager {\n')
         ret.write('  public:\n')
         ret.set_indent(0)
         for c in classes.values():
