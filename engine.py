@@ -286,14 +286,23 @@ class Entity(object):
         ret.write('};\n')
         return ret.getvalue()
 
-class EngineClass(object):
+class ManagerClass(Entity):
+    def __init__(self):
+        self.classname = 'EngineManager'
+        for c in classes.values():
+            self.attrs.append(Attr('', '%sNew' % (''.join((c.classname[0].lower(), c.classname[1:])))))
+
     def __str__(self):
         ret = IndentedString()
-        ret.write('class EngineManager {\n')
+        ret.write('class {name} : public Fwk::PtrInterface<{name}> {{\n'.format(name=self.classname))
         ret.write('  public:\n')
         ret.set_indent(0)
         for c in classes.values():
             ret.write(c.newInstanceMethodStr(4))
+        #ret.set_indent(4)
+        ret.write(self.notifiee_str())
+        ret.write('  protected:\n')
+        ret.write(self.notifiee_protected_str())
         ret.set_indent(0)
         ret.write('};\n')
         return ret.getvalue()
@@ -338,6 +347,7 @@ if __name__ == "__main__":
             c.attrIs(a)
         classes[section] = c
 
+    mng = ManagerClass()
     mng_file = open('EngineManager.h', 'w')
     mng_file.write('#ifndef ENGINE_MNG_H\n')
     mng_file.write('#define ENGINE_MNG_H\n')
@@ -352,6 +362,6 @@ if __name__ == "__main__":
         print classes[cn]
     print config.get('FOOTER', 'content').replace('\\t', '    ').replace('\\n', '')
 
-    mng_file.write('%s' % EngineClass())
+    mng_file.write('%s' % mng)
     mng_file.write('}\n#endif\n')
     mng_file.close()
