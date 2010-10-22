@@ -30,9 +30,11 @@ public:
 
     // Manager method
     void instanceDel(const string& name);
+    EngineManager* engineManager() {return engineManager_; }
 
 private:
     map<string,Ptr<Instance> > instance_;
+    EngineManager* engineManager_;
 };
 
 class SegmentRep;
@@ -51,9 +53,9 @@ public:
 
 
     Ptr<Location> location_;
-
-private:
+protected:
     Ptr<ManagerImpl> manager_;
+private:
     //map<string, Segment> segments; // do we need segment here or in Location?
     //vector<string> segmentNames_;
     int segmentNumber(const string& name);
@@ -90,7 +92,7 @@ public:
         LocationRep(name, manager), mode_(_mode)
     {
 //        location_ = Engine::truckTerminalNew();
-        location_ = Terminal::terminalNew(name, _mode);
+          location_ = manager_->engineManager()->terminalNew(name, _mode);
     }
 protected:
     Segment::TransportationMode mode_;
@@ -109,11 +111,11 @@ public:
         Instance(name), manager_(manager), mode_ (_mode)
     {
         // Nothing else to do.
-        segment_ = Segment::segmentNew(_mode, name);
+        segment_ = manager_->engineManager()->segmentNew(_mode, name);
         /* test code */
-        SegmentReactor *t = new SegmentReactor ();
-        t->notifierIs(segment_);
-        segment_->expediteSupportIs(Segment::available());
+        //SegmentReactor *t = new SegmentReactor ();
+        //t->notifierIs(segment_);
+        //segment_->expediteSupportIs(Segment::available());
         /**/
     }
 
@@ -125,8 +127,8 @@ public:
 
 protected:
     Ptr<Segment> segment_;
-private:
     Ptr<ManagerImpl> manager_;
+private:
     int segmentNumber(const string& name);
     Segment::TransportationMode mode_;
 
@@ -143,10 +145,10 @@ public:
         return instance_;
     }
 protected:
+    Ptr<ManagerImpl> manager_;
     StatsRep (const string& name, ManagerImpl *manager) :
         Instance(name), manager_(manager) { }
 private:
-    Ptr<ManagerImpl> manager_;
     static Ptr<StatsRep> instance_;
 };
 Ptr<StatsRep> StatsRep::instance_ = NULL;
@@ -165,9 +167,9 @@ protected:
     ConnRep (const string& name, ManagerImpl *manager) :
         Instance(name), manager_(manager)
     {}
+    Ptr<ManagerImpl> manager_;
 
 private:
-    Ptr<ManagerImpl> manager_;
     static Ptr<ConnRep> instance_;
 };
 Ptr<ConnRep> ConnRep::instance_ = NULL;
@@ -257,6 +259,7 @@ Ptr<Instance> ManagerImpl::instance(const string& name) {
 }
 
 void ManagerImpl::instanceDel(const string& name) {
+    engineManager_ = new EngineManager ();
 }
 
 
@@ -314,6 +317,9 @@ string StatsRep::attribute(const string& name) {
     return "";
 }
 string ConnRep::attribute(const string& name) {
+    istringstream os(name);
+  //  string temp
+//    while
     return "";
 }
 

@@ -30,7 +30,7 @@ class Fleet;
 class Segment;
 class Port;
 class Segment : public Fwk::PtrInterface<Segment> {
-   friend class EngineManager;
+    friend class EngineManager;
   public:
     ~Segment(){}
     enum TransportationMode {
@@ -102,7 +102,7 @@ class Segment : public Fwk::PtrInterface<Segment> {
 };
 
 class Location : public Fwk::PtrInterface<Location> {
-   friend class EngineManager;
+    friend class EngineManager;
   public:
     ~Location(){}
     virtual Ptr<Segment> segment(const unsigned int index) const;
@@ -140,7 +140,7 @@ class Location : public Fwk::PtrInterface<Location> {
 };
 
 class Customer : public Location {
-   friend class EngineManager;
+    friend class EngineManager;
   public:
     ~Customer(){}
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
@@ -172,7 +172,7 @@ class Customer : public Location {
 };
 
 class Port : public Location {
-   friend class EngineManager;
+    friend class EngineManager;
   public:
     ~Port(){}
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
@@ -204,7 +204,7 @@ class Port : public Location {
 };
 
 class Terminal : public Location {
-   friend class EngineManager;
+    friend class EngineManager;
   public:
     ~Terminal(){}
     Segment::TransportationMode transportationMode() const{ return transportationMode_; }
@@ -238,7 +238,7 @@ class Terminal : public Location {
 };
 
 class Fleet : public Fwk::PtrInterface<Fleet> {
-   friend class EngineManager;
+    friend class EngineManager;
   public:
     ~Fleet(){}
     USD cost() const{ return cost_; }
@@ -286,7 +286,7 @@ class Fleet : public Fwk::PtrInterface<Fleet> {
 };
 
 class TruckFleet : public Fleet {
-   friend class EngineManager;
+    friend class EngineManager;
   public:
     ~TruckFleet(){}
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
@@ -318,7 +318,7 @@ class TruckFleet : public Fleet {
 };
 
 class BoatFleet : public Fleet {
-   friend class EngineManager;
+    friend class EngineManager;
   public:
     ~BoatFleet(){}
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
@@ -350,7 +350,7 @@ class BoatFleet : public Fleet {
 };
 
 class PlaneFleet : public Fleet {
-   friend class EngineManager;
+    friend class EngineManager;
   public:
     ~PlaneFleet(){}
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {

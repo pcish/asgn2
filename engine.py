@@ -262,7 +262,7 @@ class Entity(object):
             ret.write(': public %s ' % (self.parent,))
         ret.write('{\n')
         #ret.write('    %s' % self.newInstanceMethodStr(0, 'friend', 'EngineManager::', False))
-        ret.write('   friend class EngineManager;\n')
+        ret.write('    friend class EngineManager;\n')
         ret.write('  public:\n')
         ret.write('    ~%s(){}\n' % self.classname)
         for enum in self.enums:
