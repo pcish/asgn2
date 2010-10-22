@@ -197,7 +197,11 @@ class Entity(object):
         ))
         ret.set_indent(0)
         for i in range(len(constructor_args)):
-            ret.write('const %s %s' % (constructor_args[i].type, constructor_args[i].name))
+            typename = constructor_args[i].type
+            for enum in self.enums:
+                if constructor_args[i].type == enum.name:
+                    typename = '::'.join((self.classname, constructor_args[i].type))
+            ret.write('const %s %s' % (typename, constructor_args[i].name))
             if i < len(constructor_args) - 1:
                 ret.write(', ')
         ret.write(')')

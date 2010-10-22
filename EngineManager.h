@@ -34,7 +34,7 @@ class EngineManager {
         Ptr<Fleet> m = new Fleet();
         return m;
     }
-     Ptr<Segment> segmentNew(const TransportationMode transportationMode, const string name){
+     Ptr<Segment> segmentNew(const Segment::TransportationMode transportationMode, const string name){
         Ptr<Segment> m = new Segment(transportationMode, name);
         return m;
     }
