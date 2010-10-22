@@ -15,7 +15,6 @@ using namespace std;
 #include "types.h"
 #include "fwk/BaseNotifiee.h"
 #include "fwk/NamedInterface.h"
-#include "EngineManager.h"
 
 namespace Shipping {
 

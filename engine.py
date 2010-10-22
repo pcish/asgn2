@@ -338,16 +338,6 @@ if __name__ == "__main__":
             c.attrIs(a)
         classes[section] = c
 
-    print config.get('HEADER', 'content').replace('\\t', '    ').replace('\\n', '')
-
-    for c in classes.values():
-        print 'class %s;' % c.classname
-
-    for cn in config.get('META', 'ORDER').split():
-        print classes[cn]
-
-    print config.get('FOOTER', 'content').replace('\\t', '    ').replace('\\n', '')
-
     mng_file = open('EngineManager.h', 'w')
     mng_file.write('#ifndef ENGINE_MNG_H\n')
     mng_file.write('#define ENGINE_MNG_H\n')
@@ -355,6 +345,13 @@ if __name__ == "__main__":
     mng_file.write('#include "Ptr.h"\n')
     mng_file.write('#include "PtrInterface.h"\n')
     mng_file.write('namespace Shipping {\n')
+    print config.get('HEADER', 'content').replace('\\t', '    ').replace('\\n', '')
+    for c in classes.values():
+        print 'class %s;' % c.classname
+    for cn in config.get('META', 'ORDER').split():
+        print classes[cn]
+    print config.get('FOOTER', 'content').replace('\\t', '    ').replace('\\n', '')
+
     mng_file.write('%s' % EngineClass())
     mng_file.write('}\n#endif\n')
     mng_file.close()
