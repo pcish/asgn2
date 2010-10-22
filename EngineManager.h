@@ -1,10 +1,10 @@
 #ifndef ENGINE_MNG_H
 #define ENGINE_MNG_H
-#include "Engine.h"
 #include "Ptr.h"
 #include "PtrInterface.h"
+#include "Engine.h"
 namespace Shipping {
-class Engine {
+class EngineManager {
   public:
      Ptr<Customer> customerNew(const string name){
         Ptr<Customer> m = new Customer(name);
@@ -34,7 +34,7 @@ class Engine {
         Ptr<Fleet> m = new Fleet();
         return m;
     }
-     Ptr<Segment> segmentNew(const TransportationMode transportationMode, const string name){
+     Ptr<Segment> segmentNew(const Segment::TransportationMode transportationMode, const string name){
         Ptr<Segment> m = new Segment(transportationMode, name);
         return m;
     }
