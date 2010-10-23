@@ -98,6 +98,7 @@ class Segment : public Fwk::PtrInterface<Segment> {
     SegmentDifficultyUnit difficulty_;
     Mile length_;
     string name_;
+    Segment(const Segment& o);
 };
 
 class Location : public Fwk::PtrInterface<Location> {
@@ -136,6 +137,7 @@ class Location : public Fwk::PtrInterface<Location> {
   private:
     std::vector<Ptr<Segment> > segments_;
     string name_;
+    Location(const Location& o);
 };
 
 class Customer : public Location {
@@ -168,6 +170,7 @@ class Customer : public Location {
     }
 
   private:
+    Customer(const Customer& o);
 };
 
 class Port : public Location {
@@ -200,6 +203,7 @@ class Port : public Location {
     }
 
   private:
+    Port(const Port& o);
 };
 
 class Terminal : public Location {
@@ -234,6 +238,7 @@ class Terminal : public Location {
 
   private:
     Segment::TransportationMode transportationMode_;
+    Terminal(const Terminal& o);
 };
 
 class Fleet : public Fwk::PtrInterface<Fleet> {
@@ -282,6 +287,7 @@ class Fleet : public Fwk::PtrInterface<Fleet> {
     PackageUnit capacity_;
     Segment::TransportationMode transportationMode_;
     Mile speed_;
+    Fleet(const Fleet& o);
 };
 
 class TruckFleet : public Fleet {
@@ -314,6 +320,7 @@ class TruckFleet : public Fleet {
     }
 
   private:
+    TruckFleet(const TruckFleet& o);
 };
 
 class BoatFleet : public Fleet {
@@ -346,6 +353,7 @@ class BoatFleet : public Fleet {
     }
 
   private:
+    BoatFleet(const BoatFleet& o);
 };
 
 class PlaneFleet : public Fleet {
@@ -378,6 +386,7 @@ class PlaneFleet : public Fleet {
     }
 
   private:
+    PlaneFleet(const PlaneFleet& o);
 };
 
 } /* end namespace */

@@ -283,6 +283,7 @@ class Entity(object):
         ret.write('\n  private:\n')
         for attr in self.attrs:
             ret.write('    %s\n' % attr.declaration_str())
+        ret.write('    {name}(const {name}& o);\n'.format(name=self.classname))
         ret.write('};\n')
         return ret.getvalue()
 
