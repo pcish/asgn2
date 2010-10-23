@@ -2,8 +2,8 @@
   {'name'=>'Mile', 'parent'=>'Ordinal', 'base'=>'unsigned int', 'default'=>'0', 'constructor'=>''},
   {'name'=>'USD', 'parent'=>'Ordinal', 'base'=>'double', 'default'=>'0.0', 'constructor'=>''},
   {'name'=>'PackageUnit', 'parent'=>'Ordinal', 'base'=>'unsigned int', 'default'=>'0', 'constructor'=>''},
-  {'name'=>'SegmentDifficultyUnit', 'parent'=>'Ordinal', 'base'=>'float', 'default'=>'1.0',
-  'constructor'=>'if (num < 1.0 || num > 5.0) throw ValueError("Segment Difficulty must lie between 1.0 and 5.0");'},
+  {'name'=>'SegmentDifficultyUnit', 'parent'=>'Ordinal', 'base'=>'float', 'default'=>'1.0', 'minimum'=>'1.0', 'maximum'=>'5.0',
+  'constructor'=>'if (num < minimum || num > maximum) throw ValueError("Segment Difficulty must lie between 1.0 and 5.0");'},
   {'name'=>'SegmentCount', 'parent'=>'Ordinal', 'base'=>'unsigned int', 'default'=>'0', 'constructor'=>''},
   {'name'=>'TruckSegmentCount', 'parent'=>'Ordinal', 'base'=>'unsigned int', 'default'=>'0', 'constructor'=>''},
   {'name'=>'BoatSegmentCount', 'parent'=>'Ordinal', 'base'=>'unsigned int', 'default'=>'0', 'constructor'=>''},
@@ -29,6 +29,12 @@ print FILE "namespace Shipping {\n\n";
 foreach $type (@types) {
   print FILE "class $type->{'name'} : public $type->{'parent'}<$type->{'name'}, $type->{'base'}> {\n";
   print FILE "  public:\n";
+  if ($type->{'minimum'} ne '') {
+    print FILE "    static const $type->{'base'} minimum = $type->{'minimum'};\n"
+  }
+  if ($type->{'maximum'} ne '') {
+      print FILE "    static const $type->{'base'} maximum = $type->{'maximum'};\n"
+  }
   print FILE "    $type->{'name'}($type->{'base'} num = $type->{'default'}) : $type->{'parent'}<$type->{'name'}, $type->{'base'}>(num) {\n";
   if ($type->{'constructor'} ne '') {
     print FILE "        $type->{'constructor'}\n";

@@ -25,8 +25,10 @@ class PackageUnit : public Ordinal<PackageUnit, unsigned int> {
 
 class SegmentDifficultyUnit : public Ordinal<SegmentDifficultyUnit, float> {
   public:
+    static const float minimum = 1.0;
+    static const float maximum = 5.0;
     SegmentDifficultyUnit(float num = 1.0) : Ordinal<SegmentDifficultyUnit, float>(num) {
-        if (num < 1.0 || num > 5.0) throw ValueError("Segment Difficulty must lie between 1.0 and 5.0");
+        if (num < minimum || num > maximum) throw ValueError("Segment Difficulty must lie between 1.0 and 5.0");
     }
 };
 
