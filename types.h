@@ -30,6 +30,66 @@ class SegmentDifficultyUnit : public Ordinal<SegmentDifficultyUnit, float> {
     }
 };
 
+class SegmentCount : public Ordinal<SegmentCount, unsigned int> {
+  public:
+    SegmentCount(unsigned int num = 0) : Ordinal<SegmentCount, unsigned int>(num) {
+    }
+};
+
+class TruckSegmentCount : public Ordinal<TruckSegmentCount, unsigned int> {
+  public:
+    TruckSegmentCount(unsigned int num = 0) : Ordinal<TruckSegmentCount, unsigned int>(num) {
+    }
+};
+
+class BoatSegmentCount : public Ordinal<BoatSegmentCount, unsigned int> {
+  public:
+    BoatSegmentCount(unsigned int num = 0) : Ordinal<BoatSegmentCount, unsigned int>(num) {
+    }
+};
+
+class PlaneSegmentCount : public Ordinal<PlaneSegmentCount, unsigned int> {
+  public:
+    PlaneSegmentCount(unsigned int num = 0) : Ordinal<PlaneSegmentCount, unsigned int>(num) {
+    }
+};
+
+class LocationCount : public Ordinal<LocationCount, unsigned int> {
+  public:
+    LocationCount(unsigned int num = 0) : Ordinal<LocationCount, unsigned int>(num) {
+    }
+};
+
+class PortCount : public Ordinal<PortCount, unsigned int> {
+  public:
+    PortCount(unsigned int num = 0) : Ordinal<PortCount, unsigned int>(num) {
+    }
+};
+
+class TerminalCount : public Ordinal<TerminalCount, unsigned int> {
+  public:
+    TerminalCount(unsigned int num = 0) : Ordinal<TerminalCount, unsigned int>(num) {
+    }
+};
+
+class TruckTerminalCount : public Ordinal<TruckTerminalCount, unsigned int> {
+  public:
+    TruckTerminalCount(unsigned int num = 0) : Ordinal<TruckTerminalCount, unsigned int>(num) {
+    }
+};
+
+class BoatTerminalCount : public Ordinal<BoatTerminalCount, unsigned int> {
+  public:
+    BoatTerminalCount(unsigned int num = 0) : Ordinal<BoatTerminalCount, unsigned int>(num) {
+    }
+};
+
+class PlaneTerminalCount : public Ordinal<PlaneTerminalCount, unsigned int> {
+  public:
+    PlaneTerminalCount(unsigned int num = 0) : Ordinal<PlaneTerminalCount, unsigned int>(num) {
+    }
+};
+
 }
 
 #endif
