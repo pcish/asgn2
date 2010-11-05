@@ -354,10 +354,10 @@ if __name__ == "__main__":
         classes[section] = c
 
     mng = ManagerClass()
-    mng_file = open('EngineManager.h', 'w')
+    mng_file = open('Engine.h', 'w')
     mng_file.write('#ifndef ENGINE_MNG_H\n')
     mng_file.write('#define ENGINE_MNG_H\n')
-    mng_file.write('#include "Engine.h"\n')
+    mng_file.write('#include "entities.h"\n')
     mng_file.write('#include "ShippingNetwork.h"\n')
     mng_file.write('#include "Ptr.h"\n')
     mng_file.write('#include "PtrInterface.h"\n')
