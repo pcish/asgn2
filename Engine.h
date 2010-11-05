@@ -28,7 +28,8 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     void expediteIs(const Segment::ExpediteSupport expedite) { if (expedite_ == expedite) return; expedite_ = expedite; }
     ShippingNetwork() : customers_(0), terminals_(0), ports_(0), segments_(0) {
     }
-
+  protected:
+    void customersInc() { customers_++; }
   private:
     int customers_;
     Ptr<Location> destination_;
@@ -46,11 +47,7 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
 
 class EngineManager : public Fwk::PtrInterface<EngineManager> {
   public:
-    EngineManager() {
-        network_ = new ShippingNetwork();
-        Fwk::Ptr<EngineManager::Notifiee> r = EngineManager::Notifiee::notifieeNew();
-        r->notifierIs(this);
-    }
+    EngineManager();
     Ptr<ShippingNetwork> shippingNetwork() const { return network_; }
     Ptr<Customer> customerNew(const string name){
         if (notifiee_) notifiee_->onCustomerNew();
@@ -116,10 +113,10 @@ class EngineManager : public Fwk::PtrInterface<EngineManager> {
   protected:
     Ptr<ShippingNetwork> network_;
     Ptr<EngineManager::Notifiee> notifiee_;
-    void notifieeIs(EngineManager::Notifiee* n) const {
+    void notifieeIs(EngineManager::Notifiee* n) {
         //EngineManager* me = const_cast<EngineManager*>(this);
         //me->notifiee_ = n;
-        notifiee = n;
+        notifiee_ = n;
     }
 };
 
