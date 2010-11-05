@@ -26,12 +26,11 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     int ports() const { return ports_; }
     Segment::ExpediteSupport expedite() const { return expedite_; }
     void expediteIs(const Segment::ExpediteSupport expedite) { if (expedite_ == expedite) return; expedite_ = expedite; }
-    ShippingNetwork() {
+    ShippingNetwork() : customers_(0), terminals_(0), ports_(0), segments_(0) {
     }
 
   private:
     int customers_;
-    int segments_;
     Ptr<Location> destination_;
     USD maxCost_;
     Ptr<Location> source_;
@@ -40,6 +39,7 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     int maxTime_;
     Mile maxDistance_;
     int ports_;
+    int segments_;
     Segment::ExpediteSupport expedite_;
     ShippingNetwork(const ShippingNetwork& o);
 };

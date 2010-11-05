@@ -181,7 +181,9 @@ class FleetRep : public Instance {
 };
 Ptr<FleetRep> FleetRep::instance_ = NULL;
 
-ManagerImpl::ManagerImpl() {}
+ManagerImpl::ManagerImpl() {
+    engineManager_ = new EngineManager();
+}
 
 Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
     if (instance_.find(name) != instance_.end()) {
@@ -252,7 +254,6 @@ Ptr<Instance> ManagerImpl::instance(const string& name) {
 }
 
 void ManagerImpl::instanceDel(const string& name) {
-    engineManager_ = new EngineManager ();
 }
 
 template <typename T, typename TRep>
@@ -326,7 +327,27 @@ int LocationRep::segmentNumber(const string& name) {
 }
 
 string StatsRep::attribute(const string& name) {
-    return "";
+    ostringstream os;
+    if (name == "Customer") {
+        os << manager_->engineManager()->shippingNetwork()->customers();
+    } else if (name == "Truck terminal") {
+        os << manager_->engineManager()->shippingNetwork()->terminals();
+    } else if (name == "Plane terminal") {
+        os << manager_->engineManager()->shippingNetwork()->terminals();
+    } else if (name == "Boat terminal") {
+        os << manager_->engineManager()->shippingNetwork()->terminals();
+    } else if (name == "Port") {
+        os << manager_->engineManager()->shippingNetwork()->ports();
+    } else if (name == "Truck segment") {
+        os << manager_->engineManager()->shippingNetwork()->segments();
+    } else if (name == "Plane segment") {
+        os << manager_->engineManager()->shippingNetwork()->segments();
+    } else if (name == "Boat segment") {
+        os << manager_->engineManager()->shippingNetwork()->segments();
+    } else {
+        return "";
+    }
+    return os.str();
 }
 string ConnRep::attribute(const string& name) {
     istringstream os(name);
