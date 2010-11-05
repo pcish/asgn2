@@ -28,9 +28,12 @@ public:
     // Manager method
     Ptr<Instance> instance(const string& name);
 
+    template <typename T, typename TRep>
+    Ptr<T> cast_instance(const string& v);
+
     // Manager method
     void instanceDel(const string& name);
-    EngineManager* engineManager() {return engineManager_; }
+    EngineManager* engineManager() { return engineManager_; }
 
 private:
     map<string,Ptr<Instance> > instance_;
@@ -41,165 +44,152 @@ class SegmentRep;
 
 class LocationRep : public Instance {
 public:
+    virtual string attribute(const string& name);
+    virtual void attributeIs(const string& name, const string& v);
 
+    Ptr<Location> engineObject() const { return engineObject_; }
+  protected:
     LocationRep(const string& name, ManagerImpl* manager) :
-        Instance(name), manager_(manager) { }
-
-    // Instance method
-    string attribute(const string& name);
-
-    // Instance method
-    void attributeIs(const string& name, const string& v);
-
-
-    Ptr<Location> location_;
-protected:
+        Instance(name), manager_(manager) {
+    }
     Ptr<ManagerImpl> manager_;
-private:
-    //map<string, Segment> segments; // do we need segment here or in Location?
-    //vector<string> segmentNames_;
+
+  private:
+    Ptr<Location> engineObject_;
     int segmentNumber(const string& name);
-
-//    void segmentRepIs (Ptr<SegmentRep> segRep);
-//    unsigned int segments () { return segmentName.size(); }
-
-
 };
+
 class PortRep : public LocationRep {
-public:
+  public:
     PortRep(const string& name, ManagerImpl *manager) :
-        LocationRep(name, manager)
-    {
-//        location_ = Engine::truckTerminalNew();
+        LocationRep(name, manager) {
+        engineObject_ = manager->engineManager()->portNew(name);
     }
+    Ptr<Port> engineObject() const { return engineObject_; }
 
+  private:
+    Ptr<Port> engineObject_;
 };
+
 class CustomerRep : public LocationRep {
-public:
+  public:
     CustomerRep(const string& name, ManagerImpl *manager) :
-        LocationRep(name, manager)
-    {
-//        location_ = Engine::truckTerminalNew();
+        LocationRep(name, manager) {
+        engineObject_ = manager->engineManager()->customerNew(name);
     }
+    Ptr<Customer> engineObject() const { return engineObject_; }
 
+  private:
+    Ptr<Customer> engineObject_;
 };
-
 
 class TerminalRep : public LocationRep {
-public:
-
+  public:
     TerminalRep(const string& name, ManagerImpl *manager, Segment::TransportationMode _mode) :
-        LocationRep(name, manager), mode_(_mode)
-    {
-//        location_ = Engine::truckTerminalNew();
-          location_ = manager_->engineManager()->terminalNew(name, _mode);
+        LocationRep(name, manager), mode_(_mode) {
+          engineObject_ = manager_->engineManager()->terminalNew(name, _mode);
     }
-protected:
+
+  protected:
     Segment::TransportationMode mode_;
+
+  private:
+    Ptr<Terminal> engineObject_;
 };
 
 class SegmentRep : public Instance {
-public:
-    class SegmentReactor : public Segment::Notifiee {
-        public:
-            void onExpediteSupport () {
-                cout << "Expedite Support changed" << endl;
-            }
-    };
-
+  public:
     SegmentRep(const string& name, ManagerImpl* manager, Segment::TransportationMode _mode) :
-        Instance(name), manager_(manager), mode_ (_mode)
-    {
-        // Nothing else to do.
-        segment_ = manager_->engineManager()->segmentNew(_mode, name);
-        /* test code */
-        //SegmentReactor *t = new SegmentReactor ();
-        //t->notifierIs(segment_);
-        //segment_->expediteSupportIs(Segment::available());
-        /**/
+        Instance(name), manager_(manager), mode_ (_mode) {
+        engineObject_ = manager_->engineManager()->segmentNew(_mode, name);
     }
 
-    // Instance method
     string attribute(const string& name);
-
-    // Instance method
     void attributeIs(const string& name, const string& v);
 
-protected:
-    Ptr<Segment> segment_;
+    Ptr<Segment> engineObject() const { return engineObject_; }
+
+  protected:
     Ptr<ManagerImpl> manager_;
-private:
+
+  private:
+    Ptr<Segment> engineObject_;
     int segmentNumber(const string& name);
     Segment::TransportationMode mode_;
-
 };
 
 class StatsRep : public Instance {
-public:
-    string attribute (const string &name);
-    void attributeIs(const string& name, const string& v) {} // do nothing: quietly ignore the write function
-
-    static Ptr<StatsRep> instance (const string& name, ManagerImpl *_manager) {
+  public:
+    static Ptr<StatsRep> instance(const string& name, ManagerImpl *_manager) {
         if (instance_ == NULL)
-            instance_ = new StatsRep (name, _manager);
+            instance_ = new StatsRep(name, _manager);
         return instance_;
     }
-protected:
+
+    string attribute(const string &name);
+    void attributeIs(const string& name, const string& v) {} // do nothing: quietly ignore the write function
+
+  protected:
+    StatsRep(const string& name, ManagerImpl *manager) :
+        Instance(name), manager_(manager) {}
     Ptr<ManagerImpl> manager_;
-    StatsRep (const string& name, ManagerImpl *manager) :
-        Instance(name), manager_(manager) { }
-private:
+
+  private:
     static Ptr<StatsRep> instance_;
 };
 Ptr<StatsRep> StatsRep::instance_ = NULL;
 
 class ConnRep : public Instance {
-public:
+  public:
     string attribute(const string& name);
-    void attributeIs(const string& name, const string& v) {} //do nothing: quitely ignore the write function
-    static Ptr<ConnRep> instance (const string &name, ManagerImpl *manager) {
+    void attributeIs(const string& name, const string& v) {}
+    static Ptr<ConnRep> instance(const string &name, ManagerImpl *manager) {
         if (instance_ == NULL)
             instance_ = new ConnRep (name, manager);
         return instance_;
     }
 
-protected:
+  protected:
     ConnRep (const string& name, ManagerImpl *manager) :
-        Instance(name), manager_(manager)
-    {}
+        Instance(name), manager_(manager) {}
     Ptr<ManagerImpl> manager_;
 
-private:
+  private:
     static Ptr<ConnRep> instance_;
 };
 Ptr<ConnRep> ConnRep::instance_ = NULL;
 
 class FleetRep : public Instance {
-public:
-    FleetRep(const string& name, ManagerImpl* manager) :
-        Instance(name), manager_(manager) {}
+  public:
+    static Ptr<FleetRep> instance(const string &name, ManagerImpl *manager) {
+        if (instance_ == NULL)
+            instance_ = new FleetRep(name, manager);
+        return instance_;
+    }
 
-    // Instance method
     string attribute(const string& name);
-
-    // Instance method
     void attributeIs(const string& name, const string& v);
 
-protected:
+  protected:
+    FleetRep(const string& name, ManagerImpl* manager) :
+        Instance(name), manager_(manager) {}
     Ptr<Fleet> truckfleet_, boatfleet_, planefleet_;
-private:
+
+  private:
+    static Ptr<FleetRep> instance_;
     Ptr<ManagerImpl> manager_;
 };
+Ptr<FleetRep> FleetRep::instance_ = NULL;
 
 ManagerImpl::ManagerImpl() {}
 
 Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
-    if (instance_.find(name) != instance_.end() ){
+    if (instance_.find(name) != instance_.end()) {
         cerr << "Attempt to new instances of the same names!" << endl;
         return NULL;
     }
     if (type == "Truck terminal") {
-        Ptr<TerminalRep> t = new TerminalRep(name, this, Segment::truck() );
+        Ptr<TerminalRep> t = new TerminalRep(name, this, Segment::truck());
         instance_[name] = t;
         return t;
     }
@@ -238,14 +228,18 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
         instance_[name] = t;
         return t;
     }
-    if (type == "StatsRep") {
-        Ptr<StatsRep> t = StatsRep::instance (name, this);
+    if (type == "Stats") {
+        Ptr<StatsRep> t = StatsRep::instance(name, this);
         instance_[name] = t;
         return t;
     }
-    if (type == "Fleet") {}
+    if (type == "Fleet") {
+        Ptr<FleetRep> t = FleetRep::instance(name, this);
+        instance_[name] = t;
+        return t;
+    }
     if (type == "ConnRep") {
-        Ptr<ConnRep> t = ConnRep::instance (name, this);
+        Ptr<ConnRep> t = ConnRep::instance(name, this);
         instance_[name] = t;
         return t;
     }
@@ -254,7 +248,6 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 
 Ptr<Instance> ManagerImpl::instance(const string& name) {
     map<string,Ptr<Instance> >::const_iterator t = instance_.find(name);
-
     return t == instance_.end() ? NULL : (*t).second;
 }
 
@@ -262,43 +255,62 @@ void ManagerImpl::instanceDel(const string& name) {
     engineManager_ = new EngineManager ();
 }
 
+template <typename T, typename TRep>
+Ptr<T> ManagerImpl::cast_instance(const string& v) {
+    Ptr<Instance> ins = instance(v);
+    if (ins == NULL)
+        cerr << "instance lookup for " << v << " failed" << endl;
+    return Ptr<TRep>((TRep*) ins.ptr())->engineObject();
+}
 
 string LocationRep::attribute(const string& name) {
     int i = segmentNumber(name);
     if (i != 0) {
-        //cout << "Tried to read interface " << i;
-        //if (i < 0 || i >= segmentNames_.size() ){
-        //    cerr << "Segment # out of bound" << endl;
-        //}
-        //return segmentNames_[i];
-        return location_->segment(i)->name();
+        return engineObject_->segment(i)->name();
     }
     return "";
 }
 
-
 void LocationRep::attributeIs(const string& name, const string& v) {
-    //nothing to do
+    //location has no writable attributes
 }
 
 string SegmentRep::attribute(const string& name) {
-    int i = 1;//segmentNumber(name);
-    if (i != 0) {
-        cout << "Tried to read interface " << i;
+    ostringstream os;
+    if (name == "source") {
+        os << engineObject_->source()->name();
+    } else if (name == "length") {
+        os << engineObject_->length().value();
+    } else if (name == "return segment") {
+        os << engineObject_->returnSegment()->name();
+    } else if (name == "difficulty") {
+        os << engineObject_->difficulty().value();
+    } else if (name == "expedite support") {
+        int support = engineObject_->expediteSupport();
+        if (support == Segment::available()) os << "yes";
+        else if (support == Segment::unavailable()) os << "no";
+    } else {
     }
-    return "";
+    return os.str();
 }
 
-
 void SegmentRep::attributeIs(const string& name, const string& v) {
-    //nothing to do
     if (name == "source") {
-        Ptr<Instance> instance = manager_->instance(v);
-        if (instance == NULL)
-            cerr << "instance lookup for " << v << " failed" << endl;
-        Ptr<Location> location = Ptr<LocationRep>((LocationRep*) instance.ptr())->location_;
-        segment_->sourceIs(location);
-        location->segmentIs(segment_);
+        Ptr<Location> location = manager_->cast_instance<Location, LocationRep>(v);
+        engineObject_->sourceIs(location);
+        location->segmentIs(engineObject_);
+    } else if (name == "length") {
+        engineObject_->lengthIs(atoi(v.c_str()));
+    } else if (name == "return segment") {
+        Ptr<Segment> segment = manager_->cast_instance<Segment, SegmentRep>(v);
+        engineObject_->returnSegmentIs(segment);
+    } else if (name == "difficulty") {
+        engineObject_->difficultyIs(atof(v.c_str()));
+    } else if (name == "expedite support") {
+        int support = engineObject_->expediteSupport();
+        if (support == Segment::available()) ;
+        else if (support == Segment::unavailable()) ;
+    } else {
     }
 }
 
@@ -323,7 +335,7 @@ string ConnRep::attribute(const string& name) {
     return "";
 }
 
-string FleetRep::attribute (const string& name) {
+string FleetRep::attribute(const string& name) {
     int commaPos = name.find_first_of (',');
     string mode = name.substr (0, commaPos), property = name.substr (commaPos + 1);
     //trim the string
@@ -336,24 +348,20 @@ string FleetRep::attribute (const string& name) {
     if (mode == "Boat") fleet_ = boatfleet_;
     if (mode == "Plane") fleet_ = planefleet_;
 
+    ostringstream os;
     if (property == "speed") {
-        ostringstream os;
-        os << fleet_->speed ().value();
-        return os.str();
+        os << fleet_->speed().value();
+    } else if (property == "cost"){
+        os << fleet_->cost().value();
+    } else if (property == "capacity"){
+        os << fleet_->capacity().value();
+    } else {
+        return "";
     }
-    if (property == "cost"){
-        ostringstream os;
-        os << fleet_->cost ().value();
-        return os.str();
-    }
-    if (property == "capacity"){
-        ostringstream os;
-        os << fleet_->capacity ().value();
-        return os.str();
-    }
-    return "";
+    return os.str();
 }
-void FleetRep::attributeIs (const string& name, const string& v) {
+
+void FleetRep::attributeIs(const string& name, const string& v) {
     int commaPos = name.find_first_of (',');
     string mode = name.substr (0, commaPos), property = name.substr (commaPos + 1);
     //trim the string
@@ -370,13 +378,13 @@ void FleetRep::attributeIs (const string& name, const string& v) {
     int propertyValue;
     is >> propertyValue;
     if (property == "speed") {
-        fleet_->speedIs (Mile(propertyValue) );
+        fleet_->speedIs(Mile(propertyValue));
     }
     if (property == "cost") {
-        fleet_->costIs (USD(propertyValue) );
+        fleet_->costIs(USD(propertyValue));
     }
     if (property == "capacity") {
-        fleet_->capacityIs (PackageUnit(propertyValue) );
+        fleet_->capacityIs(PackageUnit(propertyValue));
     }
 }
 
