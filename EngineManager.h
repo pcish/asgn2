@@ -1,11 +1,15 @@
 #ifndef ENGINE_MNG_H
 #define ENGINE_MNG_H
 #include "Engine.h"
+#include "ShippingNetwork.h"
 #include "Ptr.h"
 #include "PtrInterface.h"
 namespace Shipping {
 class EngineManager : public Fwk::PtrInterface<EngineManager> {
   public:
+    EngineManager() {
+        network_ = new ShippingNetwork();
+    }
      Ptr<Customer> customerNew(const string name){
         Ptr<Customer> m = new Customer(name);
         return m;
@@ -42,10 +46,6 @@ class EngineManager : public Fwk::PtrInterface<EngineManager> {
         Ptr<Port> m = new Port(name);
         return m;
     }
-     Ptr<ShippingNetwork> shippingNetworkNew(const int customers, const int segments, const int terminals, const int path, const int ports){
-        Ptr<ShippingNetwork> m = new ShippingNetwork(customers, segments, terminals, path, ports);
-        return m;
-    }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<EngineManager> notifier) {
@@ -67,13 +67,13 @@ class EngineManager : public Fwk::PtrInterface<EngineManager> {
         virtual void onFleetNew() {}
         virtual void onSegmentNew() {}
         virtual void onPortNew() {}
-        virtual void onShippingNetworkNew() {}
       protected:
         Fwk::Ptr<EngineManager> notifier_;
         Notifiee() : notifier_(0) {}
     };
     Ptr<EngineManager::Notifiee> notifiee() const { return notifiee_; }
   protected:
+    Ptr<ShippingNetwork> network_;
     Ptr<EngineManager::Notifiee> notifiee_;
     void notifieeIs(EngineManager::Notifiee* n) const {
         EngineManager* me = const_cast<EngineManager*>(this);

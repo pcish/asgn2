@@ -28,7 +28,6 @@ class BoatFleet;
 class Fleet;
 class Segment;
 class Port;
-class ShippingNetwork;
 class Segment : public Fwk::PtrInterface<Segment> {
     friend class EngineManager;
   public:
@@ -388,73 +387,6 @@ class PlaneFleet : public Fleet {
 
   private:
     PlaneFleet(const PlaneFleet& o);
-};
-
-class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
-    friend class EngineManager;
-  public:
-    ~ShippingNetwork(){}
-    int customers() const { return customers_; }
-    int segments() const { return segments_; }
-    Ptr<Location> destination() const { return destination_; }
-    void destinationIs(const Ptr<Location> destination) { if (destination_ == destination) return; destination_ = destination; }
-    USD maxCost() const { return maxCost_; }
-    void maxCostIs(const USD maxCost) { if (maxCost_ == maxCost) return; maxCost_ = maxCost; }
-    Ptr<Location> source() const { return source_; }
-    void sourceIs(const Ptr<Location> source) { if (source_ == source) return; source_ = source; }
-    int terminals() const { return terminals_; }
-    int path() const { return path_; }
-    int maxTime() const { return maxTime_; }
-    void maxTimeIs(const int maxTime) { if (maxTime_ == maxTime) return; maxTime_ = maxTime; }
-    Mile maxDistance() const { return maxDistance_; }
-    void maxDistanceIs(const Mile maxDistance) { if (maxDistance_ == maxDistance) return; maxDistance_ = maxDistance; }
-    int ports() const { return ports_; }
-    Segment::ExpediteSupport expedite() const { return expedite_; }
-    void expediteIs(const Segment::ExpediteSupport expedite) { if (expedite_ == expedite) return; expedite_ = expedite; }
-    class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
-      public:
-        virtual void notifierIs(Fwk::Ptr<ShippingNetwork> notifier) {
-            if (notifier_ == notifier) return;
-            if (notifier_) notifier->notifieeIs(0);
-            notifier_ = notifier;
-            notifier_->notifieeIs(this);
-        }
-        static Fwk::Ptr<ShippingNetwork::Notifiee> notifieeNew() {
-            Fwk::Ptr<ShippingNetwork::Notifiee> n = new Notifiee();
-            return n;
-        }
-        virtual void onDestination() {}
-        virtual void onMaxCost() {}
-        virtual void onSource() {}
-        virtual void onMaxTime() {}
-        virtual void onMaxDistance() {}
-        virtual void onExpedite() {}
-      protected:
-        Fwk::Ptr<ShippingNetwork> notifier_;
-        Notifiee() : notifier_(0) {}
-    };
-    Ptr<ShippingNetwork::Notifiee> notifiee() const { return notifiee_; }
-  protected:
-    ShippingNetwork(const int customers, const int segments, const int terminals, const int path, const int ports) : customers_(customers), segments_(segments), terminals_(terminals), path_(path), ports_(ports) {}
-    Ptr<ShippingNetwork::Notifiee> notifiee_;
-    void notifieeIs(ShippingNetwork::Notifiee* n) const {
-        ShippingNetwork* me = const_cast<ShippingNetwork*>(this);
-        me->notifiee_ = n;
-    }
-
-  private:
-    int customers_;
-    int segments_;
-    Ptr<Location> destination_;
-    USD maxCost_;
-    Ptr<Location> source_;
-    int terminals_;
-    int path_;
-    int maxTime_;
-    Mile maxDistance_;
-    int ports_;
-    Segment::ExpediteSupport expedite_;
-    ShippingNetwork(const ShippingNetwork& o);
 };
 
 } /* end namespace */
