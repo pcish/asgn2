@@ -42,6 +42,10 @@ class EngineManager : public Fwk::PtrInterface<EngineManager> {
         Ptr<Port> m = new Port(name);
         return m;
     }
+     Ptr<ShippingNetwork> shippingNetworkNew(const int customers, const int segments, const int terminals, const int path, const int ports){
+        Ptr<ShippingNetwork> m = new ShippingNetwork(customers, segments, terminals, path, ports);
+        return m;
+    }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<EngineManager> notifier) {
@@ -63,6 +67,7 @@ class EngineManager : public Fwk::PtrInterface<EngineManager> {
         virtual void onFleetNew() {}
         virtual void onSegmentNew() {}
         virtual void onPortNew() {}
+        virtual void onShippingNetworkNew() {}
       protected:
         Fwk::Ptr<EngineManager> notifier_;
         Notifiee() : notifier_(0) {}
