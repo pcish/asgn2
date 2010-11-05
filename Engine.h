@@ -4,8 +4,9 @@
 #include "Ptr.h"
 #include "PtrInterface.h"
 namespace Shipping {
-
+class EngineReactor;
 class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
+    friend class EngineReactor;
   public:
     ~ShippingNetwork(){}
     int customers() const { return customers_; }
@@ -47,8 +48,11 @@ class EngineManager : public Fwk::PtrInterface<EngineManager> {
   public:
     EngineManager() {
         network_ = new ShippingNetwork();
+        Fwk::Ptr<EngineManager::Notifiee> r = EngineManager::Notifiee::notifieeNew();
+        r->notifierIs(this);
     }
-     Ptr<Customer> customerNew(const string name){
+    Ptr<ShippingNetwork> shippingNetwork() const { return network_; }
+    Ptr<Customer> customerNew(const string name){
         Ptr<Customer> m = new Customer(name);
         return m;
     }
