@@ -12,7 +12,7 @@ test1:	test1.o $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIB)
 
 clean:
-	rm -f test1 test1.o $(OBJECTS) *~
+	rm -f tes1 test1.o test.o test.exe $(OBJECTS) *~
 
 Instance.o: Instance.cpp Instance.h PtrInterface.h Ptr.h Engine.h
 EngineManager.o: EngineManager.h Engine.h
