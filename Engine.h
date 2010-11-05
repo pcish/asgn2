@@ -53,38 +53,37 @@ class EngineManager : public Fwk::PtrInterface<EngineManager> {
     }
     Ptr<ShippingNetwork> shippingNetwork() const { return network_; }
     Ptr<Customer> customerNew(const string name){
+        if (notifiee_) notifiee_->onCustomerNew();
         Ptr<Customer> m = new Customer(name);
         return m;
     }
-     Ptr<PlaneFleet> planeFleetNew(){
+    Ptr<PlaneFleet> planeFleetNew(){
+        if (notifiee_) notifiee_->onPlaneFleetNew();
         Ptr<PlaneFleet> m = new PlaneFleet();
         return m;
     }
-     Ptr<TruckFleet> truckFleetNew(){
+    Ptr<TruckFleet> truckFleetNew(){
+        if (notifiee_) notifiee_->onTruckFleetNew();
         Ptr<TruckFleet> m = new TruckFleet();
         return m;
     }
-     Ptr<Terminal> terminalNew(const string name, const Segment::TransportationMode transportationMode){
+    Ptr<Terminal> terminalNew(const string name, const Segment::TransportationMode transportationMode){
+        if (notifiee_) notifiee_->onTerminalNew();
         Ptr<Terminal> m = new Terminal(name, transportationMode);
         return m;
     }
-     Ptr<Location> locationNew(const string name){
-        Ptr<Location> m = new Location(name);
-        return m;
-    }
-     Ptr<BoatFleet> boatFleetNew(){
+    Ptr<BoatFleet> boatFleetNew(){
+        if (notifiee_) notifiee_->onBoatFleetNew();
         Ptr<BoatFleet> m = new BoatFleet();
         return m;
     }
-     Ptr<Fleet> fleetNew(){
-        Ptr<Fleet> m = new Fleet();
-        return m;
-    }
-     Ptr<Segment> segmentNew(const Segment::TransportationMode transportationMode, const string name){
+    Ptr<Segment> segmentNew(const Segment::TransportationMode transportationMode, const string name){
+        if (notifiee_) notifiee_->onSegmentNew();
         Ptr<Segment> m = new Segment(transportationMode, name);
         return m;
     }
-     Ptr<Port> portNew(const string name){
+    Ptr<Port> portNew(const string name){
+        if (notifiee_) notifiee_->onPortNew();
         Ptr<Port> m = new Port(name);
         return m;
     }
@@ -118,8 +117,9 @@ class EngineManager : public Fwk::PtrInterface<EngineManager> {
     Ptr<ShippingNetwork> network_;
     Ptr<EngineManager::Notifiee> notifiee_;
     void notifieeIs(EngineManager::Notifiee* n) const {
-        EngineManager* me = const_cast<EngineManager*>(this);
-        me->notifiee_ = n;
+        //EngineManager* me = const_cast<EngineManager*>(this);
+        //me->notifiee_ = n;
+        notifiee = n;
     }
 };
 
