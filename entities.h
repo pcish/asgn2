@@ -19,6 +19,7 @@ using namespace std;
 namespace Shipping {
 
 class EngineManager;
+class ShippingNetwork;
 class Customer;
 class PlaneFleet;
 class TruckFleet;
@@ -55,11 +56,13 @@ class Segment : public Fwk::PtrInterface<Segment> {
     void sourceIs(const Ptr<Location> source) { if (source_ == source) return; source_ = source; }
     Ptr<Segment> returnSegment() const { return returnSegment_; }
     void returnSegmentIs(const Ptr<Segment> returnSegment) { if (returnSegment_ == returnSegment) return; returnSegment_ = returnSegment; }
+    string name() const { return name_; }
     SegmentDifficultyUnit difficulty() const { return difficulty_; }
     void difficultyIs(const SegmentDifficultyUnit difficulty) { if (difficulty_ == difficulty) return; difficulty_ = difficulty; }
     Mile length() const { return length_; }
     void lengthIs(const Mile length) { if (length_ == length) return; length_ = length; }
-    string name() const { return name_; }
+    ShippingNetwork* shippingNetwork() const { return shippingNetwork_; }
+    void shippingNetworkIs(ShippingNetwork* shippingNetwork) { if (shippingNetwork_ == shippingNetwork) return; shippingNetwork_ = shippingNetwork; }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<Segment> notifier) {
@@ -77,6 +80,7 @@ class Segment : public Fwk::PtrInterface<Segment> {
         virtual void onReturnSegment() {}
         virtual void onDifficulty() {}
         virtual void onLength() {}
+        virtual void onShippingNetwork() {}
         virtual void onDel(Fwk::Ptr<Segment> p) {}
       protected:
         Fwk::Ptr<Segment> notifier_;
@@ -96,9 +100,10 @@ class Segment : public Fwk::PtrInterface<Segment> {
     TransportationMode transportationMode_;
     Ptr<Location> source_;
     Ptr<Segment> returnSegment_;
+    string name_;
     SegmentDifficultyUnit difficulty_;
     Mile length_;
-    string name_;
+    ShippingNetwork* shippingNetwork_;
     Segment(const Segment& o);
 };
 
@@ -109,6 +114,8 @@ class Location : public Fwk::PtrInterface<Location> {
     virtual Ptr<Segment> segment(const unsigned int index) const ;
     virtual void segmentIs(const Ptr<Segment> segment) ;
     string name() const { return name_; }
+    ShippingNetwork* shippingNetwork() const { return shippingNetwork_; }
+    void shippingNetworkIs(ShippingNetwork* shippingNetwork) { if (shippingNetwork_ == shippingNetwork) return; shippingNetwork_ = shippingNetwork; }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<Location> notifier) {
@@ -122,6 +129,7 @@ class Location : public Fwk::PtrInterface<Location> {
             return n;
         }
         virtual void onSegment() {}
+        virtual void onShippingNetwork() {}
         virtual void onDel(Fwk::Ptr<Location> p) {}
       protected:
         Fwk::Ptr<Location> notifier_;
@@ -139,6 +147,7 @@ class Location : public Fwk::PtrInterface<Location> {
   private:
     std::vector<Ptr<Segment> > segments_;
     string name_;
+    ShippingNetwork* shippingNetwork_;
     Location(const Location& o);
 };
 

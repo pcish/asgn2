@@ -43,7 +43,10 @@ class Attr(object):
         ret = StringIO()
         if self.virtual:
             ret.write('virtual ')
-        ret.write('void {name}Is(const {type} {name}) '.format(type=self.type, name=self.name))
+        if self.type.endswith('*'):
+            ret.write('void {name}Is({type} {name}) '.format(type=self.type, name=self.name))
+        else:
+            ret.write('void {name}Is(const {type} {name}) '.format(type=self.type, name=self.name))
         if self.complex:
             ret.write(';')
         elif self.collection:
@@ -270,6 +273,7 @@ class Entity(object):
         ret.write('    friend class EngineManager;\n')
         ret.write('  public:\n')
         ret.write('    ~%s() { if (notifiee_) notifiee_->onDel(this); }\n' % self.classname)
+        #ret.write('    ShippingNetwork* shippingNetwork() { return network_; }\n')
         for enum in self.enums:
             ret.write('%s' % enum.__str__(4))
         for attr in self.attrs:
@@ -285,6 +289,7 @@ class Entity(object):
         for attr in self.attrs:
             ret.write('    %s\n' % attr.declaration_str())
         ret.write('    {name}(const {name}& o);\n'.format(name=self.classname))
+        #ret.write('    ShippingNetwork *network_;\n')
         ret.write('};\n')
         return ret.getvalue()
 

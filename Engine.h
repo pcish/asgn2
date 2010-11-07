@@ -64,6 +64,7 @@ class EngineManager : public Fwk::PtrInterface<EngineManager> {
     Ptr<ShippingNetwork> shippingNetwork() const { return network_; }
     Ptr<Customer> customerNew(const string name){
         Ptr<Customer> m = new Customer(name);
+        m->shippingNetworkIs(network_.ptr());
         if (notifiee_) notifiee_->onCustomerNew(m);
         return m;
     }
@@ -79,6 +80,7 @@ class EngineManager : public Fwk::PtrInterface<EngineManager> {
     }
     Ptr<Terminal> terminalNew(const string name, const Segment::TransportationMode transportationMode){
         Ptr<Terminal> m = new Terminal(name, transportationMode);
+        m->shippingNetworkIs(network_.ptr());
         if (notifiee_) notifiee_->onTerminalNew(m);
         return m;
     }
@@ -89,11 +91,13 @@ class EngineManager : public Fwk::PtrInterface<EngineManager> {
     }
     Ptr<Segment> segmentNew(const Segment::TransportationMode transportationMode, const string name){
         Ptr<Segment> m = new Segment(transportationMode, name);
+        m->shippingNetworkIs(network_.ptr());
         if (notifiee_) notifiee_->onSegmentNew(m);
         return m;
     }
     Ptr<Port> portNew(const string name){
         Ptr<Port> m = new Port(name);
+        m->shippingNetworkIs(network_.ptr());
         if (notifiee_) notifiee_->onPortNew(m);
         return m;
     }
