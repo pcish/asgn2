@@ -11,14 +11,21 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
   public:
     ~ShippingNetwork(){}
     int customers() const { return customers_; }
-    int segments() const { return segments_; }
+    int segments() const { return truckSegments_ + planeSegments_ + boatSegments_; }
+    int truckSegments() const { return truckSegments_; }
+    int planeSegments() const { return planeSegments_; }
+    int boatSegments() const { return boatSegments_; }
+    int terminals() const { return truckTerminals_ + planeTerminals_ + boatTerminals_; }
+    int truckTerminals() const { return truckTerminals_; }
+    int planeTerminals() const { return planeTerminals_; }
+    int boatTerminals() const { return boatTerminals_; }
     Ptr<Location> destination() const { return destination_; }
     void destinationIs(const Ptr<Location> destination) { if (destination_ == destination) return; destination_ = destination; }
     USD maxCost() const { return maxCost_; }
     void maxCostIs(const USD maxCost) { if (maxCost_ == maxCost) return; maxCost_ = maxCost; }
     Ptr<Location> source() const { return source_; }
     void sourceIs(const Ptr<Location> source) { if (source_ == source) return; source_ = source; }
-    int terminals() const { return terminals_; }
+
     int path() const { return path_; }
     int maxTime() const { return maxTime_; }
     void maxTimeIs(const int maxTime) { if (maxTime_ == maxTime) return; maxTime_ = maxTime; }
@@ -27,21 +34,26 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     int ports() const { return ports_; }
     Segment::ExpediteSupport expedite() const { return expedite_; }
     void expediteIs(const Segment::ExpediteSupport expedite) { if (expedite_ == expedite) return; expedite_ = expedite; }
-    ShippingNetwork() : customers_(0), terminals_(0), ports_(0), segments_(0) {
+    ShippingNetwork() : customers_(0), ports_(0), truckTerminals_(0), planeTerminals_(0), boatTerminals_(0), truckSegments_(0), planeSegments_(0), boatSegments_(0) {
     }
   protected:
     void customersInc() { customers_++; }
   private:
     int customers_;
+    int ports_;
+    int truckTerminals_;
+    int planeTerminals_;
+    int boatTerminals_;
+    int truckSegments_;
+    int planeSegments_;
+    int boatSegments_;
     Ptr<Location> destination_;
     USD maxCost_;
     Ptr<Location> source_;
-    int terminals_;
     int path_;
     int maxTime_;
     Mile maxDistance_;
-    int ports_;
-    int segments_;
+
     Segment::ExpediteSupport expedite_;
     ShippingNetwork(const ShippingNetwork& o);
 };

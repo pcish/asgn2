@@ -331,19 +331,19 @@ string StatsRep::attribute(const string& name) {
     if (name == "Customer") {
         os << manager_->engineManager()->shippingNetwork()->customers();
     } else if (name == "Truck terminal") {
-        os << manager_->engineManager()->shippingNetwork()->terminals();
+        os << manager_->engineManager()->shippingNetwork()->truckTerminals();
     } else if (name == "Plane terminal") {
-        os << manager_->engineManager()->shippingNetwork()->terminals();
+        os << manager_->engineManager()->shippingNetwork()->planeTerminals();
     } else if (name == "Boat terminal") {
-        os << manager_->engineManager()->shippingNetwork()->terminals();
+        os << manager_->engineManager()->shippingNetwork()->boatTerminals();
     } else if (name == "Port") {
         os << manager_->engineManager()->shippingNetwork()->ports();
     } else if (name == "Truck segment") {
-        os << manager_->engineManager()->shippingNetwork()->segments();
+        os << manager_->engineManager()->shippingNetwork()->truckSegments();
     } else if (name == "Plane segment") {
-        os << manager_->engineManager()->shippingNetwork()->segments();
+        os << manager_->engineManager()->shippingNetwork()->planeSegments();
     } else if (name == "Boat segment") {
-        os << manager_->engineManager()->shippingNetwork()->segments();
+        os << manager_->engineManager()->shippingNetwork()->boatSegments();
     } else {
         return "";
     }

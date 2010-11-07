@@ -8,10 +8,22 @@ class EngineReactor : public EngineManager::Notifiee {
         notifier_->shippingNetwork()->customersInc();
     }
     virtual void onTerminalNew(Fwk::Ptr<Terminal> p) {
-        notifier_->shippingNetwork()->terminals_++;
+        if (p->transportationMode() == Segment::truck()) {
+            notifier_->shippingNetwork()->truckTerminals_++;
+        } else if (p->transportationMode() == Segment::plane()) {
+            notifier_->shippingNetwork()->planeTerminals_++;
+        } else if (p->transportationMode() == Segment::boat()) {
+            notifier_->shippingNetwork()->boatTerminals_++;
+        }
     }
     virtual void onSegmentNew(Fwk::Ptr<Segment> p) {
-        notifier_->shippingNetwork()->segments_++;
+        if (p->transportationMode() == Segment::truck()) {
+            notifier_->shippingNetwork()->truckSegments_++;
+        } else if (p->transportationMode() == Segment::plane()) {
+            notifier_->shippingNetwork()->planeSegments_++;
+        } else if (p->transportationMode() == Segment::boat()) {
+            notifier_->shippingNetwork()->boatSegments_++;
+        }
     }
     virtual void onPortNew(Fwk::Ptr<Port> p) {
         notifier_->shippingNetwork()->ports_++;
