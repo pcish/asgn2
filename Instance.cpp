@@ -254,6 +254,12 @@ Ptr<Instance> ManagerImpl::instance(const string& name) {
 }
 
 void ManagerImpl::instanceDel(const string& name) {
+    map<string,Ptr<Instance> >::iterator t = instance_.find(name);
+    if (t != NULL) {
+        instance_.erase(t);
+    } else {
+        cerr << "attempting to delete non-existant instance " << name << endl;
+    }
 }
 
 template <typename T, typename TRep>
