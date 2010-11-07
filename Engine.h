@@ -6,6 +6,10 @@
 
 namespace Shipping {
 class EngineReactor;
+class SegmentReactor;
+class CustomerReactor;
+class PortReactor;
+class TerminalReactor;
 class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     friend class EngineReactor;
     friend class SegmentReactor;
@@ -66,12 +70,7 @@ class EngineManager : public Fwk::PtrInterface<EngineManager> {
   public:
     EngineManager();
     Ptr<ShippingNetwork> shippingNetwork() const { return network_; }
-    Ptr<Customer> customerNew(const string name){
-        Ptr<Customer> m = new Customer(name);
-        m->shippingNetworkIs(network_.ptr());
-        if (notifiee_) notifiee_->onCustomerNew(m);
-        return m;
-    }
+    Ptr<Customer> customerNew(const string name);
     Ptr<PlaneFleet> planeFleetNew(){
         Ptr<PlaneFleet> m = new PlaneFleet();
         if (notifiee_) notifiee_->onPlaneFleetNew(m);
@@ -82,29 +81,14 @@ class EngineManager : public Fwk::PtrInterface<EngineManager> {
         if (notifiee_) notifiee_->onTruckFleetNew(m);
         return m;
     }
-    Ptr<Terminal> terminalNew(const string name, const Segment::TransportationMode transportationMode){
-        Ptr<Terminal> m = new Terminal(name, transportationMode);
-        m->shippingNetworkIs(network_.ptr());
-        if (notifiee_) notifiee_->onTerminalNew(m);
-        return m;
-    }
+    Ptr<Terminal> terminalNew(const string name, const Segment::TransportationMode transportationMode);
     Ptr<BoatFleet> boatFleetNew(){
         Ptr<BoatFleet> m = new BoatFleet();
         if (notifiee_) notifiee_->onBoatFleetNew(m);
         return m;
     }
-    Ptr<Segment> segmentNew(const Segment::TransportationMode transportationMode, const string name){
-        Ptr<Segment> m = new Segment(transportationMode, name);
-        m->shippingNetworkIs(network_.ptr());
-        if (notifiee_) notifiee_->onSegmentNew(m);
-        return m;
-    }
-    Ptr<Port> portNew(const string name){
-        Ptr<Port> m = new Port(name);
-        m->shippingNetworkIs(network_.ptr());
-        if (notifiee_) notifiee_->onPortNew(m);
-        return m;
-    }
+    Ptr<Segment> segmentNew(const Segment::TransportationMode transportationMode, const string name);
+    Ptr<Port> portNew(const string name);
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<EngineManager> notifier) {

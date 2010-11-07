@@ -1,4 +1,5 @@
 #include "Engine.h"
+#include "entityReactor.h"
 
 namespace Shipping {
 
@@ -38,6 +39,42 @@ EngineManager::EngineManager() {
     network_ = new ShippingNetwork();
     Fwk::Ptr<EngineReactor> r = EngineReactor::engineReactorNew();
     r->notifierIs(this);
+}
+
+Ptr<Customer> EngineManager::customerNew(const string name) {
+    Ptr<Customer> m = new Customer(name);
+    m->shippingNetworkIs(network_.ptr());
+    Fwk::Ptr<CustomerReactor> r = CustomerReactor::customerReactorNew();
+    r->notifierIs(m);
+    if (notifiee_) notifiee_->onCustomerNew(m);
+    return m;
+}
+
+Ptr<Terminal> EngineManager::terminalNew(const string name, const Segment::TransportationMode transportationMode){
+    Ptr<Terminal> m = new Terminal(name, transportationMode);
+    m->shippingNetworkIs(network_.ptr());
+    Fwk::Ptr<TerminalReactor> r = TerminalReactor::terminalReactorNew();
+    r->notifierIs(m);
+    if (notifiee_) notifiee_->onTerminalNew(m);
+    return m;
+}
+
+Ptr<Segment> EngineManager::segmentNew(const Segment::TransportationMode transportationMode, const string name){
+    Ptr<Segment> m = new Segment(transportationMode, name);
+    m->shippingNetworkIs(network_.ptr());
+    Fwk::Ptr<SegmentReactor> r = SegmentReactor::segmentReactorNew();
+    r->notifierIs(m);
+    if (notifiee_) notifiee_->onSegmentNew(m);
+    return m;
+}
+
+Ptr<Port> EngineManager::portNew(const string name){
+    Ptr<Port> m = new Port(name);
+    m->shippingNetworkIs(network_.ptr());
+    Fwk::Ptr<PortReactor> r = PortReactor::portReactorNew();
+    r->notifierIs(m);
+    if (notifiee_) notifiee_->onPortNew(m);
+    return m;
 }
 
 }
