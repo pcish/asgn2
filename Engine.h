@@ -3,6 +3,7 @@
 #include "entities.h"
 #include "Ptr.h"
 #include "PtrInterface.h"
+
 namespace Shipping {
 class EngineReactor;
 class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
@@ -50,38 +51,38 @@ class EngineManager : public Fwk::PtrInterface<EngineManager> {
     EngineManager();
     Ptr<ShippingNetwork> shippingNetwork() const { return network_; }
     Ptr<Customer> customerNew(const string name){
-        if (notifiee_) notifiee_->onCustomerNew();
         Ptr<Customer> m = new Customer(name);
+        if (notifiee_) notifiee_->onCustomerNew(m);
         return m;
     }
     Ptr<PlaneFleet> planeFleetNew(){
-        if (notifiee_) notifiee_->onPlaneFleetNew();
         Ptr<PlaneFleet> m = new PlaneFleet();
+        if (notifiee_) notifiee_->onPlaneFleetNew(m);
         return m;
     }
     Ptr<TruckFleet> truckFleetNew(){
-        if (notifiee_) notifiee_->onTruckFleetNew();
         Ptr<TruckFleet> m = new TruckFleet();
+        if (notifiee_) notifiee_->onTruckFleetNew(m);
         return m;
     }
     Ptr<Terminal> terminalNew(const string name, const Segment::TransportationMode transportationMode){
-        if (notifiee_) notifiee_->onTerminalNew();
         Ptr<Terminal> m = new Terminal(name, transportationMode);
+        if (notifiee_) notifiee_->onTerminalNew(m);
         return m;
     }
     Ptr<BoatFleet> boatFleetNew(){
-        if (notifiee_) notifiee_->onBoatFleetNew();
         Ptr<BoatFleet> m = new BoatFleet();
+        if (notifiee_) notifiee_->onBoatFleetNew(m);
         return m;
     }
     Ptr<Segment> segmentNew(const Segment::TransportationMode transportationMode, const string name){
-        if (notifiee_) notifiee_->onSegmentNew();
         Ptr<Segment> m = new Segment(transportationMode, name);
+        if (notifiee_) notifiee_->onSegmentNew(m);
         return m;
     }
     Ptr<Port> portNew(const string name){
-        if (notifiee_) notifiee_->onPortNew();
         Ptr<Port> m = new Port(name);
+        if (notifiee_) notifiee_->onPortNew(m);
         return m;
     }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
@@ -96,15 +97,15 @@ class EngineManager : public Fwk::PtrInterface<EngineManager> {
             Fwk::Ptr<EngineManager::Notifiee> n = new Notifiee();
             return n;
         }
-        virtual void onCustomerNew() {}
-        virtual void onPlaneFleetNew() {}
-        virtual void onTruckFleetNew() {}
-        virtual void onTerminalNew() {}
-        virtual void onLocationNew() {}
-        virtual void onBoatFleetNew() {}
-        virtual void onFleetNew() {}
-        virtual void onSegmentNew() {}
-        virtual void onPortNew() {}
+        virtual void onCustomerNew(Fwk::Ptr<Customer> p) {}
+        virtual void onPlaneFleetNew(Fwk::Ptr<PlaneFleet> p) {}
+        virtual void onTruckFleetNew(Fwk::Ptr<TruckFleet> p) {}
+        virtual void onTerminalNew(Fwk::Ptr<Terminal> p) {}
+        virtual void onLocationNew(Fwk::Ptr<Location> p) {}
+        virtual void onBoatFleetNew(Fwk::Ptr<BoatFleet> p) {}
+        virtual void onFleetNew(Fwk::Ptr<Fleet> p) {}
+        virtual void onSegmentNew(Fwk::Ptr<Segment> p) {}
+        virtual void onPortNew(Fwk::Ptr<Port> p) {}
       protected:
         Fwk::Ptr<EngineManager> notifier_;
         Notifiee() : notifier_(0) {}

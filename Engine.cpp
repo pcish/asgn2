@@ -4,16 +4,16 @@ namespace Shipping {
 
 class EngineReactor : public EngineManager::Notifiee {
   public:
-    virtual void onCustomerNew() {
+    virtual void onCustomerNew(Fwk::Ptr<Customer> p) {
         notifier_->shippingNetwork()->customersInc();
     }
-    virtual void onTerminalNew() {
+    virtual void onTerminalNew(Fwk::Ptr<Terminal> p) {
         notifier_->shippingNetwork()->terminals_++;
     }
-    virtual void onSegmentNew() {
+    virtual void onSegmentNew(Fwk::Ptr<Segment> p) {
         notifier_->shippingNetwork()->segments_++;
     }
-    virtual void onPortNew() {
+    virtual void onPortNew(Fwk::Ptr<Port> p) {
         notifier_->shippingNetwork()->ports_++;
     }
     static Fwk::Ptr<EngineReactor> engineReactorNew() {
