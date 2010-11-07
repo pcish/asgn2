@@ -255,7 +255,7 @@ Ptr<Instance> ManagerImpl::instance(const string& name) {
 
 void ManagerImpl::instanceDel(const string& name) {
     map<string,Ptr<Instance> >::iterator t = instance_.find(name);
-    if (t != NULL) {
+    if (t != instance_.end()) {
         instance_.erase(t);
     } else {
         cerr << "attempting to delete non-existant instance " << name << endl;
@@ -356,10 +356,60 @@ string StatsRep::attribute(const string& name) {
     return os.str();
 }
 string ConnRep::attribute(const string& name) {
-    istringstream os(name);
-  //  string temp
-//    while
-    return "";
+    istringstream is(name);
+    ostringstream os;
+    string cmd, attr, val, token, source, dest, dummy;
+    Segment::ExpediteSupport expedite = Segment::unavailable();
+    Mile maxDistance;
+    USD maxCost;
+    int maxTime;
+  
+    is >> cmd;
+    if (cmd.compare("explore") == 0) {
+        is >> source;
+        is >> dummy; // colon
+        while (!is.eof () ){
+            is >> attr; 
+            if (attr.compare("expedite") == 0) 
+                expedite = Segment::available();
+            else {
+                //is >> val;
+                if (attr.compare("distance") == 0){
+                    int raw;
+                    is >> raw;
+                    maxDistance = raw;
+                }
+                else if (attr.compare("cost") == 0) {
+                    double raw;
+                    is >> raw;
+                    maxCost = raw;
+                }
+                else if (attr.compare("time") == 0){
+                    int raw;
+                    is >> raw;
+                    maxTime = raw;
+                }
+            }
+        }
+        Ptr<ShippingNetwork> network = manager_->engineManager()->shippingNetwork();
+//        Ptr<LocationRep> locationInstance = dynamic_cast<LocationRep*> (manager_->instance(location));
+        network->sourceIs( Ptr<LocationRep>((LocationRep*)manager_->instance(source).ptr() )->engineObject() );
+        network->maxCostIs(maxCost);
+        network->maxDistanceIs(maxDistance);
+        network->maxTimeIs(maxTime);
+    }
+    else if (cmd.compare("connect") == 0) {
+        Ptr<ShippingNetwork> network = manager_->engineManager()->shippingNetwork();
+        is >> source >> dummy >> dest;
+        network->sourceIs( Ptr<LocationRep>((LocationRep*)manager_->instance(source).ptr() )->engineObject() );
+        network->destinationIs( Ptr<LocationRep>((LocationRep*)manager_->instance(dest).ptr() )->engineObject() );
+    }
+    else {
+    }
+
+//  call lowlevel to compute attribute here
+//
+    return os.str();
 }
 
 string FleetRep::attribute(const string& name) {
