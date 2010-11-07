@@ -8,6 +8,10 @@ namespace Shipping {
 class EngineReactor;
 class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     friend class EngineReactor;
+    friend class SegmentReactor;
+    friend class CustomerReactor;
+    friend class PortReactor;
+    friend class TerminalReactor;
   public:
     ~ShippingNetwork(){}
     int customers() const { return customers_; }
