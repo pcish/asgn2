@@ -1,5 +1,5 @@
-#ifndef ENTITIES_H
-#define ENTITIES_H
+#ifndef ENGINE_H
+#define ENGINE_H
 
 #include <iostream>
 #include <string>
@@ -31,7 +31,7 @@ class Port;
 class Segment : public Fwk::PtrInterface<Segment> {
     friend class EngineManager;
   public:
-    ~Segment(){}
+    ~Segment() { if (notifiee_) notifiee_->onDel(this); }
     enum TransportationMode {
         truck_,
         boat_,
@@ -77,6 +77,7 @@ class Segment : public Fwk::PtrInterface<Segment> {
         virtual void onReturnSegment() {}
         virtual void onDifficulty() {}
         virtual void onLength() {}
+        virtual void onDel(Fwk::Ptr<Segment> p) {}
       protected:
         Fwk::Ptr<Segment> notifier_;
         Notifiee() : notifier_(0) {}
@@ -104,7 +105,7 @@ class Segment : public Fwk::PtrInterface<Segment> {
 class Location : public Fwk::PtrInterface<Location> {
     friend class EngineManager;
   public:
-    ~Location(){}
+    ~Location() { if (notifiee_) notifiee_->onDel(this); }
     virtual Ptr<Segment> segment(const unsigned int index) const ;
     virtual void segmentIs(const Ptr<Segment> segment) ;
     string name() const { return name_; }
@@ -121,6 +122,7 @@ class Location : public Fwk::PtrInterface<Location> {
             return n;
         }
         virtual void onSegment() {}
+        virtual void onDel(Fwk::Ptr<Location> p) {}
       protected:
         Fwk::Ptr<Location> notifier_;
         Notifiee() : notifier_(0) {}
@@ -143,7 +145,7 @@ class Location : public Fwk::PtrInterface<Location> {
 class Customer : public Location {
     friend class EngineManager;
   public:
-    ~Customer(){}
+    ~Customer() { if (notifiee_) notifiee_->onDel(this); }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<Customer> notifier) {
@@ -156,6 +158,7 @@ class Customer : public Location {
             Fwk::Ptr<Customer::Notifiee> n = new Notifiee();
             return n;
         }
+        virtual void onDel(Fwk::Ptr<Customer> p) {}
       protected:
         Fwk::Ptr<Customer> notifier_;
         Notifiee() : notifier_(0) {}
@@ -176,7 +179,7 @@ class Customer : public Location {
 class Port : public Location {
     friend class EngineManager;
   public:
-    ~Port(){}
+    ~Port() { if (notifiee_) notifiee_->onDel(this); }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<Port> notifier) {
@@ -189,6 +192,7 @@ class Port : public Location {
             Fwk::Ptr<Port::Notifiee> n = new Notifiee();
             return n;
         }
+        virtual void onDel(Fwk::Ptr<Port> p) {}
       protected:
         Fwk::Ptr<Port> notifier_;
         Notifiee() : notifier_(0) {}
@@ -209,7 +213,7 @@ class Port : public Location {
 class Terminal : public Location {
     friend class EngineManager;
   public:
-    ~Terminal(){}
+    ~Terminal() { if (notifiee_) notifiee_->onDel(this); }
     Segment::TransportationMode transportationMode() const { return transportationMode_; }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
@@ -223,6 +227,7 @@ class Terminal : public Location {
             Fwk::Ptr<Terminal::Notifiee> n = new Notifiee();
             return n;
         }
+        virtual void onDel(Fwk::Ptr<Terminal> p) {}
       protected:
         Fwk::Ptr<Terminal> notifier_;
         Notifiee() : notifier_(0) {}
@@ -244,7 +249,7 @@ class Terminal : public Location {
 class Fleet : public Fwk::PtrInterface<Fleet> {
     friend class EngineManager;
   public:
-    ~Fleet(){}
+    ~Fleet() { if (notifiee_) notifiee_->onDel(this); }
     USD cost() const { return cost_; }
     void costIs(const USD cost) { if (cost_ == cost) return; cost_ = cost; }
     PackageUnit capacity() const { return capacity_; }
@@ -269,6 +274,7 @@ class Fleet : public Fwk::PtrInterface<Fleet> {
         virtual void onCapacity() {}
         virtual void onTransportationMode() {}
         virtual void onSpeed() {}
+        virtual void onDel(Fwk::Ptr<Fleet> p) {}
       protected:
         Fwk::Ptr<Fleet> notifier_;
         Notifiee() : notifier_(0) {}
@@ -293,7 +299,7 @@ class Fleet : public Fwk::PtrInterface<Fleet> {
 class TruckFleet : public Fleet {
     friend class EngineManager;
   public:
-    ~TruckFleet(){}
+    ~TruckFleet() { if (notifiee_) notifiee_->onDel(this); }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<TruckFleet> notifier) {
@@ -306,6 +312,7 @@ class TruckFleet : public Fleet {
             Fwk::Ptr<TruckFleet::Notifiee> n = new Notifiee();
             return n;
         }
+        virtual void onDel(Fwk::Ptr<TruckFleet> p) {}
       protected:
         Fwk::Ptr<TruckFleet> notifier_;
         Notifiee() : notifier_(0) {}
@@ -326,7 +333,7 @@ class TruckFleet : public Fleet {
 class BoatFleet : public Fleet {
     friend class EngineManager;
   public:
-    ~BoatFleet(){}
+    ~BoatFleet() { if (notifiee_) notifiee_->onDel(this); }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<BoatFleet> notifier) {
@@ -339,6 +346,7 @@ class BoatFleet : public Fleet {
             Fwk::Ptr<BoatFleet::Notifiee> n = new Notifiee();
             return n;
         }
+        virtual void onDel(Fwk::Ptr<BoatFleet> p) {}
       protected:
         Fwk::Ptr<BoatFleet> notifier_;
         Notifiee() : notifier_(0) {}
@@ -359,7 +367,7 @@ class BoatFleet : public Fleet {
 class PlaneFleet : public Fleet {
     friend class EngineManager;
   public:
-    ~PlaneFleet(){}
+    ~PlaneFleet() { if (notifiee_) notifiee_->onDel(this); }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<PlaneFleet> notifier) {
@@ -372,6 +380,7 @@ class PlaneFleet : public Fleet {
             Fwk::Ptr<PlaneFleet::Notifiee> n = new Notifiee();
             return n;
         }
+        virtual void onDel(Fwk::Ptr<PlaneFleet> p) {}
       protected:
         Fwk::Ptr<PlaneFleet> notifier_;
         Notifiee() : notifier_(0) {}

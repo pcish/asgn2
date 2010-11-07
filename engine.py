@@ -240,6 +240,7 @@ class Entity(object):
             if attr.readonly:
                 continue
             ret.write('virtual void on%s() {}\n' % ''.join((attr.name[0].upper(), attr.name[1:])))
+        ret.write('virtual void onDel(Fwk::Ptr<%s> p) {}\n' % self.classname)
         ret.set_indent(4)
         ret.write('  protected:\n')
         ret.set_indent(8)
@@ -268,7 +269,7 @@ class Entity(object):
         #ret.write('    %s' % self.newInstanceMethodStr(0, 'friend', 'EngineManager::', False))
         ret.write('    friend class EngineManager;\n')
         ret.write('  public:\n')
-        ret.write('    ~%s(){}\n' % self.classname)
+        ret.write('    ~%s() { if (notifiee_) notifiee_->onDel(this); }\n' % self.classname)
         for enum in self.enums:
             ret.write('%s' % enum.__str__(4))
         for attr in self.attrs:
@@ -354,7 +355,7 @@ if __name__ == "__main__":
         classes[section] = c
 
     mng = ManagerClass()
-    mng_file = open('Engine.h', 'w')
+    mng_file = open('Engine.h.new', 'w')
     mng_file.write('#ifndef ENGINE_MNG_H\n')
     mng_file.write('#define ENGINE_MNG_H\n')
     mng_file.write('#include "entities.h"\n')
