@@ -10,6 +10,22 @@ class SegmentReactor;
 class CustomerReactor;
 class PortReactor;
 class TerminalReactor;
+class Path : public Fwk::PtrInterface<Path> {
+public:
+    void locationIs (Ptr<Location> _location) {
+        locations_.push_back(_location);
+    }
+    void SegmentIs(Ptr<Segment> _segment ) {
+        segments_.push_back (_segment);
+    }
+    Ptr<Location> location(LocationCount index) const { return index < locations_.size() ?segments[index]}
+    LocationCount locations() const { return locations_.size(); }
+    SegmentCount segments() const {return segments_.size(); }
+
+private:
+    vector<Ptr<Location> > locations_;
+    vector<Ptr<Segment> > segments_;
+};
 class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     friend class EngineReactor;
     friend class SegmentReactor;
