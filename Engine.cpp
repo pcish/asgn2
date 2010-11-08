@@ -27,7 +27,7 @@ Ptr<Path> ShippingNetwork::explore() const {
         curLocation = bfsQueue.front();
         bfsQueue.pop();
         for (unsigned int i = 0; i < curLocation->segments(); ++i) {
-            Ptr<Segment> seg = curLocation->segment(i);
+            WeakPtr<Segment> seg = curLocation->segment(i);
             USD segCost;
             Hour segTime;
             //Computes time and cost here

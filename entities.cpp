@@ -5,17 +5,17 @@
 
 namespace Shipping {
 
-void Location::segmentIs(const Ptr<Segment> seg) {
+void Location::segmentIs(const WeakPtr<Segment> seg) {
     if (seg == NULL) {
         cerr << "Can't add NULL segment" << endl;
         return;
     }
-    segments_.push_back (seg);
+    segments_.push_back (seg.ptr());
     if (notifiee_)
         notifiee_->onSegment ();
 }
 
-void Location::segmentIs(const unsigned int index, Ptr<Segment> seg) {
+void Location::segmentIs(const unsigned int index, WeakPtr<Segment> seg) {
     if (index < 0 || index >= segments_.size() ) {
         cerr <<  "Index out of bound exception" << endl;
         return;
@@ -24,12 +24,12 @@ void Location::segmentIs(const unsigned int index, Ptr<Segment> seg) {
         segments_.erase(segments_.begin() + index);
     }
     else { //put segment at that position
-        segments_.insert(segments_.begin() + index, seg);
+        segments_.insert(segments_.begin() + index, seg.ptr());
     }
 }
 //unsigned int Location::segments () { return segments_.size(); }
 
-Ptr<Segment> Location::segment(const unsigned int index) const {
+WeakPtr<Segment> Location::segment(const unsigned int index) const {
     if (index < 0 || index >= segments_.size () ){
          cerr << "Segment # out of bound exception" << endl;
          return NULL;

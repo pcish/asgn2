@@ -9,13 +9,14 @@
 
 using namespace std;
 #include "Ptr.h"
+#include "WeakPtr.h"
 #include "PtrInterface.h"
 #include "Instance.h"
 #include "Nominal.h"
 #include "types.h"
 #include "fwk/BaseNotifiee.h"
 #include "fwk/NamedInterface.h"
-
+using Fwk::WeakPtr;
 namespace Shipping {
 
 class EngineManager;
@@ -116,9 +117,9 @@ class Location : public Fwk::PtrInterface<Location> {
     friend class EngineManager;
   public:
     ~Location() { if (notifiee_) notifiee_->onDel(this); }
-    virtual Ptr<Segment> segment(const unsigned int index) const;
-    virtual void segmentIs(const Ptr<Segment> segment);
-    virtual void segmentIs(const unsigned int index, Ptr<Segment> segment);
+    virtual WeakPtr<Segment> segment(const unsigned int index) const;
+    virtual void segmentIs(const WeakPtr<Segment> segment);
+    virtual void segmentIs(const unsigned int index, WeakPtr<Segment> segment);
     virtual unsigned int segments() const { return segments_.size(); }
     string name() const { return name_; }
     ShippingNetwork* shippingNetwork() const { return shippingNetwork_; }
@@ -153,7 +154,7 @@ class Location : public Fwk::PtrInterface<Location> {
     }
 
   private:
-    std::vector<Ptr<Segment> > segments_;
+    std::vector<WeakPtr<Segment> > segments_;
     string name_;
     ShippingNetwork* shippingNetwork_;
     Location(const Location& o);
