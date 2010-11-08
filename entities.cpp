@@ -34,9 +34,6 @@ WeakPtr<Segment> Location::segment(const unsigned int index) const {
          cerr << "Segment # out of bound exception" << endl;
          return NULL;
     }
-    for (unsigned int i = 0; i < segments_.size(); i++) {
-        cerr << segments_[i]->name();
-    } cerr<< endl;
     return segments_[index];
 }
 /*
