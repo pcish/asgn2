@@ -335,6 +335,8 @@ string StatsRep::attribute(const string& name) {
         totalSegments += manager_->engineManager()->shippingNetwork()->truckSegments();
         totalSegments += manager_->engineManager()->shippingNetwork()->planeSegments();
         totalSegments += manager_->engineManager()->shippingNetwork()->boatSegments();
+        os.setf(ios::fixed,ios::floatfield);
+        os.precision(2);
         os << ((float) expediteAvailable / (float) totalSegments) * 100.0;
     } else {
         return "";
