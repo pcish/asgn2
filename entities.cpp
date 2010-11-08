@@ -14,16 +14,16 @@ void Location::segmentIs(const Ptr<Segment> seg) {
     if (notifiee_)
         notifiee_->onSegment ();
 }
-void Location::segmentIs (int index, Ptr<Segment> seg) {
+void Location::segmentIs(const unsigned int index, Ptr<Segment> seg) {
     if (index < 0 || index >= segments_.size() ) {
         cerr <<  "Index out of bound exception" << endl;
         return;
     }
     if (seg == NULL) { //delete segment
-
+        segments_.erase(segments_.begin() + index);
     }
     else { //put segment at that position
-
+        segments_.insert(segments_.begin() + index, seg);
     }
 }
 //unsigned int Location::segments () { return segments_.size(); }
@@ -33,6 +33,9 @@ Ptr<Segment> Location::segment(const unsigned int index) const {
          cerr << "Segment # out of bound exception" << endl;
          return NULL;
     }
+    for (int i = 0; i < segments_.size(); i++) {
+        cerr << segments_[i]->name();
+    } cerr<< endl;
     return segments_[index];
 }
 /*
@@ -47,7 +50,7 @@ void Terminal::segmentIs (Ptr<Segment> seg) {
     }
     Location::segmentIs (seg);
 }
-/*void Terminal::segmentIs (unsigned int index, Ptr<Segment> seg) {
+void Terminal::segmentIs (unsigned int index, Ptr<Segment> seg) {
     if (seg != NULL && seg->transportationMode() != transMode_ ) {// insert node rather than delete
         cerr << "Terminal must connect two segments with the same transportation mode" << endl;
         return;
