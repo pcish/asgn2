@@ -8,12 +8,34 @@ class ShippingNetwork;
 class SegmentReactor : public Segment::Notifiee {
   public:
     virtual void onDel(Segment *p) {
+        int delta = 0;
+        if (notifier_->expediteSupport() == Segment::available()) {
+            delta = 1;
+        }
         if (p->transportationMode() == Segment::truck()) {
             notifier_->shippingNetwork()->truckSegments_--;
+            notifier_->shippingNetwork()->truckSegmentsExpediteAvailable_ -= delta;
         } else if (p->transportationMode() == Segment::plane()) {
             notifier_->shippingNetwork()->planeSegments_--;
+            notifier_->shippingNetwork()->planeSegmentsExpediteAvailable_ -= delta;
         } else if (p->transportationMode() == Segment::boat()) {
             notifier_->shippingNetwork()->boatSegments_--;
+            notifier_->shippingNetwork()->boatSegmentsExpediteAvailable_ -= delta;
+        }
+    }
+    virtual void onExpediteSupport() {
+        int delta;
+        if (notifier_->expediteSupport() == Segment::available()) {
+            delta = 1;
+        } else if (notifier_->expediteSupport() == Segment::unavailable()) {
+            delta = -1;
+        }
+        if (notifier_->transportationMode() == Segment::truck()) {
+            notifier_->shippingNetwork()->truckSegmentsExpediteAvailable_ += delta;
+        } else if (notifier_->transportationMode() == Segment::plane()) {
+            notifier_->shippingNetwork()->planeSegmentsExpediteAvailable_ += delta;
+        } else if (notifier_->transportationMode() == Segment::boat()) {
+            notifier_->shippingNetwork()->boatSegmentsExpediteAvailable_ += delta;
         }
     }
     static Fwk::Ptr<SegmentReactor> segmentReactorNew() {

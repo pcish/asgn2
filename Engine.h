@@ -20,9 +20,18 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     ~ShippingNetwork(){}
     int customers() const { return customers_; }
     int segments() const { return truckSegments_ + planeSegments_ + boatSegments_; }
-    int truckSegments() const { return truckSegments_; }
-    int planeSegments() const { return planeSegments_; }
-    int boatSegments() const { return boatSegments_; }
+    int truckSegments() const {
+        if (expedite_ == Segment::available()) return truckSegmentsExpediteAvailable_;
+        else return truckTerminals_;
+    }
+    int planeSegments() const {
+        if (expedite_ == Segment::available()) return planeSegmentsExpediteAvailable_;
+        else return planeTerminals_;
+    }
+    int boatSegments() const {
+        if (expedite_ == Segment::available()) return boatSegmentsExpediteAvailable_;
+        else return boatTerminals_;
+    }
     int terminals() const { return truckTerminals_ + planeTerminals_ + boatTerminals_; }
     int truckTerminals() const { return truckTerminals_; }
     int planeTerminals() const { return planeTerminals_; }
@@ -42,7 +51,8 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     int ports() const { return ports_; }
     Segment::ExpediteSupport expedite() const { return expedite_; }
     void expediteIs(const Segment::ExpediteSupport expedite) { if (expedite_ == expedite) return; expedite_ = expedite; }
-    ShippingNetwork() : customers_(0), ports_(0), truckTerminals_(0), planeTerminals_(0), boatTerminals_(0), truckSegments_(0), planeSegments_(0), boatSegments_(0) {
+    ShippingNetwork() : customers_(0), ports_(0), truckTerminals_(0), planeTerminals_(0), boatTerminals_(0), truckSegments_(0), planeSegments_(0), boatSegments_(0),
+    truckSegmentsExpediteAvailable_(0), planeSegmentsExpediteAvailable_(0), boatSegmentsExpediteAvailable_(0), expedite_(Segment::allAvailabilities()) {
     }
   protected:
     void customersInc() { customers_++; }
@@ -55,6 +65,9 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     int truckSegments_;
     int planeSegments_;
     int boatSegments_;
+    int truckSegmentsExpediteAvailable_;
+    int planeSegmentsExpediteAvailable_;
+    int boatSegmentsExpediteAvailable_;
     Ptr<Location> destination_;
     USD maxCost_;
     Ptr<Location> source_;

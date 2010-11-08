@@ -44,13 +44,15 @@ class Segment : public Fwk::PtrInterface<Segment> {
 
     enum ExpediteSupport {
         available_,
-        unavailable_
+        unavailable_,
+        allAvailabilities_
     };
     static inline ExpediteSupport available() { return available_; }
     static inline ExpediteSupport unavailable() { return unavailable_; }
+    static inline ExpediteSupport allAvailabilities() { return allAvailabilities_; }
 
     ExpediteSupport expediteSupport() const { return expediteSupport_; }
-    void expediteSupportIs(const ExpediteSupport expediteSupport) { if (expediteSupport_ == expediteSupport) return; expediteSupport_ = expediteSupport; }
+    void expediteSupportIs(const ExpediteSupport expediteSupport) { if (expediteSupport_ == expediteSupport) return; expediteSupport_ = expediteSupport; if (notifiee_) notifiee_->onExpediteSupport(); }
     TransportationMode transportationMode() const { return transportationMode_; }
     Ptr<Location> source() const { return source_; }
     void sourceIs(const Ptr<Location> source) { if (source_ == source) return; source_ = source; }
@@ -89,7 +91,7 @@ class Segment : public Fwk::PtrInterface<Segment> {
     };
     Ptr<Segment::Notifiee> notifiee() const { return notifiee_; }
   protected:
-    Segment(const TransportationMode transportationMode, const string name) : transportationMode_(transportationMode), name_(name) {}
+    Segment(const TransportationMode transportationMode, const string name) : transportationMode_(transportationMode), name_(name), expediteSupport_(unavailable_) {}
     Ptr<Segment::Notifiee> notifiee_;
     void notifieeIs(Segment::Notifiee* n) const {
         Segment* me = const_cast<Segment*>(this);

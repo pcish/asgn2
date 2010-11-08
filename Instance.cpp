@@ -316,9 +316,8 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
     } else if (name == "difficulty") {
         engineObject_->difficultyIs(atof(v.c_str()));
     } else if (name == "expedite support") {
-        Segment::ExpediteSupport support = engineObject_->expediteSupport();
-        if (support == Segment::available()) ;
-        else if (support == Segment::unavailable()) ;
+        if (v == "yes") engineObject_->expediteSupportIs(Segment::available());
+        else if (v == "no") engineObject_->expediteSupportIs(Segment::unavailable());
     } else {
     }
 }
@@ -352,6 +351,18 @@ string StatsRep::attribute(const string& name) {
         os << manager_->engineManager()->shippingNetwork()->planeSegments();
     } else if (name == "Boat segment") {
         os << manager_->engineManager()->shippingNetwork()->boatSegments();
+    } else if (name == "expedite percentage") {
+        int expediteAvailable = 0;
+        manager_->engineManager()->shippingNetwork()->expediteIs(Segment::available());
+        expediteAvailable += manager_->engineManager()->shippingNetwork()->truckSegments();
+        expediteAvailable += manager_->engineManager()->shippingNetwork()->planeSegments();
+        expediteAvailable += manager_->engineManager()->shippingNetwork()->boatSegments();
+        int totalSegments = 0;
+        manager_->engineManager()->shippingNetwork()->expediteIs(Segment::allAvailabilities());
+        totalSegments += manager_->engineManager()->shippingNetwork()->truckSegments();
+        totalSegments += manager_->engineManager()->shippingNetwork()->planeSegments();
+        totalSegments += manager_->engineManager()->shippingNetwork()->boatSegments();
+        os << ((float) expediteAvailable / (float) totalSegments) * 100.0;
     } else {
         return "";
     }
@@ -365,14 +376,14 @@ string ConnRep::attribute(const string& name) {
     Mile maxDistance;
     USD maxCost;
     int maxTime;
-  
+
     is >> cmd;
     if (cmd.compare("explore") == 0) {
         is >> source;
         is >> dummy; // colon
         while (!is.eof () ){
-            is >> attr; 
-            if (attr.compare("expedite") == 0) 
+            is >> attr;
+            if (attr.compare("expedite") == 0)
                 expedite = Segment::available();
             else {
                 //is >> val;
@@ -455,17 +466,17 @@ void FleetRep::attributeIs(const string& name, const string& v) {
 
     istringstream is(v);
     if (property == "speed") {
-        int propertyValue; 
+        int propertyValue;
         is >> propertyValue;
         fleet_->speedIs(Mile(propertyValue));
     }
-    if (property == "cost") { 
-        double propertyValue; 
+    if (property == "cost") {
+        double propertyValue;
         is >> propertyValue;
         fleet_->costIs(USD(propertyValue));
     }
     if (property == "capacity") {
-        int propertyValue; 
+        int propertyValue;
         is >> propertyValue;
         fleet_->capacityIs(PackageUnit(propertyValue));
     }
