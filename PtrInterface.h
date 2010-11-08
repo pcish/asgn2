@@ -14,6 +14,7 @@ public:
     // DRC - support for templates
     inline const PtrInterface * newRef() const { ++ref_; return this; }
     inline void deleteRef() const { if( --ref_ == 0 ) onZeroReferences(); }
+    inline void referencesDec() { --ref_; }
 protected:
     virtual ~PtrInterface() {}
     virtual void onZeroReferences() const { delete this; }

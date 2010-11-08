@@ -7,7 +7,7 @@ namespace Shipping {
 class ShippingNetwork;
 class SegmentReactor : public Segment::Notifiee {
   public:
-    virtual void onDel(Fwk::Ptr<Segment> p) {
+    virtual void onDel(Segment *p) {
         if (p->transportationMode() == Segment::truck()) {
             notifier_->shippingNetwork()->truckSegments_--;
         } else if (p->transportationMode() == Segment::plane()) {
@@ -23,7 +23,7 @@ class SegmentReactor : public Segment::Notifiee {
 };
 class CustomerReactor : public Customer::Notifiee {
   public:
-    virtual void onDel(Fwk::Ptr<Customer> p) {
+    virtual void onDel(Customer *p) {
         notifier_->shippingNetwork()->customers_--;
     }
     static Fwk::Ptr<CustomerReactor> customerReactorNew() {
@@ -33,7 +33,7 @@ class CustomerReactor : public Customer::Notifiee {
 };
 class PortReactor : public Port::Notifiee {
   public:
-    virtual void onDel(Fwk::Ptr<Port> p) {
+    virtual void onDel(Port *p) {
         notifier_->shippingNetwork()->ports_--;
     }
     static Fwk::Ptr<PortReactor> portReactorNew() {
@@ -43,7 +43,7 @@ class PortReactor : public Port::Notifiee {
 };
 class TerminalReactor : public Terminal::Notifiee {
   public:
-    virtual void onDel(Fwk::Ptr<Terminal> p) {
+    virtual void onDel(Terminal *p) {
         if (p->transportationMode() == Segment::truck()) {
             notifier_->shippingNetwork()->truckTerminals_--;
         } else if (p->transportationMode() == Segment::plane()) {
