@@ -15,7 +15,7 @@ locationNotFound(string locationName) {
 }
 
 void
-extraLocationFound(string loccationName) {
+extraLocationFound(string locationName) {
     cout << "Extra location found: " << locationName << endl;
 }
 
