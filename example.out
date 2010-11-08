@@ -1,0 +1,19 @@
+fleet->attribute('Boat, speed'): 60.00
+truckSeg1->attribute('source'): customer1
+boatSeg1->attribute('return segment'): boatSeg2
+**** explore customer1 : distance 1500 ****
+customer1(truckSeg1:900.00:truckSeg2) port1
+customer1(truckSeg1:900.00:truckSeg2) port1(boatSeg2:400.00:boatSeg1) customer2
+
+*** connect customer2 : customer1 ****
+1300.00 906.67 no; customer2(boatSeg1:400.00:boatSeg2) port1(truckSeg2:900.00:truckSeg1) customer1
+1950.00 697.44 yes; customer2(boatSeg1:400.00:boatSeg2) port1(truckSeg2:900.00:truckSeg1) customer1
+
+===== Stats attributes =====
+ --- Segments --- 
+# Truck segments : 2
+Expediting %     : 100.00
+ --- Terminals --- 
+# Plane terminals: 0
+ --- Ports and customers --- 
+# Ports          : 1

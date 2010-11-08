@@ -11,6 +11,9 @@ test:	test.o $(OBJECTS)
 test1:	test1.o $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIB)
 
+example: example.o $(OBJECTS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIB)
+
 clean:
 	rm -f tes1 test1.o test.o test.exe $(OBJECTS) *~
 
@@ -20,3 +23,4 @@ entities.o: entities.cpp entities.h
 Engine.o: Engine.h Engine.cpp types.h error.h
 test.o: test1.cpp Instance.h PtrInterface.h Ptr.h
 test1.o: test1.cpp Instance.h PtrInterface.h Ptr.h
+example.o: example.cpp Instance.h
