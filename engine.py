@@ -57,7 +57,7 @@ class Attr(object):
             ret.write('\n    ')
             if self.virtual:
                 ret.write('virtual ')
-            ret.write('void {name}Is(int index, {type} {name})'.format(type=self.type, name=self.name))
+            ret.write('void {name}Is(const unsigned int index, {type} {name})'.format(type=self.type, name=self.name))
             if self.complex:
                 ret.write(';')
             else:
