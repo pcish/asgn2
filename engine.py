@@ -229,6 +229,7 @@ class Entity(object):
         ret.write('if (notifier_ == notifier) return;\n')
         ret.write('if (notifier_) notifier->notifieeIs(0);\n')
         ret.write('notifier_ = notifier;\n')
+        ret.write('notifier_->referencesDec();\n')
         ret.write('notifier_->notifieeIs(this);\n')
         ret.set_indent(8)
         ret.write('}\n')

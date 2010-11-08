@@ -69,6 +69,7 @@ class Segment : public Fwk::PtrInterface<Segment> {
             if (notifier_ == notifier) return;
             if (notifier_) notifier->notifieeIs(0);
             notifier_ = notifier;
+            notifier_->referencesDec();
             notifier_->notifieeIs(this);
         }
         static Fwk::Ptr<Segment::Notifiee> notifieeNew() {
@@ -122,6 +123,7 @@ class Location : public Fwk::PtrInterface<Location> {
             if (notifier_ == notifier) return;
             if (notifier_) notifier->notifieeIs(0);
             notifier_ = notifier;
+            notifier_->referencesDec();
             notifier_->notifieeIs(this);
         }
         static Fwk::Ptr<Location::Notifiee> notifieeNew() {
@@ -161,6 +163,7 @@ class Customer : public Location {
             if (notifier_ == notifier) return;
             if (notifier_) notifier->notifieeIs(0);
             notifier_ = notifier;
+            notifier_->referencesDec();
             notifier_->notifieeIs(this);
         }
         static Fwk::Ptr<Customer::Notifiee> notifieeNew() {
@@ -195,6 +198,7 @@ class Port : public Location {
             if (notifier_ == notifier) return;
             if (notifier_) notifier->notifieeIs(0);
             notifier_ = notifier;
+            notifier_->referencesDec();
             notifier_->notifieeIs(this);
         }
         static Fwk::Ptr<Port::Notifiee> notifieeNew() {
@@ -230,6 +234,7 @@ class Terminal : public Location {
             if (notifier_ == notifier) return;
             if (notifier_) notifier->notifieeIs(0);
             notifier_ = notifier;
+            notifier_->referencesDec();
             notifier_->notifieeIs(this);
         }
         static Fwk::Ptr<Terminal::Notifiee> notifieeNew() {
@@ -273,6 +278,7 @@ class Fleet : public Fwk::PtrInterface<Fleet> {
             if (notifier_ == notifier) return;
             if (notifier_) notifier->notifieeIs(0);
             notifier_ = notifier;
+            notifier_->referencesDec();
             notifier_->notifieeIs(this);
         }
         static Fwk::Ptr<Fleet::Notifiee> notifieeNew() {
@@ -315,6 +321,7 @@ class TruckFleet : public Fleet {
             if (notifier_ == notifier) return;
             if (notifier_) notifier->notifieeIs(0);
             notifier_ = notifier;
+            notifier_->referencesDec();
             notifier_->notifieeIs(this);
         }
         static Fwk::Ptr<TruckFleet::Notifiee> notifieeNew() {
@@ -349,6 +356,7 @@ class BoatFleet : public Fleet {
             if (notifier_ == notifier) return;
             if (notifier_) notifier->notifieeIs(0);
             notifier_ = notifier;
+            notifier_->referencesDec();
             notifier_->notifieeIs(this);
         }
         static Fwk::Ptr<BoatFleet::Notifiee> notifieeNew() {
@@ -383,6 +391,7 @@ class PlaneFleet : public Fleet {
             if (notifier_ == notifier) return;
             if (notifier_) notifier->notifieeIs(0);
             notifier_ = notifier;
+            notifier_->referencesDec();
             notifier_->notifieeIs(this);
         }
         static Fwk::Ptr<PlaneFleet::Notifiee> notifieeNew() {
