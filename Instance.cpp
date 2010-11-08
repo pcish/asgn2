@@ -418,8 +418,10 @@ string FleetRep::attribute(const string& name) {
     if (mode == "Plane") fleet_ = planefleet_;
 
     ostringstream os;
+    os.setf(ios::fixed,ios::floatfield);
+    os.precision(2);
     if (property == "speed") {
-        os << fleet_->speed().value();
+        os << (float) fleet_->speed().value();
     } else if (property == "cost"){
         os << fleet_->cost().value();
     } else if (property == "capacity"){
