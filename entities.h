@@ -52,19 +52,19 @@ class Segment : public Fwk::PtrInterface<Segment> {
     static inline ExpediteSupport allAvailabilities() { return allAvailabilities_; }
 
     ExpediteSupport expediteSupport() const { return expediteSupport_; }
-    void expediteSupportIs(const ExpediteSupport expediteSupport) { if (expediteSupport_ == expediteSupport) return; expediteSupport_ = expediteSupport; }
+    void expediteSupportIs(const ExpediteSupport expediteSupport) { if (expediteSupport_ == expediteSupport) return; expediteSupport_ = expediteSupport; if (notifiee_) notifiee_->onExpediteSupport(); }
     string name() const { return name_; }
     Ptr<Location> source() const { return source_; }
-    void sourceIs(const Ptr<Location> source) { if (source_ == source) return; source_ = source; }
+    void sourceIs(const Ptr<Location> source) { if (source_ == source) return; source_ = source; if (notifiee_) notifiee_->onSource(); }
     Ptr<Segment> returnSegment() const { return returnSegment_; }
-    void returnSegmentIs(const Ptr<Segment> returnSegment) { if (returnSegment_ == returnSegment) return; returnSegment_ = returnSegment; }
+    void returnSegmentIs(const Ptr<Segment> returnSegment) { if (returnSegment_ == returnSegment) return; returnSegment_ = returnSegment; if (notifiee_) notifiee_->onReturnSegment(); }
     TransportationMode transportationMode() const { return transportationMode_; }
     SegmentDifficultyUnit difficulty() const { return difficulty_; }
-    void difficultyIs(const SegmentDifficultyUnit difficulty) { if (difficulty_ == difficulty) return; difficulty_ = difficulty; }
+    void difficultyIs(const SegmentDifficultyUnit difficulty) { if (difficulty_ == difficulty) return; difficulty_ = difficulty; if (notifiee_) notifiee_->onDifficulty(); }
     Mile length() const { return length_; }
-    void lengthIs(const Mile length) { if (length_ == length) return; length_ = length; }
+    void lengthIs(const Mile length) { if (length_ == length) return; length_ = length; if (notifiee_) notifiee_->onLength(); }
     ShippingNetwork* shippingNetwork() const { return shippingNetwork_; }
-    void shippingNetworkIs(ShippingNetwork* shippingNetwork) { if (shippingNetwork_ == shippingNetwork) return; shippingNetwork_ = shippingNetwork; }
+    void shippingNetworkIs(ShippingNetwork* shippingNetwork) { if (shippingNetwork_ == shippingNetwork) return; shippingNetwork_ = shippingNetwork; if (notifiee_) notifiee_->onShippingNetwork(); }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<Segment> notifier) {
@@ -120,7 +120,7 @@ class Location : public Fwk::PtrInterface<Location> {
     virtual void segmentIs(const Ptr<Segment> segment) ;
     string name() const { return name_; }
     ShippingNetwork* shippingNetwork() const { return shippingNetwork_; }
-    void shippingNetworkIs(ShippingNetwork* shippingNetwork) { if (shippingNetwork_ == shippingNetwork) return; shippingNetwork_ = shippingNetwork; }
+    void shippingNetworkIs(ShippingNetwork* shippingNetwork) { if (shippingNetwork_ == shippingNetwork) return; shippingNetwork_ = shippingNetwork; if (notifiee_) notifiee_->onShippingNetwork(); }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<Location> notifier) {
@@ -269,13 +269,13 @@ class Fleet : public Fwk::PtrInterface<Fleet> {
   public:
     ~Fleet() { if (notifiee_) notifiee_->onDel(this); }
     USD cost() const { return cost_; }
-    void costIs(const USD cost) { if (cost_ == cost) return; cost_ = cost; }
+    void costIs(const USD cost) { if (cost_ == cost) return; cost_ = cost; if (notifiee_) notifiee_->onCost(); }
     PackageUnit capacity() const { return capacity_; }
-    void capacityIs(const PackageUnit capacity) { if (capacity_ == capacity) return; capacity_ = capacity; }
+    void capacityIs(const PackageUnit capacity) { if (capacity_ == capacity) return; capacity_ = capacity; if (notifiee_) notifiee_->onCapacity(); }
     Segment::TransportationMode transportationMode() const { return transportationMode_; }
-    void transportationModeIs(const Segment::TransportationMode transportationMode) { if (transportationMode_ == transportationMode) return; transportationMode_ = transportationMode; }
+    void transportationModeIs(const Segment::TransportationMode transportationMode) { if (transportationMode_ == transportationMode) return; transportationMode_ = transportationMode; if (notifiee_) notifiee_->onTransportationMode(); }
     Mile speed() const { return speed_; }
-    void speedIs(const Mile speed) { if (speed_ == speed) return; speed_ = speed; }
+    void speedIs(const Mile speed) { if (speed_ == speed) return; speed_ = speed; if (notifiee_) notifiee_->onSpeed(); }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<Fleet> notifier) {

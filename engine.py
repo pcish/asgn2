@@ -52,7 +52,7 @@ class Attr(object):
         elif self.collection:
             ret.write('{{ {name}s_.push_back({name}); }}'.format(type=self.type, name=self.name))
         else:
-            ret.write('{{ if ({name}_ == {name}) return; {name}_ = {name}; }}'.format(type=self.type, name=self.name))
+            ret.write('{{ if ({name}_ == {name}) return; {name}_ = {name}; if (notifiee_) notifiee_->on{capitalname}(); }}'.format(type=self.type, name=self.name, capitalname=''.join((self.name[0].upper(), self.name[1:]))))
         return ret.getvalue()
 
     def accessor_str(self):
