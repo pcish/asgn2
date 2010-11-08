@@ -5,9 +5,9 @@
 
 namespace Shipping {
 
-class Mile : public Ordinal<Mile, unsigned int> {
+class Mile : public Ordinal<Mile, double> {
   public:
-    Mile(unsigned int num = 0) : Ordinal<Mile, unsigned int>(num) {
+    Mile(double num = 0) : Ordinal<Mile, double>(num) {
     }
 };
 

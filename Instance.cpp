@@ -421,7 +421,7 @@ string FleetRep::attribute(const string& name) {
     os.setf(ios::fixed,ios::floatfield);
     os.precision(2);
     if (property == "speed") {
-        os << (float) fleet_->speed().value();
+        os << fleet_->speed().value();
     } else if (property == "cost"){
         os << fleet_->cost().value();
     } else if (property == "capacity"){
@@ -447,7 +447,7 @@ void FleetRep::attributeIs(const string& name, const string& v) {
 
     istringstream is(v);
     if (property == "speed") {
-        int propertyValue;
+        double propertyValue;
         is >> propertyValue;
         fleet_->speedIs(Mile(propertyValue));
     }
