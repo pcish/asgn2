@@ -60,7 +60,7 @@ Ptr<Terminal> EngineManager::terminalNew(const string name, const Segment::Trans
 }
 
 Ptr<Segment> EngineManager::segmentNew(const Segment::TransportationMode transportationMode, const string name){
-    Ptr<Segment> m = new Segment(transportationMode, name);
+    Ptr<Segment> m = new Segment(name, transportationMode);
     m->shippingNetworkIs(network_.ptr());
     Fwk::Ptr<SegmentReactor> r = SegmentReactor::segmentReactorNew();
     r->notifierIs(m);

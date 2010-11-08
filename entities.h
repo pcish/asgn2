@@ -52,13 +52,13 @@ class Segment : public Fwk::PtrInterface<Segment> {
     static inline ExpediteSupport allAvailabilities() { return allAvailabilities_; }
 
     ExpediteSupport expediteSupport() const { return expediteSupport_; }
-    void expediteSupportIs(const ExpediteSupport expediteSupport) { if (expediteSupport_ == expediteSupport) return; expediteSupport_ = expediteSupport; if (notifiee_) notifiee_->onExpediteSupport(); }
-    TransportationMode transportationMode() const { return transportationMode_; }
+    void expediteSupportIs(const ExpediteSupport expediteSupport) { if (expediteSupport_ == expediteSupport) return; expediteSupport_ = expediteSupport; }
+    string name() const { return name_; }
     Ptr<Location> source() const { return source_; }
     void sourceIs(const Ptr<Location> source) { if (source_ == source) return; source_ = source; }
     Ptr<Segment> returnSegment() const { return returnSegment_; }
     void returnSegmentIs(const Ptr<Segment> returnSegment) { if (returnSegment_ == returnSegment) return; returnSegment_ = returnSegment; }
-    string name() const { return name_; }
+    TransportationMode transportationMode() const { return transportationMode_; }
     SegmentDifficultyUnit difficulty() const { return difficulty_; }
     void difficultyIs(const SegmentDifficultyUnit difficulty) { if (difficulty_ == difficulty) return; difficulty_ = difficulty; }
     Mile length() const { return length_; }
@@ -91,7 +91,9 @@ class Segment : public Fwk::PtrInterface<Segment> {
     };
     Ptr<Segment::Notifiee> notifiee() const { return notifiee_; }
   protected:
-    Segment(const TransportationMode transportationMode, const string name) : transportationMode_(transportationMode), name_(name), expediteSupport_(unavailable_) {}
+    Segment(const string name, const TransportationMode transportationMode) : name_(name), transportationMode_(transportationMode) {
+        expediteSupport_ = unavailable_;        
+    }
     Ptr<Segment::Notifiee> notifiee_;
     void notifieeIs(Segment::Notifiee* n) const {
         Segment* me = const_cast<Segment*>(this);
@@ -100,10 +102,10 @@ class Segment : public Fwk::PtrInterface<Segment> {
 
   private:
     ExpediteSupport expediteSupport_;
-    TransportationMode transportationMode_;
+    string name_;
     Ptr<Location> source_;
     Ptr<Segment> returnSegment_;
-    string name_;
+    TransportationMode transportationMode_;
     SegmentDifficultyUnit difficulty_;
     Mile length_;
     ShippingNetwork* shippingNetwork_;
