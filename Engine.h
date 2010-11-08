@@ -22,15 +22,15 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     int segments() const { return truckSegments_ + planeSegments_ + boatSegments_; }
     int truckSegments() const {
         if (expedite_ == Segment::available()) return truckSegmentsExpediteAvailable_;
-        else return truckTerminals_;
+        else return truckSegments_;
     }
     int planeSegments() const {
         if (expedite_ == Segment::available()) return planeSegmentsExpediteAvailable_;
-        else return planeTerminals_;
+        else return planeSegments_;
     }
     int boatSegments() const {
         if (expedite_ == Segment::available()) return boatSegmentsExpediteAvailable_;
-        else return boatTerminals_;
+        else return boatSegments_;
     }
     int terminals() const { return truckTerminals_ + planeTerminals_ + boatTerminals_; }
     int truckTerminals() const { return truckTerminals_; }
