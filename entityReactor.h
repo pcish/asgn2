@@ -40,7 +40,7 @@ class SegmentReactor : public Segment::Notifiee {
     }
     virtual void onSource() {
         if (previousSource_ != NULL) {
-            int i = 1;
+            int i = 0;
             while (previousSource_->segment(i).ptr() != notifier_.ptr()) i++;
             previousSource_->segmentIs(i, 0);
         }

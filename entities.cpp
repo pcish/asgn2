@@ -29,11 +29,11 @@ void Location::segmentIs (int index, Ptr<Segment> seg) {
 //unsigned int Location::segments () { return segments_.size(); }
 
 Ptr<Segment> Location::segment(const unsigned int index) const {
-    if (index-1 < 0 || index-1 >= segments_.size () ){
+    if (index < 0 || index >= segments_.size () ){
          cerr << "Segment # out of bound exception" << endl;
          return NULL;
     }
-    return segments_[index-1];
+    return segments_[index];
 }
 /*
 void Terminal::segmentIs (Ptr<Segment> seg) {
