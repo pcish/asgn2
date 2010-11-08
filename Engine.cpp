@@ -22,11 +22,11 @@ Ptr<Path> ShippingNetwork::explore() const {
     Mile curDistance;
     Hour curTime;
 
-    bfsQueue.push(source_);    
+    bfsQueue.push(source_);
     while (!bfsQueue.empty() ) {
         curLocation = bfsQueue.front();
         bfsQueue.pop();
-        for (SegmentCount i = 0; i < curLocation->segments().value(); ++i) {
+        for (unsigned int i = 0; i < curLocation->segments(); ++i) {
             Ptr<Segment> seg = curLocation->segment(i);
             USD segCost;
             Hour segTime;
@@ -41,12 +41,12 @@ Ptr<Path> ShippingNetwork::explore() const {
                 segCost = boatFleet->cost().value() * seg->length().value();
                 segTime = seg->length().value() / boatFleet->speed().value();
             }
-            if ( !(maxDistance_ > 0 && curDistance + seg->length() > maxDistance_) && 
-                 !(maxCost_ > 0 && curCost + segCost > maxCost_) && 
-                 !(maxTime_ > 0 && curTime + segTime > maxTime_) &&                 
+            if ( !(maxDistance_ > 0 && curDistance + seg->length() > maxDistance_) &&
+                 !(maxCost_ > 0 && curCost + segCost > maxCost_) &&
+                 !(maxTime_ > 0 && curTime + segTime > maxTime_) &&
                  !(expedite_ == Segment::available() && seg->expediteSupport() == Segment::unavailable() ) ) {
                 //push location and segment into path
-                bfsQueue.push(seg->returnSegment()->source() ); // get its return segment's source                
+                bfsQueue.push(seg->returnSegment()->source() ); // get its return segment's source
             }
             else { //reaches the limit
             }
