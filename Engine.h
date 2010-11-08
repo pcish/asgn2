@@ -3,6 +3,7 @@
 #include "entities.h"
 #include "Ptr.h"
 #include "PtrInterface.h"
+#include <vector>
 
 namespace Shipping {
 class EngineReactor;
@@ -18,13 +19,23 @@ public:
     void SegmentIs(Ptr<Segment> _segment ) {
         segments_.push_back (_segment);
     }
-    Ptr<Location> location(LocationCount index) const { return index < locations_.size() ?segments[index]}
+    Ptr<Location> location(LocationCount index) const { return (index < locations_.size())?locations_[index.value()]:NULL; }
+    Ptr<Segment> segment(SegmentCount index) const { return (index < segments_.size())?segments_[index.value()]:NULL; }
     LocationCount locations() const { return locations_.size(); }
-    SegmentCount segments() const {return segments_.size(); }
-
+    SegmentCount segments() const { return segments_.size(); }
+    void hourIs(Hour _hour) { hour_ = _hour; }
+    Hour hour() const { return hour_; }
+    void costIs(USD _cost) { cost_ = _cost; }
+    USD cost() const { return cost_; }
+    Segment::ExpediteSupport expediteSupport() const { return expediteSupport_; }
+    void expediteSupportIs(Segment::ExpediteSupport _expediteSupport) { expediteSupport_ = _expediteSupport; }
 private:
     vector<Ptr<Location> > locations_;
     vector<Ptr<Segment> > segments_;
+    USD cost_;
+    Segment::ExpediteSupport expediteSupport_;
+    Hour hour_;
+
 };
 class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     friend class EngineReactor;
