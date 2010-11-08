@@ -1,0 +1,16 @@
+Nov 7 luyota
+Changes engineObject_ to be protected and only provides engineObject() in the Location class and removed the engineObject() in its subclass.
+This is because in the following code:
+
+if (name == "source") {
+    Ptr<Location> location = manager_->cast_instance<Location, LocationRep>(v);
+    engineObject_->sourceIs(location);
+    location->segmentIs(engineObject_);
+} 
+
+manager_->cast_instance always returns an arbitrary pointer to the location due to the process:
+1. Fetch the rep instance of v, in which we get a LocationRep object
+2. Call this object's engineObject(), which returns Ptr<Location> and store that in location.
+The problem is, this location is the member variable of Location (Ptr<Location> engineObject) rather than like Terminal or Customer, and is not instantiated when a Terminal or Customer object is created, for the constructors of Terminal and Customer only instantiate Ptr<Terminal> and Ptr<Customer> without instantiated their parent class (Location)
+'s engine object.
+ 

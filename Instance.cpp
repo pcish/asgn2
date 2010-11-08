@@ -53,10 +53,11 @@ public:
         Instance(name), manager_(manager) {
     }
     Ptr<ManagerImpl> manager_;
+    Ptr<Location> engineObject_;
 
   private:
-    Ptr<Location> engineObject_;
     int segmentNumber(const string& name);
+    //Ptr<Location> engineObject_;
 };
 
 class PortRep : public LocationRep {
@@ -65,10 +66,10 @@ class PortRep : public LocationRep {
         LocationRep(name, manager) {
         engineObject_ = manager->engineManager()->portNew(name);
     }
-    Ptr<Port> engineObject() const { return engineObject_; }
+    //Ptr<Port> engineObject() const { return engineObject_; }
 
-  private:
-    Ptr<Port> engineObject_;
+  //private:
+  //  Ptr<Port> engineObject_;
 };
 
 class CustomerRep : public LocationRep {
@@ -77,10 +78,10 @@ class CustomerRep : public LocationRep {
         LocationRep(name, manager) {
         engineObject_ = manager->engineManager()->customerNew(name);
     }
-    Ptr<Customer> engineObject() const { return engineObject_; }
+    //Ptr<Customer> engineObject() const { return engineObject_; }
 
-  private:
-    Ptr<Customer> engineObject_;
+  //private:
+  //  Ptr<Customer> engineObject_;
 };
 
 class TerminalRep : public LocationRep {
@@ -89,12 +90,13 @@ class TerminalRep : public LocationRep {
         LocationRep(name, manager), mode_(_mode) {
           engineObject_ = manager_->engineManager()->terminalNew(name, _mode);
     }
+    //Ptr<Terminal> engineObject() const { return engineObject_; }
 
   protected:
     Segment::TransportationMode mode_;
 
-  private:
-    Ptr<Terminal> engineObject_;
+  //private:
+   // Ptr<Terminal> engineObject_;
 };
 
 class SegmentRep : public Instance {
@@ -407,7 +409,7 @@ string ConnRep::attribute(const string& name) {
     else {
     }
 
-//  call lowlevel to compute attribute here
+//  call low level to compute attribute here
 //
     return os.str();
 }
@@ -452,15 +454,19 @@ void FleetRep::attributeIs(const string& name, const string& v) {
     if (mode == "Plane") fleet_ = planefleet_;
 
     istringstream is(v);
-    int propertyValue;
-    is >> propertyValue;
     if (property == "speed") {
+        int propertyValue; 
+        is >> propertyValue;
         fleet_->speedIs(Mile(propertyValue));
     }
-    if (property == "cost") {
+    if (property == "cost") { 
+        double propertyValue; 
+        is >> propertyValue;
         fleet_->costIs(USD(propertyValue));
     }
     if (property == "capacity") {
+        int propertyValue; 
+        is >> propertyValue;
         fleet_->capacityIs(PackageUnit(propertyValue));
     }
 }
