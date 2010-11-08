@@ -91,6 +91,11 @@ class PlaneTerminalCount : public Ordinal<PlaneTerminalCount, unsigned int> {
     PlaneTerminalCount(unsigned int num = 0) : Ordinal<PlaneTerminalCount, unsigned int>(num) {
     }
 };
+class Hour : public Ordinal<Hour, double> {
+  public:
+    Hour (double num = 0.0) : Ordinal<Hour, double>(num) {
+    }
+};
 
 }
 
