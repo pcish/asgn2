@@ -52,7 +52,7 @@ class Attr(object):
         elif self.collection:
             ret.write('{{ {name}s_.push_back({name}); }}'.format(type=self.type, name=self.name))
         else:
-            ret.write('{{ if ({name}_ == {name}) return; {name}_ = {name}; }}'.format(type=self.type, name=self.name))
+            ret.write('{{ if ({name}_ == {name}) return; {name}_ = {name}; if (notifiee_) notifiee_->on{capitalname}(); }}'.format(type=self.type, name=self.name, capitalname=''.join((self.name[0].upper(), self.name[1:]))))
         return ret.getvalue()
 
     def accessor_str(self):
@@ -118,11 +118,13 @@ class Entity(object):
     enums = []
     classname = None
     parent = None
+    constructorContents = ''
     def __init__(self, name, parent=None):
         self.attrs = []
         self.enums = []
         self.classname = name
         self.parent = parent
+        self.constructorContents = ''
 
     def attrIs(self, attr):
         self.attrs.append(attr)
@@ -147,7 +149,7 @@ class Entity(object):
         return roattrs
 
     def constructorStr(self):
-        ret = StringIO()
+        ret = IndentedString()
         ret.write('%s(' % self.classname)
         roattrs = self.roattrs()
         constructor_args = self.parent_ro_attrs()
@@ -169,7 +171,14 @@ class Entity(object):
                 ret.write('%s_(%s)' % (roattrs[i].name, roattrs[i].name))
                 if i < len(roattrs) - 1:
                     ret.write(', ')
-        ret.write(' {}\n')
+        ret.write(' {')
+        if len(self.constructorContents) > 0:
+            ret.write('\n')
+            ret.set_indent(8)
+            ret.write(self.constructorContents)
+            ret.write('\n')
+            ret.set_indent(4)
+        ret.write('}\n')
         #ret.write(' {\n')
         #ret.write('        if (notifiee_) notifiee_->on%s();\n' % self.classname)
         #ret.write('    }\n')
@@ -324,6 +333,7 @@ classes = {}
 if __name__ == "__main__":
     baseclassOpt = 'BASECLASS'
     enumOpt = 'ENUM'
+    constructorOpt = 'CONSTRUCTOR'
     config = ConfigParser.ConfigParser()
     config.optionxform = lambda x: x
     config.read('engine.conf')
@@ -347,6 +357,9 @@ if __name__ == "__main__":
                     e.append(i)
                 c.enumIs(e)
                 continue
+            if attr.startswith(constructorOpt):
+                c.constructorContents = type;
+                continue;
             (type, _, modifiers) = type.partition('$')
             a = Attr(type, attr)
             if modifiers.find('R') >= 0:
