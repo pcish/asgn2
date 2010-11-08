@@ -251,7 +251,7 @@ Ptr<T> ManagerImpl::cast_instance(const string& v) {
 
 string LocationRep::attribute(const string& name) {
     int i = segmentNumber(name);
-    if (i != 0) {
+    if (i >= 0) {
         return engineObject_->segment(i)->name();
     }
     return "";
@@ -305,9 +305,9 @@ static const int segmentStrlen = segmentStr.length();
 int LocationRep::segmentNumber(const string& name) {
     if (name.substr(0, segmentStrlen) == segmentStr) {
         const char* t = name.c_str() + segmentStrlen;
-        return atoi(t);
+        return atoi(t) - 1;
     }
-    return 0;
+    return -1;
 }
 
 string StatsRep::attribute(const string& name) {

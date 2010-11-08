@@ -38,10 +38,25 @@ class SegmentReactor : public Segment::Notifiee {
             notifier_->shippingNetwork()->boatSegmentsExpediteAvailable_ += delta;
         }
     }
+    virtual void onSource() {
+        if (previousSource_ != NULL) {
+            int i = 0;
+            while (previousSource_->segment(i).ptr() != notifier_.ptr()) i++;
+            previousSource_->segmentIs(i, 0);
+        }
+        if (notifier_->source() != NULL) {
+            notifier_->source()->segmentIs(notifier_);
+        }
+    }
     static Fwk::Ptr<SegmentReactor> segmentReactorNew() {
         Fwk::Ptr<SegmentReactor> n = new SegmentReactor();
         return n;
     }
+  protected:
+    SegmentReactor() {
+        previousSource_ = NULL;
+    }
+    Location *previousSource_;
 };
 class CustomerReactor : public Customer::Notifiee {
   public:

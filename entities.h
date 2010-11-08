@@ -118,6 +118,7 @@ class Location : public Fwk::PtrInterface<Location> {
     ~Location() { if (notifiee_) notifiee_->onDel(this); }
     virtual Ptr<Segment> segment(const SegmentCount index) const ;
     virtual void segmentIs(const Ptr<Segment> segment) ;
+    virtual void segmentIs(SegmentCount index, Ptr<Segment> segment);
     virtual SegmentCount segments() const { return segments_.size(); }
     string name() const { return name_; }
     ShippingNetwork* shippingNetwork() const { return shippingNetwork_; }

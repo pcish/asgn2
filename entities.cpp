@@ -14,7 +14,7 @@ void Location::segmentIs(const Ptr<Segment> seg) {
     if (notifiee_)
         notifiee_->onSegment ();
 }
-/*void Location::segmentIs (unsigned int index, Ptr<Segment> seg) {
+void Location::segmentIs (SegmentCount index, Ptr<Segment> seg) {
     if (index < 0 || index >= segments_.size() ) {
         cerr <<  "Index out of bound exception" << endl;
         return;
@@ -27,13 +27,13 @@ void Location::segmentIs(const Ptr<Segment> seg) {
     }
 }
 //unsigned int Location::segments () { return segments_.size(); }
-*/
+
 Ptr<Segment> Location::segment(const SegmentCount index) const {
-    if (index-1 < 0 || index-1 >= segments_.size () ){
+    if (index < 0 || index >= segments_.size () ){
          cerr << "Segment # out of bound exception" << endl;
          return NULL;
     }
-    return segments_[index-1];
+    return segments_[index.value()];
 }
 /*
 void Terminal::segmentIs (Ptr<Segment> seg) {
