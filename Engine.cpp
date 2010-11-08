@@ -1,7 +1,60 @@
+#include <queue>
+
 #include "Engine.h"
 #include "entityReactor.h"
 
 namespace Shipping {
+
+Ptr<Path> ShippingNetwork::path() const {
+    if (!source_)
+        return NULL;
+    if (!destination_) {
+        return explore();
+    } else {
+        return conn();
+    }
+}
+Ptr<Path> ShippingNetwork::explore() const {
+    Ptr<Path> path_;
+    queue<Ptr<Location> > bfsQueue;
+    Ptr<Location> curLocation;
+    USD curCost;
+    Mile curDistance;
+    Hour curTime;
+
+    bfsQueue.push(source_);    
+    while (!bfsQueue.empty() ) {
+        curLocation = bfsQueue.front();
+        bfsQueue.pop();
+        for (SegmentCount i = 0; i < curLocation->segments().value(); ++i) {
+            Ptr<Segment> seg = curLocation->segment(i);
+            USD segCost;
+            Hour segTime;
+            //Computes time and cost here
+            if (seg->transportationMode() == Segment::truck() ) {
+                segCost = truckFleet->cost().value() * seg->length().value();
+                segTime = seg->length().value() / truckFleet->speed().value();
+            } else if (seg->transportationMode() == Segment::plane() ) {
+                segCost = planeFleet->cost().value() * seg->length().value();
+                segTime = seg->length().value() / planeFleet->speed().value();
+            } else if (seg->transportationMode() == Segment::boat() ) {
+                segCost = boatFleet->cost().value() * seg->length().value();
+                segTime = seg->length().value() / boatFleet->speed().value();
+            }
+            if ( !(maxDistance_ > 0 && curDistance + seg->length() > maxDistance_) && 
+                 !(maxCost_ > 0 && curCost + segCost > maxCost_) && 
+                 !(maxTime_ > 0 && curTime + segTime > maxTime_) &&                 
+                 !(expedite_ == Segment::available() && seg->expediteSupport() == Segment::unavailable() ) ) {
+                //push location and segment into path
+                bfsQueue.push(seg->returnSegment()->source() ); // get its return segment's source                
+            }
+            else { //reaches the limit
+            }
+        }
+    }
+}
+Ptr<Path> ShippingNetwork::conn() const {
+}
 
 class EngineReactor : public EngineManager::Notifiee {
   public:

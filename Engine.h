@@ -19,21 +19,21 @@ public:
     void SegmentIs(Ptr<Segment> _segment ) {
         segments_.push_back (_segment);
     }
-    Ptr<Location> location(LocationCount index) const { return (index < locations_.size())?locations_[index.value()]:NULL; }
-    Ptr<Segment> segment(SegmentCount index) const { return (index < segments_.size())?segments_[index.value()]:NULL; }
+    Ptr<Location> location(const LocationCount index) const { return (index < locations_.size())?locations_[index.value()]:NULL; }
+    Ptr<Segment> segment(const SegmentCount index) const { return (index < segments_.size())?segments_[index.value()]:NULL; }
     LocationCount locations() const { return locations_.size(); }
     SegmentCount segments() const { return segments_.size(); }
-    void hourIs(Hour _hour) { hour_ = _hour; }
+    void hourIs(const Hour _hour) { hour_ = _hour; }
     Hour hour() const { return hour_; }
-    void costIs(USD _cost) { cost_ = _cost; }
+    void costIs(const USD _cost) { cost_ = _cost; }
     USD cost() const { return cost_; }
-    Segment::ExpediteSupport expediteSupport() const { return expediteSupport_; }
-    void expediteSupportIs(Segment::ExpediteSupport _expediteSupport) { expediteSupport_ = _expediteSupport; }
+    Segment::ExpediteSupport expedite() const { return expedite_; }
+    void expediteIs(const Segment::ExpediteSupport _expedite) { expedite_ = _expedite; }
 private:
     vector<Ptr<Location> > locations_;
     vector<Ptr<Segment> > segments_;
     USD cost_;
-    Segment::ExpediteSupport expediteSupport_;
+    Segment::ExpediteSupport expedite_;
     Hour hour_;
 
 };
@@ -70,9 +70,10 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     Ptr<Location> source() const { return source_; }
     void sourceIs(const Ptr<Location> source) { if (source_ == source) return; source_ = source; }
 
-    int path() const { return path_; }
-    int maxTime() const { return maxTime_; }
-    void maxTimeIs(const int maxTime) { if (maxTime_ == maxTime) return; maxTime_ = maxTime; }
+    //Ptr<Path> path() const { return path_; }
+    Ptr<Path> path() const;
+    Hour maxTime() const { return maxTime_; }
+    void maxTimeIs(const Hour maxTime) { if (maxTime_ == maxTime) return; maxTime_ = maxTime; }
     Mile maxDistance() const { return maxDistance_; }
     void maxDistanceIs(const Mile maxDistance) { if (maxDistance_ == maxDistance) return; maxDistance_ = maxDistance; }
     int ports() const { return ports_; }
@@ -95,15 +96,20 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     int truckSegmentsExpediteAvailable_;
     int planeSegmentsExpediteAvailable_;
     int boatSegmentsExpediteAvailable_;
+    Ptr<TruckFleet> truckFleet;
+    Ptr<PlaneFleet> planeFleet;
+    Ptr<BoatFleet> boatFleet;
     Ptr<Location> destination_;
     USD maxCost_;
     Ptr<Location> source_;
-    int path_;
-    int maxTime_;
+    Ptr<Path> path_;
+    Hour maxTime_;
     Mile maxDistance_;
 
     Segment::ExpediteSupport expedite_;
     ShippingNetwork(const ShippingNetwork& o);
+    Ptr<Path> explore() const;
+    Ptr<Path> conn() const;
 };
 
 class EngineManager : public Fwk::PtrInterface<EngineManager> {

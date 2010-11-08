@@ -14,6 +14,7 @@ void Location::segmentIs(const Ptr<Segment> seg) {
     if (notifiee_)
         notifiee_->onSegment ();
 }
+
 void Location::segmentIs(const unsigned int index, Ptr<Segment> seg) {
     if (index < 0 || index >= segments_.size() ) {
         cerr <<  "Index out of bound exception" << endl;
