@@ -174,7 +174,11 @@ class FleetRep : public Instance {
 
   protected:
     FleetRep(const string& name, ManagerImpl* manager) :
-        Instance(name), manager_(manager) {}
+        Instance(name), manager_(manager) {
+        truckfleet_ = manager->engineManager()->truckFleetNew();
+        planefleet_ = manager->engineManager()->planeFleetNew();
+        boatfleet_ = manager->engineManager()->boatFleetNew();
+    }
     Ptr<Fleet> truckfleet_, boatfleet_, planefleet_;
 
   private:
@@ -402,12 +406,12 @@ string ConnRep::attribute(const string& name) {
 
 string FleetRep::attribute(const string& name) {
     int commaPos = name.find_first_of (',');
-    string mode = name.substr (0, commaPos), property = name.substr (commaPos + 1);
+    string mode = name.substr (0, commaPos), property = name.substr (commaPos + 1, name.length());
     //trim the string
     mode = mode.substr (mode.find_first_not_of(' '));
     mode = mode.substr (0, mode.find_last_not_of (' ') + 1);
     property = property.substr (property.find_first_not_of(' ') );
-    property = property.substr (0, property.find_first_not_of(' ') + 1);
+    property = property.substr (0, property.find_last_not_of(' ') + 1);
     Ptr<Fleet> fleet_;
     if (mode == "Truck") fleet_ = truckfleet_;
     if (mode == "Boat") fleet_ = boatfleet_;
@@ -428,12 +432,12 @@ string FleetRep::attribute(const string& name) {
 
 void FleetRep::attributeIs(const string& name, const string& v) {
     int commaPos = name.find_first_of (',');
-    string mode = name.substr (0, commaPos), property = name.substr (commaPos + 1);
+    string mode = name.substr (0, commaPos), property = name.substr (commaPos + 1, name.length());
     //trim the string
     mode = mode.substr (mode.find_first_not_of(' '));
     mode = mode.substr (0, mode.find_last_not_of (' ') + 1);
     property = property.substr (property.find_first_not_of(' ') );
-    property = property.substr (0, property.find_first_not_of(' ') + 1);
+    property = property.substr (0, property.find_last_not_of(' ') + 1);
     Ptr<Fleet> fleet_;
     if (mode == "Truck") fleet_ = truckfleet_;
     if (mode == "Boat") fleet_ = boatfleet_;
