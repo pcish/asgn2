@@ -192,62 +192,34 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
         cerr << "Attempt to new instances of the same names!" << endl;
         return NULL;
     }
+    Ptr<Instance> t;
     if (type == "Truck terminal") {
-        Ptr<TerminalRep> t = new TerminalRep(name, this, Segment::truck());
-        instance_[name] = t;
-        return t;
+        t = new TerminalRep(name, this, Segment::truck());
+    } else if (type == "Truck segment") {
+        t = new SegmentRep(name, this, Segment::truck());
+    } else if (type == "Boat terminal") {
+        t = new TerminalRep(name, this, Segment::boat());
+    } else if (type == "Boat segment") {
+        t = new SegmentRep(name, this, Segment::boat());
+    } else if (type == "Plane terminal") {
+        t = new TerminalRep(name, this, Segment::plane());
+    } else if (type == "Plane segment") {
+        t = new SegmentRep(name, this, Segment::plane());
+    } else if (type == "Port") {
+        t = new PortRep(name, this);
+    } else if (type == "Customer") {
+        t = new CustomerRep(name, this);
+    } else if (type == "Stats") {
+        t = StatsRep::instance(name, this);
+    } else if (type == "Fleet") {
+        t = FleetRep::instance(name, this);
+    } else if (type == "Conn") {
+        t = ConnRep::instance(name, this);
+    } else {
+        return NULL;
     }
-    if (type == "Truck segment") {
-        Ptr<SegmentRep> t = new SegmentRep(name, this, Segment::truck());
-        instance_[name] = t;
-        return t;
-    }
-    if (type == "Boat terminal") {
-        Ptr<TerminalRep> t = new TerminalRep(name, this, Segment::boat());
-        instance_[name] = t;
-        return t;
-    }
-    if (type == "Boat segment") {
-        Ptr<SegmentRep> t = new SegmentRep(name, this, Segment::boat());
-        instance_[name] = t;
-        return t;
-    }
-    if (type == "Plane terminal") {
-        Ptr<TerminalRep> t = new TerminalRep(name, this, Segment::plane());
-        instance_[name] = t;
-        return t;
-    }
-    if (type == "Plane segment") {
-        Ptr<SegmentRep> t = new SegmentRep(name, this, Segment::plane());
-        instance_[name] = t;
-        return t;
-    }
-    if (type == "Port") {
-        Ptr<PortRep> t = new PortRep(name, this);
-        instance_[name] = t;
-        return t;
-    }
-    if (type == "Customer") {
-        Ptr<CustomerRep> t = new CustomerRep(name, this);
-        instance_[name] = t;
-        return t;
-    }
-    if (type == "Stats") {
-        Ptr<StatsRep> t = StatsRep::instance(name, this);
-        instance_[name] = t;
-        return t;
-    }
-    if (type == "Fleet") {
-        Ptr<FleetRep> t = FleetRep::instance(name, this);
-        instance_[name] = t;
-        return t;
-    }
-    if (type == "Conn") {
-        Ptr<ConnRep> t = ConnRep::instance(name, this);
-        instance_[name] = t;
-        return t;
-    }
-    return NULL;
+    instance_[name] = t;
+    return t;
 }
 
 Ptr<Instance> ManagerImpl::instance(const string& name) {
@@ -258,6 +230,7 @@ Ptr<Instance> ManagerImpl::instance(const string& name) {
 void ManagerImpl::instanceDel(const string& name) {
     map<string,Ptr<Instance> >::iterator t = instance_.find(name);
     if (t != instance_.end()) {
+        while (instance_[name]->references() > 1) instance_[name]->referencesDec();
         instance_.erase(t);
     } else {
         cerr << "attempting to delete non-existant instance " << name << endl;
