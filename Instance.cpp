@@ -153,7 +153,7 @@ class ConnRep : public Instance {
 
   protected:
     ConnRep (const string& name, ManagerImpl *manager) :
-        Instance(name), manager_(manager) {}
+        Instance(name), manager_(manager) { }
     Ptr<ManagerImpl> manager_;
 
   private:
@@ -242,7 +242,7 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
         instance_[name] = t;
         return t;
     }
-    if (type == "ConnRep") {
+    if (type == "Conn") {
         Ptr<ConnRep> t = ConnRep::instance(name, this);
         instance_[name] = t;
         return t;
@@ -316,7 +316,7 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
     } else if (name == "difficulty") {
         engineObject_->difficultyIs(atof(v.c_str()));
     } else if (name == "expedite support") {
-        int support = engineObject_->expediteSupport();
+        Segment::ExpediteSupport support = engineObject_->expediteSupport();
         if (support == Segment::available()) ;
         else if (support == Segment::unavailable()) ;
     } else {
