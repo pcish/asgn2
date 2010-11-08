@@ -40,21 +40,18 @@ protected:
 
 template<class T> WeakPtr<T>&
 WeakPtr<T>::operator=( const WeakPtr<T>& mp ) {
-    const T * save = ptr_;
     ptr_ = mp.ptr_;
     return *this;
 }
 
 template<class T> WeakPtr<T>&
 WeakPtr<T>::operator=( WeakPtr<T>& mp ) {
-    T * save = ptr_;
     ptr_ = mp.ptr_;
     return *this;
 }
 
 template<class T> WeakPtr<T>&
 WeakPtr<T>::operator=( T* p ) {
-    T * save = ptr_;
     ptr_ = p;
     return *this;
 }
