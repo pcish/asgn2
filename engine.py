@@ -44,15 +44,24 @@ class Attr(object):
         if self.virtual:
             ret.write('virtual ')
         if self.type.endswith('*'):
-            ret.write('void {name}Is({type} {name}) '.format(type=self.type, name=self.name))
+            ret.write('void {name}Is({type} {name})'.format(type=self.type, name=self.name))
         else:
-            ret.write('void {name}Is(const {type} {name}) '.format(type=self.type, name=self.name))
+            ret.write('void {name}Is(const {type} {name})'.format(type=self.type, name=self.name))
         if self.complex:
             ret.write(';')
         elif self.collection:
-            ret.write('{{ {name}s_.push_back({name}); }}'.format(type=self.type, name=self.name))
+            ret.write(' {{ {name}s_.push_back({name}); }}'.format(type=self.type, name=self.name))
         else:
-            ret.write('{{ if ({name}_ == {name}) return; {name}_ = {name}; if (notifiee_) notifiee_->on{capitalname}(); }}'.format(type=self.type, name=self.name, capitalname=''.join((self.name[0].upper(), self.name[1:]))))
+            ret.write(' {{ if ({name}_ == {name}) return; {name}_ = {name}; if (notifiee_) notifiee_->on{capitalname}(); }}'.format(type=self.type, name=self.name, capitalname=''.join((self.name[0].upper(), self.name[1:]))))
+        if self.collection:
+            ret.write('\n    ')
+            if self.virtual:
+                ret.write('virtual ')
+            ret.write('void {name}Is(int index, {type} {name})'.format(type=self.type, name=self.name))
+            if self.complex:
+                ret.write(';')
+            else:
+                ret.write(' {{ {name}s_[index] = {name}; }}'.format(type=self.type, name=self.name))
         return ret.getvalue()
 
     def accessor_str(self):
@@ -60,16 +69,16 @@ class Attr(object):
         if self.virtual:
             ret.write('virtual ')
         if self.collection:
-            ret.write('{type} {name}(const unsigned int index) const '.format(type=self.type, name=self.name))
+            ret.write('{type} {name}(const unsigned int index) const'.format(type=self.type, name=self.name))
         else:
-            ret.write('{type} {name}() const '.format(type=self.type, name=self.name))
+            ret.write('{type} {name}() const'.format(type=self.type, name=self.name))
 
         if self.complex:
             ret.write(';')
         elif self.collection:
-            ret.write('{{ return {name}s_.at(index); }}'.format(type=self.type, name=self.name))
+            ret.write(' {{ return {name}s_.at(index); }}'.format(type=self.type, name=self.name))
         else:
-            ret.write('{{ return {name}_; }}'.format(type=self.type, name=self.name))
+            ret.write(' {{ return {name}_; }}'.format(type=self.type, name=self.name))
         return ret.getvalue()
 
     def isReadonly(self):
