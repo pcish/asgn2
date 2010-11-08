@@ -28,7 +28,7 @@ void Location::segmentIs(const Ptr<Segment> seg) {
 }
 //unsigned int Location::segments () { return segments_.size(); }
 */
-Ptr<Segment> Location::segment(const unsigned int index) const {
+Ptr<Segment> Location::segment(const SegmentCount index) const {
     if (index-1 < 0 || index-1 >= segments_.size () ){
          cerr << "Segment # out of bound exception" << endl;
          return NULL;

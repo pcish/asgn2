@@ -13,7 +13,8 @@
   {'name'=>'TerminalCount', 'parent'=>'Ordinal', 'base'=>'unsigned int', 'default'=>'0', 'constructor'=>''},
   {'name'=>'TruckTerminalCount', 'parent'=>'Ordinal', 'base'=>'unsigned int', 'default'=>'0', 'constructor'=>''},
   {'name'=>'BoatTerminalCount', 'parent'=>'Ordinal', 'base'=>'unsigned int', 'default'=>'0', 'constructor'=>''},
-  {'name'=>'PlaneTerminalCount', 'parent'=>'Ordinal', 'base'=>'unsigned int', 'default'=>'0', 'constructor'=>''}
+  {'name'=>'PlaneTerminalCount', 'parent'=>'Ordinal', 'base'=>'unsigned int', 'default'=>'0', 'constructor'=>''},
+  {'name'=>'Hour', 'parent'=>'Ordinal', 'base'=>'double', 'default'=>'0.0', 'constructor'=>''}
 );
 
 
