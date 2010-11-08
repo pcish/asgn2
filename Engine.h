@@ -13,26 +13,39 @@ class PortReactor;
 class TerminalReactor;
 class Path : public Fwk::PtrInterface<Path> {
 public:
-    void locationIs (Ptr<Location> _location) {
-        locations_.push_back(_location);
+    static Ptr<Path> pathNew() { return new Path(); }
+    void locationIs (Ptr<Location> _location) { 
+        if (_location)
+            location_.push_back(_location); 
+        else
+            location_.pop_back();
+    }    
+    void segmentIs(Ptr<Segment> _segment ) { 
+        if (_segment)
+            segment_.push_back (_segment); 
+        else
+            segment_.pop_back();       
     }
-    void SegmentIs(Ptr<Segment> _segment ) {
-        segments_.push_back (_segment);
-    }
-    Ptr<Location> location(const LocationCount index) const { return (index < locations_.size())?locations_[index.value()]:NULL; }
-    Ptr<Segment> segment(const SegmentCount index) const { return (index < segments_.size())?segments_[index.value()]:NULL; }
-    LocationCount locations() const { return locations_.size(); }
-    SegmentCount segments() const { return segments_.size(); }
+    Ptr<Location> location(const unsigned int index) const { return (index < location_.size() && index >= 0)?location_[index]:NULL; }
+    Ptr<Segment> segment(const unsigned int index) const { return (index < segment_.size() && index >= 0)?segment_[index]:NULL; }
+    unsigned int locations() const { return location_.size(); }
+    unsigned int segments() const { return segment_.size(); }
     void hourIs(const Hour _hour) { hour_ = _hour; }
     Hour hour() const { return hour_; }
     void costIs(const USD _cost) { cost_ = _cost; }
     USD cost() const { return cost_; }
     Segment::ExpediteSupport expedite() const { return expedite_; }
     void expediteIs(const Segment::ExpediteSupport _expedite) { expedite_ = _expedite; }
+    Mile distance() const { return distance_; }
+    void distanceIs(const Mile _distance) { distance_ = _distance; }   
+    Ptr<Path> clone();
 private:
-    vector<Ptr<Location> > locations_;
-    vector<Ptr<Segment> > segments_;
+    Path() {}
+    Path(Path&) {}
+    vector<Ptr<Location> > location_;
+    vector<Ptr<Segment> > segment_;
     USD cost_;
+    Mile distance_;
     Segment::ExpediteSupport expedite_;
     Hour hour_;
 
@@ -63,24 +76,29 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     int truckTerminals() const { return truckTerminals_; }
     int planeTerminals() const { return planeTerminals_; }
     int boatTerminals() const { return boatTerminals_; }
+
+    void truckFleetIs(const Ptr<TruckFleet> _truckFleet) { truckFleet_ = _truckFleet; }
+    void planeFleetIs(const Ptr<PlaneFleet> _planeFleet) { planeFleet_ = _planeFleet; }
+    void boatFleetIs(const Ptr<BoatFleet> _boatFleet) { boatFleet_ = _boatFleet; }
+    /*Connectivity*/
     Ptr<Location> destination() const { return destination_; }
-    void destinationIs(const Ptr<Location> destination) { if (destination_ == destination) return; destination_ = destination; }
+    void destinationIs(const Ptr<Location> destination) { if (destination_ == destination) return; destination_ = destination; isConnAttributeChange = true; }
     USD maxCost() const { return maxCost_; }
     void maxCostIs(const USD maxCost) { if (maxCost_ == maxCost) return; maxCost_ = maxCost; }
     Ptr<Location> source() const { return source_; }
-    void sourceIs(const Ptr<Location> source) { if (source_ == source) return; source_ = source; }
-
-    //Ptr<Path> path() const { return path_; }
-    Ptr<Path> path() const;
+    void sourceIs(const Ptr<Location> source) { if (source_ == source) return; source_ = source; isConnAttributeChange = true; }
+    
+    Ptr<Path> path(unsigned int index);
+    unsigned int paths() const { return path_.size(); }
     Hour maxTime() const { return maxTime_; }
-    void maxTimeIs(const Hour maxTime) { if (maxTime_ == maxTime) return; maxTime_ = maxTime; }
+    void maxTimeIs(const Hour maxTime) { if (maxTime_ == maxTime) return; maxTime_ = maxTime; isConnAttributeChange = true;}
     Mile maxDistance() const { return maxDistance_; }
-    void maxDistanceIs(const Mile maxDistance) { if (maxDistance_ == maxDistance) return; maxDistance_ = maxDistance; }
+    void maxDistanceIs(const Mile maxDistance) { if (maxDistance_ == maxDistance) return; maxDistance_ = maxDistance; isConnAttributeChange = true; }
     int ports() const { return ports_; }
     Segment::ExpediteSupport expedite() const { return expedite_; }
-    void expediteIs(const Segment::ExpediteSupport expedite) { if (expedite_ == expedite) return; expedite_ = expedite; }
+    void expediteIs(const Segment::ExpediteSupport expedite) { if (expedite_ == expedite) return; expedite_ = expedite; isConnAttributeChange = true; }
     ShippingNetwork() : customers_(0), ports_(0), truckTerminals_(0), planeTerminals_(0), boatTerminals_(0), truckSegments_(0), planeSegments_(0), boatSegments_(0),
-    truckSegmentsExpediteAvailable_(0), planeSegmentsExpediteAvailable_(0), boatSegmentsExpediteAvailable_(0), expedite_(Segment::allAvailabilities()) {
+    truckSegmentsExpediteAvailable_(0), planeSegmentsExpediteAvailable_(0), boatSegmentsExpediteAvailable_(0), isConnAttributeChange(false), expedite_(Segment::allAvailabilities()){
     }
   protected:
     void customersInc() { customers_++; }
@@ -96,19 +114,20 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     int truckSegmentsExpediteAvailable_;
     int planeSegmentsExpediteAvailable_;
     int boatSegmentsExpediteAvailable_;
-    Ptr<TruckFleet> truckFleet;
-    Ptr<PlaneFleet> planeFleet;
-    Ptr<BoatFleet> boatFleet;
+    bool isConnAttributeChange;
+    Ptr<TruckFleet> truckFleet_;
+    Ptr<PlaneFleet> planeFleet_;
+    Ptr<BoatFleet> boatFleet_;
     Ptr<Location> destination_;
     USD maxCost_;
     Ptr<Location> source_;
-    Ptr<Path> path_;
+    vector<Ptr<Path> > path_;
     Hour maxTime_;
     Mile maxDistance_;
 
     Segment::ExpediteSupport expedite_;
     ShippingNetwork(const ShippingNetwork& o);
-    Ptr<Path> explore() const;
+    Ptr<Path> explore(Ptr<Location> curLocation, list<Ptr<Location> > visitedNodes, Ptr<Path> curPath);
     Ptr<Path> conn() const;
 };
 

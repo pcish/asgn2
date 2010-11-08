@@ -1,71 +1,90 @@
 #include <queue>
+#include <list>
 
 #include "Engine.h"
 #include "entityReactor.h"
 
 namespace Shipping {
-
-Ptr<Path> ShippingNetwork::path() const {
-    if (!source_)
-        return NULL;
-    if (!destination_) {
-        return explore();
-    } else {
-        return conn();
-    }
+Ptr<Path> Path::clone() {
+//    Ptr<Path> newPath (const_cast<Ptr<Path> >(this) );
+    Ptr<Path> newPath = Path::pathNew();
+    
+    newPath->cost_ = cost_;
+    newPath->distance_ = distance_;
+    newPath->expedite_ = expedite_;
+    newPath->hour_ = hour_;
+    newPath->location_ = location_;
+    newPath->segment_ = segment_;
+    
+    return newPath;
 }
-Ptr<Path> ShippingNetwork::explore() const {
-    Ptr<Path> path_;
-    queue<Ptr<Location> > bfsQueue;
-    Ptr<Location> curLocation;
+Ptr<Path> ShippingNetwork::path(unsigned int index) {
+    if (isConnAttributeChange) {
+        if (source_ == NULL) return NULL;
+        explore (source_, list<Ptr<Location> >(), Path::pathNew() );
+    }
+    return (index < path_.size() && index >= 0)?path_[index]:NULL;
+}
+Ptr<Path> ShippingNetwork::explore(const Ptr<Location> curLocation, list<Ptr<Location> > visitedNotes, Ptr<Path> curPath) {
+    list<Ptr<Location> > visitedNodes;
     USD curCost;
     Mile curDistance;
     Hour curTime;
+    bool isLast = true;
 
-    bfsQueue.push(source_);
-    while (!bfsQueue.empty() ) {
-        curLocation = bfsQueue.front();
-        bfsQueue.pop();
-        for (unsigned int i = 0; i < curLocation->segments(); ++i) {
-            Ptr<Segment> seg = curLocation->segment(i);
-            USD segCost;
-            Hour segTime;
-            //Computes time and cost here
-            if (seg->transportationMode() == Segment::truck() ) {
-                segCost = truckFleet->cost().value() * seg->length().value();
-                segTime = seg->length().value() / truckFleet->speed().value();
-            } else if (seg->transportationMode() == Segment::plane() ) {
-                segCost = planeFleet->cost().value() * seg->length().value();
-                segTime = seg->length().value() / planeFleet->speed().value();
-            } else if (seg->transportationMode() == Segment::boat() ) {
-                segCost = boatFleet->cost().value() * seg->length().value();
-                segTime = seg->length().value() / boatFleet->speed().value();
-            }
-            if ( !(maxDistance_ > 0 && curDistance + seg->length() > maxDistance_) &&
-                 !(maxCost_ > 0 && curCost + segCost > maxCost_) &&
-                 !(maxTime_ > 0 && curTime + segTime > maxTime_) &&
-                 !(expedite_ == Segment::available() && seg->expediteSupport() == Segment::unavailable() ) ) {
-                //push location and segment into path
-                bfsQueue.push(seg->returnSegment()->source() ); // get its return segment's source
-            }
-            else { //reaches the limit
+    visitedNodes.push_back(curLocation);
+    for (unsigned int i = 0; i < curLocation->segments(); ++i) {
+        Ptr<Segment> seg = curLocation->segment(i);
+        Ptr<Location> nextLocation = seg->returnSegment()->source();
+        USD segCost;
+        Hour segTime;
+        //Computes time and cost here
+        if (seg->transportationMode() == Segment::truck() ) {
+            segCost = truckFleet->cost().value() * seg->length().value();
+            segTime = seg->length().value() / truckFleet->speed().value();
+        } else if (seg->transportationMode() == Segment::plane() ) {
+            segCost = planeFleet->cost().value() * seg->length().value();
+            segTime = seg->length().value() / planeFleet->speed().value();
+        } else if (seg->transportationMode() == Segment::boat() ) {
+            segCost = boatFleet->cost().value() * seg->length().value();
+            segTime = seg->length().value() / boatFleet->speed().value();
+        }
+        bool visited = false;
+        /* implement search algorithm (should be using like hash map or set)*/
+        for (list<Ptr<Location> >::iterator scannerPtr = visitedNodes.begin(); scannerPtr != visitedNodes.end(); scannerPtr ++) {
+            if ((*scannerPtr).ptr() == nextLocation.ptr() ) {
+                visited = true;
             }
         }
+        if ( !visited && 
+                !(maxDistance_ > 0 && curPath->distance() + seg->length() > maxDistance_) &&
+                !(maxCost_ > 0 && curPath->cost() + segCost > maxCost_) &&
+                !(maxTime_ > 0 && curPath->hour() + segTime > maxTime_) &&
+                !(expedite_ == Segment::available() && seg->expediteSupport() == Segment::unavailable() ) ) {
+            isLast = false;
+            visitedNotes.push_back(nextLocation ); // get its return segment's source
+            curPath->locationIs(nextLocation);
+            curPath->segmentIs(seg);
+            explore (nextLocation, visitedNotes, curPath);
+        }
     }
+    if (isLast) {
+        Ptr<Path> newPath = curPath->clone();
+        path_.push_back(newPath);
+    }
+    curPath->locationIs(NULL);
+    curPath->segmentIs(NULL);
 }
-Ptr<Path> ShippingNetwork::conn() const {
-}
-
 class EngineReactor : public EngineManager::Notifiee {
-  public:
-    virtual void onCustomerNew(Fwk::Ptr<Customer> p) {
-        notifier_->shippingNetwork()->customersInc();
-    }
-    virtual void onTerminalNew(Fwk::Ptr<Terminal> p) {
-        if (p->transportationMode() == Segment::truck()) {
-            notifier_->shippingNetwork()->truckTerminals_++;
-        } else if (p->transportationMode() == Segment::plane()) {
-            notifier_->shippingNetwork()->planeTerminals_++;
+    public:
+        virtual void onCustomerNew(Fwk::Ptr<Customer> p) {
+            notifier_->shippingNetwork()->customersInc();
+        }
+        virtual void onTerminalNew(Fwk::Ptr<Terminal> p) {
+            if (p->transportationMode() == Segment::truck()) {
+                notifier_->shippingNetwork()->truckTerminals_++;
+            } else if (p->transportationMode() == Segment::plane()) {
+                notifier_->shippingNetwork()->planeTerminals_++;
         } else if (p->transportationMode() == Segment::boat()) {
             notifier_->shippingNetwork()->boatTerminals_++;
         }

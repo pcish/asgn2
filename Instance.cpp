@@ -272,7 +272,7 @@ string SegmentRep::attribute(const string& name) {
     } else if (name == "difficulty") {
         os << engineObject_->difficulty().value();
     } else if (name == "expedite support") {
-        int support = engineObject_->expediteSupport();
+        Segment::ExpediteSupport support = engineObject_->expediteSupport();
         if (support == Segment::available()) os << "yes";
         else if (support == Segment::unavailable()) os << "no";
     } else {
