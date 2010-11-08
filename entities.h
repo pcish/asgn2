@@ -93,7 +93,7 @@ class Segment : public Fwk::PtrInterface<Segment> {
     Ptr<Segment::Notifiee> notifiee() const { return notifiee_; }
   protected:
     Segment(const string name, const TransportationMode transportationMode) : name_(name), transportationMode_(transportationMode) {
-        expediteSupport_ = unavailable_;
+        expediteSupport_ = unavailable_;        
     }
     Ptr<Segment::Notifiee> notifiee_;
     void notifieeIs(Segment::Notifiee* n) const {
@@ -118,9 +118,9 @@ class Location : public Fwk::PtrInterface<Location> {
   public:
     ~Location() { if (notifiee_) notifiee_->onDel(this); }
     virtual WeakPtr<Segment> segment(const unsigned int index) const;
+    virtual unsigned int segments() const { return segments_.size(); }
     virtual void segmentIs(const WeakPtr<Segment> segment);
     virtual void segmentIs(const unsigned int index, WeakPtr<Segment> segment);
-    virtual unsigned int segments() const { return segments_.size(); }
     string name() const { return name_; }
     ShippingNetwork* shippingNetwork() const { return shippingNetwork_; }
     void shippingNetworkIs(ShippingNetwork* shippingNetwork) { if (shippingNetwork_ == shippingNetwork) return; shippingNetwork_ = shippingNetwork; if (notifiee_) notifiee_->onShippingNetwork(); }

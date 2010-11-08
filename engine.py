@@ -79,6 +79,12 @@ class Attr(object):
             ret.write(' {{ return {name}s_.at(index); }}'.format(type=self.type, name=self.name))
         else:
             ret.write(' {{ return {name}_; }}'.format(type=self.type, name=self.name))
+
+        if self.collection:
+            ret.write('\n    ')
+            if self.virtual:
+                ret.write('virtual ')
+            ret.write('unsigned int {name}s() const {{ return {name}s_.size(); }}'.format(type=self.type, name=self.name))
         return ret.getvalue()
 
     def isReadonly(self):
