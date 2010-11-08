@@ -243,7 +243,7 @@ class Entity(object):
             if attr.readonly:
                 continue
             ret.write('virtual void on%s() {}\n' % ''.join((attr.name[0].upper(), attr.name[1:])))
-        ret.write('virtual void onDel(Fwk::Ptr<%s> p) {}\n' % self.classname)
+        ret.write('virtual void onDel(%s *p) {}\n' % self.classname)
         ret.set_indent(4)
         ret.write('  protected:\n')
         ret.set_indent(8)
