@@ -284,7 +284,7 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
     if (name == "source") {
         Ptr<Location> location = manager_->cast_instance<Location, LocationRep>(v);
         engineObject_->sourceIs(location);
-        location->segmentIs(engineObject_);
+        //location->segmentIs(engineObject_);
     } else if (name == "length") {
         engineObject_->lengthIs(atoi(v.c_str()));
     } else if (name == "return segment") {
