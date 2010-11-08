@@ -1,5 +1,5 @@
 @types = (
-  {'name'=>'Mile', 'parent'=>'Ordinal', 'base'=>'unsigned int', 'default'=>'0', 'constructor'=>''},
+  {'name'=>'Mile', 'parent'=>'Ordinal', 'base'=>'double', 'default'=>'0', 'constructor'=>''},
   {'name'=>'USD', 'parent'=>'Ordinal', 'base'=>'double', 'default'=>'0.0', 'constructor'=>''},
   {'name'=>'PackageUnit', 'parent'=>'Ordinal', 'base'=>'unsigned int', 'default'=>'0', 'constructor'=>''},
   {'name'=>'SegmentDifficultyUnit', 'parent'=>'Ordinal', 'base'=>'float', 'default'=>'1.0', 'minimum'=>'1.0', 'maximum'=>'5.0',
