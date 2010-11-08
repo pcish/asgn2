@@ -54,6 +54,9 @@ class SegmentReactor : public Segment::Notifiee {
         }
         previousSource_ = notifier_->source().ptr();
     }
+    virtual void onReturnSegment() {
+        notifier_->returnSegment()->returnSegmentIs(notifier_);
+    }
     static Fwk::Ptr<SegmentReactor> segmentReactorNew() {
         Fwk::Ptr<SegmentReactor> n = new SegmentReactor();
         return n;
