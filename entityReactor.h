@@ -22,6 +22,11 @@ class SegmentReactor : public Segment::Notifiee {
             notifier_->shippingNetwork()->boatSegments_--;
             notifier_->shippingNetwork()->boatSegmentsExpediteAvailable_ -= delta;
         }
+        if (notifier_->source() != NULL) {
+            int i = 0;
+            while (notifier_->source()->segment(i).ptr() != notifier_.ptr()) i++;
+            notifier_->source()->segmentIs(i, NULL);
+        }
     }
     virtual void onExpediteSupport() {
         int delta;
@@ -42,11 +47,12 @@ class SegmentReactor : public Segment::Notifiee {
         if (previousSource_ != NULL) {
             int i = 0;
             while (previousSource_->segment(i).ptr() != notifier_.ptr()) i++;
-            previousSource_->segmentIs(i, 0);
+            previousSource_->segmentIs(i, NULL);
         }
         if (notifier_->source() != NULL) {
             notifier_->source()->segmentIs(notifier_);
         }
+        previousSource_ = notifier_->source().ptr();
     }
     static Fwk::Ptr<SegmentReactor> segmentReactorNew() {
         Fwk::Ptr<SegmentReactor> n = new SegmentReactor();
