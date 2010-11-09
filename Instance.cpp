@@ -373,7 +373,7 @@ string ConnRep::attribute(const string& name) {
         is >> dummy; // colon
         while (!is.eof () ){
             is >> attr;
-            if (attr.compare("expedite") == 0)
+            if (attr.compare("expedited") == 0)
                 expedite = Segment::available();
             else {
                 //is >> val;
@@ -396,6 +396,7 @@ string ConnRep::attribute(const string& name) {
         }
         network->sourceIs( Ptr<LocationRep>((LocationRep*)manager_->instance(source).ptr() )->engineObject() );
         network->destinationIs(NULL);
+        network->expediteIs(expedite);
         network->maxCostIs(maxCost);
         network->maxDistanceIs(maxDistance);
         network->maxTimeIs(maxTime);
@@ -405,6 +406,9 @@ string ConnRep::attribute(const string& name) {
         is >> source >> dummy >> dest;
         network->sourceIs( Ptr<LocationRep>((LocationRep*)manager_->instance(source).ptr() )->engineObject() );
         network->destinationIs( Ptr<LocationRep>((LocationRep*)manager_->instance(dest).ptr() )->engineObject() );
+        network->maxCostIs(0);
+        network->maxDistanceIs(0);
+        network->maxTimeIs(0);
     }
     os.setf(ios::fixed,ios::floatfield);
     os.precision(2);

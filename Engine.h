@@ -15,17 +15,17 @@ class TerminalReactor;
 class Path : public Fwk::PtrInterface<Path> {
 public:
     static Ptr<Path> pathNew() { return new Path(); }
-    void locationIs (Ptr<Location> _location) { 
+    void locationIs (Ptr<Location> _location) {
         if (_location)
-            location_.push_back(_location); 
+            location_.push_back(_location);
         else
             if (location_.size() > 0) location_.pop_back();
-    }    
-    void segmentIs(WeakPtr<Segment> _segment ) { 
+    }
+    void segmentIs(WeakPtr<Segment> _segment ) {
         if (_segment)
-            segment_.push_back (_segment); 
+            segment_.push_back (_segment);
         else
-            if (segment_.size() > 0) segment_.pop_back();       
+            if (segment_.size() > 0) segment_.pop_back();
     }
     Ptr<Location> location(const unsigned int index) const { return (index < location_.size() && index >= 0)?location_[index]:NULL; }
     WeakPtr<Segment> segment(const unsigned int index) const { return (index < segment_.size() && index >= 0)?segment_[index]:NULL; }
@@ -38,7 +38,7 @@ public:
     Segment::ExpediteSupport expedite() const { return expedite_; }
     void expediteIs(const Segment::ExpediteSupport _expedite) { expedite_ = _expedite; }
     Mile distance() const { return distance_; }
-    void distanceIs(const Mile _distance) { distance_ = _distance; }   
+    void distanceIs(const Mile _distance) { distance_ = _distance; }
     Ptr<Path> clone();
 private:
     Path() {}
@@ -85,10 +85,10 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     Ptr<Location> destination() const { return destination_; }
     void destinationIs(const Ptr<Location> destination) { if (destination_ == destination) return; destination_ = destination; isConnAttributeChange = true; }
     USD maxCost() const { return maxCost_; }
-    void maxCostIs(const USD maxCost) { if (maxCost_ == maxCost) return; maxCost_ = maxCost; }
+    void maxCostIs(const USD maxCost) { if (maxCost_ == maxCost) return; maxCost_ = maxCost; isConnAttributeChange = true;}
     Ptr<Location> source() const { return source_; }
     void sourceIs(const Ptr<Location> source) { if (source_ == source) return; source_ = source; isConnAttributeChange = true; }
-    
+
     Ptr<Path> path(unsigned int index);
     unsigned int paths();
     Hour maxTime() const { return maxTime_; }
