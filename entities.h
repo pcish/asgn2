@@ -9,13 +9,14 @@
 
 using namespace std;
 #include "Ptr.h"
+#include "WeakPtr.h"
 #include "PtrInterface.h"
 #include "Instance.h"
 #include "Nominal.h"
 #include "types.h"
 #include "fwk/BaseNotifiee.h"
 #include "fwk/NamedInterface.h"
-
+using Fwk::WeakPtr;
 namespace Shipping {
 
 class EngineManager;
@@ -71,7 +72,6 @@ class Segment : public Fwk::PtrInterface<Segment> {
             if (notifier_ == notifier) return;
             if (notifier_) notifier->notifieeIs(0);
             notifier_ = notifier;
-            notifier_->referencesDec();
             notifier_->notifieeIs(this);
         }
         static Fwk::Ptr<Segment::Notifiee> notifieeNew() {
@@ -86,13 +86,13 @@ class Segment : public Fwk::PtrInterface<Segment> {
         virtual void onShippingNetwork() {}
         virtual void onDel(Segment *p) {}
       protected:
-        Fwk::Ptr<Segment> notifier_;
+        Fwk::WeakPtr<Segment> notifier_;
         Notifiee() : notifier_(0) {}
     };
     Ptr<Segment::Notifiee> notifiee() const { return notifiee_; }
   protected:
     Segment(const string name, const TransportationMode transportationMode) : name_(name), transportationMode_(transportationMode) {
-        expediteSupport_ = unavailable_;
+        expediteSupport_ = unavailable_;        
     }
     Ptr<Segment::Notifiee> notifiee_;
     void notifieeIs(Segment::Notifiee* n) const {
@@ -116,10 +116,10 @@ class Location : public Fwk::PtrInterface<Location> {
     friend class EngineManager;
   public:
     ~Location() { if (notifiee_) notifiee_->onDel(this); }
-    virtual Ptr<Segment> segment(const unsigned int index) const;
-    virtual void segmentIs(const Ptr<Segment> segment);
-    virtual void segmentIs(const unsigned int index, Ptr<Segment> segment);
+    virtual WeakPtr<Segment> segment(const unsigned int index) const;
     virtual unsigned int segments() const { return segments_.size(); }
+    virtual void segmentIs(const WeakPtr<Segment> segment);
+    virtual void segmentIs(const unsigned int index, WeakPtr<Segment> segment);
     string name() const { return name_; }
     ShippingNetwork* shippingNetwork() const { return shippingNetwork_; }
     void shippingNetworkIs(ShippingNetwork* shippingNetwork) { if (shippingNetwork_ == shippingNetwork) return; shippingNetwork_ = shippingNetwork; if (notifiee_) notifiee_->onShippingNetwork(); }
@@ -129,7 +129,6 @@ class Location : public Fwk::PtrInterface<Location> {
             if (notifier_ == notifier) return;
             if (notifier_) notifier->notifieeIs(0);
             notifier_ = notifier;
-            notifier_->referencesDec();
             notifier_->notifieeIs(this);
         }
         static Fwk::Ptr<Location::Notifiee> notifieeNew() {
@@ -140,7 +139,7 @@ class Location : public Fwk::PtrInterface<Location> {
         virtual void onShippingNetwork() {}
         virtual void onDel(Location *p) {}
       protected:
-        Fwk::Ptr<Location> notifier_;
+        Fwk::WeakPtr<Location> notifier_;
         Notifiee() : notifier_(0) {}
     };
     Ptr<Location::Notifiee> notifiee() const { return notifiee_; }
@@ -153,7 +152,7 @@ class Location : public Fwk::PtrInterface<Location> {
     }
 
   private:
-    std::vector<Ptr<Segment> > segments_;
+    std::vector<WeakPtr<Segment> > segments_;
     string name_;
     ShippingNetwork* shippingNetwork_;
     Location(const Location& o);
@@ -169,7 +168,6 @@ class Customer : public Location {
             if (notifier_ == notifier) return;
             if (notifier_) notifier->notifieeIs(0);
             notifier_ = notifier;
-            notifier_->referencesDec();
             notifier_->notifieeIs(this);
         }
         static Fwk::Ptr<Customer::Notifiee> notifieeNew() {
@@ -178,7 +176,7 @@ class Customer : public Location {
         }
         virtual void onDel(Customer *p) {}
       protected:
-        Fwk::Ptr<Customer> notifier_;
+        Fwk::WeakPtr<Customer> notifier_;
         Notifiee() : notifier_(0) {}
     };
     Ptr<Customer::Notifiee> notifiee() const { return notifiee_; }
@@ -204,7 +202,6 @@ class Port : public Location {
             if (notifier_ == notifier) return;
             if (notifier_) notifier->notifieeIs(0);
             notifier_ = notifier;
-            notifier_->referencesDec();
             notifier_->notifieeIs(this);
         }
         static Fwk::Ptr<Port::Notifiee> notifieeNew() {
@@ -213,7 +210,7 @@ class Port : public Location {
         }
         virtual void onDel(Port *p) {}
       protected:
-        Fwk::Ptr<Port> notifier_;
+        Fwk::WeakPtr<Port> notifier_;
         Notifiee() : notifier_(0) {}
     };
     Ptr<Port::Notifiee> notifiee() const { return notifiee_; }
@@ -240,7 +237,6 @@ class Terminal : public Location {
             if (notifier_ == notifier) return;
             if (notifier_) notifier->notifieeIs(0);
             notifier_ = notifier;
-            notifier_->referencesDec();
             notifier_->notifieeIs(this);
         }
         static Fwk::Ptr<Terminal::Notifiee> notifieeNew() {
@@ -249,7 +245,7 @@ class Terminal : public Location {
         }
         virtual void onDel(Terminal *p) {}
       protected:
-        Fwk::Ptr<Terminal> notifier_;
+        Fwk::WeakPtr<Terminal> notifier_;
         Notifiee() : notifier_(0) {}
     };
     Ptr<Terminal::Notifiee> notifiee() const { return notifiee_; }
@@ -284,7 +280,6 @@ class Fleet : public Fwk::PtrInterface<Fleet> {
             if (notifier_ == notifier) return;
             if (notifier_) notifier->notifieeIs(0);
             notifier_ = notifier;
-            notifier_->referencesDec();
             notifier_->notifieeIs(this);
         }
         static Fwk::Ptr<Fleet::Notifiee> notifieeNew() {
@@ -297,7 +292,7 @@ class Fleet : public Fwk::PtrInterface<Fleet> {
         virtual void onSpeed() {}
         virtual void onDel(Fleet *p) {}
       protected:
-        Fwk::Ptr<Fleet> notifier_;
+        Fwk::WeakPtr<Fleet> notifier_;
         Notifiee() : notifier_(0) {}
     };
     Ptr<Fleet::Notifiee> notifiee() const { return notifiee_; }
@@ -327,7 +322,6 @@ class TruckFleet : public Fleet {
             if (notifier_ == notifier) return;
             if (notifier_) notifier->notifieeIs(0);
             notifier_ = notifier;
-            notifier_->referencesDec();
             notifier_->notifieeIs(this);
         }
         static Fwk::Ptr<TruckFleet::Notifiee> notifieeNew() {
@@ -336,7 +330,7 @@ class TruckFleet : public Fleet {
         }
         virtual void onDel(TruckFleet *p) {}
       protected:
-        Fwk::Ptr<TruckFleet> notifier_;
+        Fwk::WeakPtr<TruckFleet> notifier_;
         Notifiee() : notifier_(0) {}
     };
     Ptr<TruckFleet::Notifiee> notifiee() const { return notifiee_; }
@@ -362,7 +356,6 @@ class BoatFleet : public Fleet {
             if (notifier_ == notifier) return;
             if (notifier_) notifier->notifieeIs(0);
             notifier_ = notifier;
-            notifier_->referencesDec();
             notifier_->notifieeIs(this);
         }
         static Fwk::Ptr<BoatFleet::Notifiee> notifieeNew() {
@@ -371,7 +364,7 @@ class BoatFleet : public Fleet {
         }
         virtual void onDel(BoatFleet *p) {}
       protected:
-        Fwk::Ptr<BoatFleet> notifier_;
+        Fwk::WeakPtr<BoatFleet> notifier_;
         Notifiee() : notifier_(0) {}
     };
     Ptr<BoatFleet::Notifiee> notifiee() const { return notifiee_; }
@@ -397,7 +390,6 @@ class PlaneFleet : public Fleet {
             if (notifier_ == notifier) return;
             if (notifier_) notifier->notifieeIs(0);
             notifier_ = notifier;
-            notifier_->referencesDec();
             notifier_->notifieeIs(this);
         }
         static Fwk::Ptr<PlaneFleet::Notifiee> notifieeNew() {
@@ -406,7 +398,7 @@ class PlaneFleet : public Fleet {
         }
         virtual void onDel(PlaneFleet *p) {}
       protected:
-        Fwk::Ptr<PlaneFleet> notifier_;
+        Fwk::WeakPtr<PlaneFleet> notifier_;
         Notifiee() : notifier_(0) {}
     };
     Ptr<PlaneFleet::Notifiee> notifiee() const { return notifiee_; }

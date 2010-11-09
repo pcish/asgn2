@@ -270,6 +270,8 @@ string SegmentRep::attribute(const string& name) {
     } else if (name == "return segment") {
         os << engineObject_->returnSegment()->name();
     } else if (name == "difficulty") {
+        os.setf(ios::fixed,ios::floatfield);
+        os.precision(2);
         os << engineObject_->difficulty().value();
     } else if (name == "expedite support") {
         Segment::ExpediteSupport support = engineObject_->expediteSupport();
@@ -282,11 +284,14 @@ string SegmentRep::attribute(const string& name) {
 
 void SegmentRep::attributeIs(const string& name, const string& v) {
     if (name == "source") {
-        Ptr<Location> location = manager_->cast_instance<Location, LocationRep>(v);
-        engineObject_->sourceIs(location);
+        if (v != "") {
+            Ptr<Location> location = manager_->cast_instance<Location, LocationRep>(v);
+            engineObject_->sourceIs(location);
+        }
+        else engineObject_->sourceIs(NULL);
         //location->segmentIs(engineObject_);
     } else if (name == "length") {
-        engineObject_->lengthIs(atoi(v.c_str()));
+        engineObject_->lengthIs(atof(v.c_str()));
     } else if (name == "return segment") {
         Ptr<Segment> segment = manager_->cast_instance<Segment, SegmentRep>(v);
         engineObject_->returnSegmentIs(segment);

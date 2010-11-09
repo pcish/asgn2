@@ -79,6 +79,12 @@ class Attr(object):
             ret.write(' {{ return {name}s_.at(index); }}'.format(type=self.type, name=self.name))
         else:
             ret.write(' {{ return {name}_; }}'.format(type=self.type, name=self.name))
+
+        if self.collection:
+            ret.write('\n    ')
+            if self.virtual:
+                ret.write('virtual ')
+            ret.write('unsigned int {name}s() const {{ return {name}s_.size(); }}'.format(type=self.type, name=self.name))
         return ret.getvalue()
 
     def isReadonly(self):
@@ -247,7 +253,7 @@ class Entity(object):
         ret.write('if (notifier_ == notifier) return;\n')
         ret.write('if (notifier_) notifier->notifieeIs(0);\n')
         ret.write('notifier_ = notifier;\n')
-        ret.write('notifier_->referencesDec();\n')
+        #ret.write('notifier_->referencesDec();\n')
         ret.write('notifier_->notifieeIs(this);\n')
         ret.set_indent(8)
         ret.write('}\n')
@@ -266,7 +272,7 @@ class Entity(object):
         ret.set_indent(4)
         ret.write('  protected:\n')
         ret.set_indent(8)
-        ret.write('Fwk::Ptr<%s> notifier_;\n' % self.classname)
+        ret.write('Fwk::WeakPtr<%s> notifier_;\n' % self.classname)
         ret.write('Notifiee() : notifier_(0) {}\n')
         ret.set_indent(4)
         ret.write('};\n')
