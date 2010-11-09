@@ -284,8 +284,11 @@ string SegmentRep::attribute(const string& name) {
 
 void SegmentRep::attributeIs(const string& name, const string& v) {
     if (name == "source") {
-        Ptr<Location> location = manager_->cast_instance<Location, LocationRep>(v);
-        engineObject_->sourceIs(location);
+        if (v != "") {
+            Ptr<Location> location = manager_->cast_instance<Location, LocationRep>(v);
+            engineObject_->sourceIs(location);
+        }
+        else engineObject_->sourceIs(NULL);
         //location->segmentIs(engineObject_);
     } else if (name == "length") {
         engineObject_->lengthIs(atof(v.c_str()));
