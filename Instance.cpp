@@ -276,7 +276,7 @@ string SegmentRep::attribute(const string& name) {
         os.precision(2);
         os << engineObject_->difficulty().value();
     } else if (name == "expedite support") {
-        int support = engineObject_->expediteSupport();
+        Segment::ExpediteSupport support = engineObject_->expediteSupport();
         if (support == Segment::available()) os << "yes";
         else if (support == Segment::unavailable()) os << "no";
     } else {
@@ -365,6 +365,8 @@ string ConnRep::attribute(const string& name) {
     USD maxCost;
     int maxTime;
 
+    Ptr<ShippingNetwork> network = manager_->engineManager()->shippingNetwork();
+
     is >> cmd;
     if (cmd.compare("explore") == 0) {
         is >> source;
@@ -392,9 +394,8 @@ string ConnRep::attribute(const string& name) {
                 }
             }
         }
-        Ptr<ShippingNetwork> network = manager_->engineManager()->shippingNetwork();
-//        Ptr<LocationRep> locationInstance = dynamic_cast<LocationRep*> (manager_->instance(location));
         network->sourceIs( Ptr<LocationRep>((LocationRep*)manager_->instance(source).ptr() )->engineObject() );
+        network->destinationIs(NULL);
         network->maxCostIs(maxCost);
         network->maxDistanceIs(maxDistance);
         network->maxTimeIs(maxTime);
@@ -405,11 +406,26 @@ string ConnRep::attribute(const string& name) {
         network->sourceIs( Ptr<LocationRep>((LocationRep*)manager_->instance(source).ptr() )->engineObject() );
         network->destinationIs( Ptr<LocationRep>((LocationRep*)manager_->instance(dest).ptr() )->engineObject() );
     }
-    else {
+    os.setf(ios::fixed,ios::floatfield);
+    os.precision(2);
+    for (unsigned int i = 0; i < network->paths(); i ++) {
+        Ptr<Path> path = network->path(i);
+        if (path) {
+            if ( dest != "") {
+                os << path->cost().value() << " " << path->hour().value() << " " << ((path->expedite()==Segment::available())?"yes":"no") << "; ";
+            }
+            for (unsigned int j = 0; j < path->locations(); j ++) {
+                Ptr<Location> loc = path->location(j);
+                os << loc->name();
+                if (j != path->locations() - 1) {
+                    WeakPtr<Segment> seg = path->segment(j);
+                    os << "(" << seg->name() << ":" << seg->length().value() << ":" << seg->returnSegment()->name() << ") ";
+                }
+            }
+            os << endl;
+        }
     }
 
-//  call low level to compute attribute here
-//
     return os.str();
 }
 

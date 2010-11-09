@@ -1,71 +1,132 @@
 #include <queue>
+#include <set>
 
 #include "Engine.h"
 #include "entityReactor.h"
 
 namespace Shipping {
-
-Ptr<Path> ShippingNetwork::path() const {
-    if (!source_)
-        return NULL;
-    if (!destination_) {
-        return explore();
-    } else {
-        return conn();
+Ptr<Path> Path::clone() {
+//    Ptr<Path> newPath (const_cast<Ptr<Path> >(this) );
+    Ptr<Path> newPath = Path::pathNew();
+    
+    newPath->cost_ = cost_;
+    newPath->distance_ = distance_;
+    newPath->expedite_ = expedite_;
+    newPath->hour_ = hour_;
+    newPath->location_ = location_;
+    newPath->segment_ = segment_;
+    
+    return newPath;
+}
+void ShippingNetwork::computePath() {
+    path_.clear();
+    if (source_ == NULL) return;
+    if (destination_) { // conn
+        expedite_ = Segment::unavailable();
+        explore (source_, set<string>(), Path::pathNew() );
+        expedite_ = Segment::available();
+        explore (source_, set<string>(), Path::pathNew() );
+    }
+    else { //explore
+        explore (source_, set<string>(), Path::pathNew() );
     }
 }
-Ptr<Path> ShippingNetwork::explore() const {
-    Ptr<Path> path_;
-    queue<Ptr<Location> > bfsQueue;
-    Ptr<Location> curLocation;
+unsigned int ShippingNetwork::paths() {
+    if (isConnAttributeChange) {
+        computePath();
+        isConnAttributeChange = false;
+    }
+    return path_.size();
+}
+Ptr<Path> ShippingNetwork::path(unsigned int index) {
+    if (isConnAttributeChange) {
+        computePath();
+        isConnAttributeChange = false;
+    }
+    return (index < path_.size() && index >= 0)?path_[index]:NULL;
+}
+void ShippingNetwork::explore(const Ptr<Location> curLocation, set<string> visitedNodes, Ptr<Path> curPath) {
     USD curCost;
     Mile curDistance;
     Hour curTime;
+    bool isLast = true;
+//    cerr << "Now at location: " << curLocation->name() << endl;
+    curPath->locationIs(curLocation);
+    if (!destination_ || (curLocation->name() == destination_->name() ))
+        if (curPath->locations() > 1) {
+            Ptr<Path> newPath = curPath->clone();
+            newPath->expediteIs(expedite_);
+            path_.push_back(newPath);
+        }
+    if (destination_ && curLocation->name() == destination_->name() ) {
+        curPath->locationIs(NULL); // pop the node because it already reached the destination
+        return;
+    }
 
-    bfsQueue.push(source_);
-    while (!bfsQueue.empty() ) {
-        curLocation = bfsQueue.front();
-        bfsQueue.pop();
-        for (unsigned int i = 0; i < curLocation->segments(); ++i) {
-            WeakPtr<Segment> seg = curLocation->segment(i);
-            USD segCost;
-            Hour segTime;
-            //Computes time and cost here
-            if (seg->transportationMode() == Segment::truck() ) {
-                segCost = truckFleet->cost().value() * seg->length().value();
-                segTime = seg->length().value() / truckFleet->speed().value();
-            } else if (seg->transportationMode() == Segment::plane() ) {
-                segCost = planeFleet->cost().value() * seg->length().value();
-                segTime = seg->length().value() / planeFleet->speed().value();
-            } else if (seg->transportationMode() == Segment::boat() ) {
-                segCost = boatFleet->cost().value() * seg->length().value();
-                segTime = seg->length().value() / boatFleet->speed().value();
-            }
-            if ( !(maxDistance_ > 0 && curDistance + seg->length() > maxDistance_) &&
-                 !(maxCost_ > 0 && curCost + segCost > maxCost_) &&
-                 !(maxTime_ > 0 && curTime + segTime > maxTime_) &&
-                 !(expedite_ == Segment::available() && seg->expediteSupport() == Segment::unavailable() ) ) {
-                //push location and segment into path
-                bfsQueue.push(seg->returnSegment()->source() ); // get its return segment's source
-            }
-            else { //reaches the limit
-            }
+    visitedNodes.insert(curLocation->name());
+
+    for (unsigned int i = 0; i < curLocation->segments(); ++i) {
+        WeakPtr<Segment> seg = curLocation->segment(i);
+        Ptr<Location> nextLocation = seg->returnSegment()->source();
+        USD segCost;
+        Hour segTime;
+        //Computes time and cost here
+        if (seg->transportationMode() == Segment::truck() ) {
+            segCost = truckFleet_->cost().value() * seg->length().value();
+            segTime = seg->length().value() / truckFleet_->speed().value();
+        } else if (seg->transportationMode() == Segment::plane() ) {
+            segCost = planeFleet_->cost().value() * seg->length().value();
+            segTime = seg->length().value() / planeFleet_->speed().value();
+        } else if (seg->transportationMode() == Segment::boat() ) {
+            segCost = boatFleet_->cost().value() * seg->length().value();
+            segTime = seg->length().value() / boatFleet_->speed().value();
+        }
+        if (expedite_ == Segment::available() ) {
+            segCost = segCost.value() * 1.5;
+            segTime = segTime.value() / 1.3;
+        }
+        //cerr << "Try Segment: " << seg->name() << " Destination: " << seg->returnSegment()->name() << "...";
+        bool visited = false;
+        /* implement search algorithm (should be using like hash map or set)*/
+        if (visitedNodes.find(nextLocation->name() ) != visitedNodes.end() )
+            visited = true;
+        if ( !visited && 
+                !(maxDistance_ > 0 && curPath->distance() + seg->length() > maxDistance_) &&
+                !(maxCost_ > 0 && curPath->cost() + segCost > maxCost_) &&
+                !(maxTime_ > 0 && curPath->hour() + segTime > maxTime_) &&
+                !(expedite_ == Segment::available() && seg->expediteSupport() == Segment::unavailable() ) ) {
+            //    cerr << "successull" << endl;
+            isLast = false;
+            //visitedNotes.push_back(nextLocation ); // get its return segment's source
+            //curPath->locationIs(nextLocation);
+            curPath->segmentIs(seg);
+            curPath->distanceIs(curPath->distance().value() + seg->length().value() );
+            curPath->costIs(curPath->cost().value() + segCost.value());
+            curPath->hourIs(curPath->hour().value() + segTime.value());
+            explore (nextLocation, visitedNodes, curPath);
+            curPath->distanceIs(curPath->distance().value() - seg->length().value() );
+            curPath->costIs(curPath->cost().value() - segCost.value());
+            curPath->hourIs(curPath->hour().value() - segTime.value());
+        }
+        else {
+            //    cerr << "fail because of insatisfaction of the condition" << endl;
         }
     }
+    curPath->locationIs(NULL);
+    if (curPath->locations() > 1)
+        curPath->segmentIs(NULL);
+    visitedNodes.erase(curLocation->name() );
 }
-Ptr<Path> ShippingNetwork::conn() const {
-}
-
 class EngineReactor : public EngineManager::Notifiee {
-  public:
-    virtual void onCustomerNew(Fwk::Ptr<Customer> p) {
-        notifier_->shippingNetwork()->customersInc();
-    }
-    virtual void onTerminalNew(Fwk::Ptr<Terminal> p) {
-        if (p->transportationMode() == Segment::truck()) {
-            notifier_->shippingNetwork()->truckTerminals_++;
-        } else if (p->transportationMode() == Segment::plane()) {
-            notifier_->shippingNetwork()->planeTerminals_++;
+    public:
+        virtual void onCustomerNew(Fwk::Ptr<Customer> p) {
+            notifier_->shippingNetwork()->customersInc();
+        }
+        virtual void onTerminalNew(Fwk::Ptr<Terminal> p) {
+            if (p->transportationMode() == Segment::truck()) {
+                notifier_->shippingNetwork()->truckTerminals_++;
+            } else if (p->transportationMode() == Segment::plane()) {
+                notifier_->shippingNetwork()->planeTerminals_++;
         } else if (p->transportationMode() == Segment::boat()) {
             notifier_->shippingNetwork()->boatTerminals_++;
         }
@@ -81,6 +142,15 @@ class EngineReactor : public EngineManager::Notifiee {
     }
     virtual void onPortNew(Fwk::Ptr<Port> p) {
         notifier_->shippingNetwork()->ports_++;
+    }
+    virtual void onPlaneFleetNew(Fwk::Ptr<PlaneFleet> p) {
+        notifier_->shippingNetwork()->planeFleetIs(p);
+    }
+    virtual void onTruckFleetNew(Fwk::Ptr<TruckFleet> p) {
+        notifier_->shippingNetwork()->truckFleetIs(p);
+    }
+    virtual void onBoatFleetNew(Fwk::Ptr<BoatFleet> p) {
+        notifier_->shippingNetwork()->boatFleetIs(p);
     }
     static Fwk::Ptr<EngineReactor> engineReactorNew() {
         Fwk::Ptr<EngineReactor> n = new EngineReactor();
