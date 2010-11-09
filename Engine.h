@@ -18,13 +18,13 @@ public:
         if (_location)
             location_.push_back(_location); 
         else
-            location_.pop_back();
+            if (location_.size() > 0) location_.pop_back();
     }    
     void segmentIs(Ptr<Segment> _segment ) { 
         if (_segment)
             segment_.push_back (_segment); 
         else
-            segment_.pop_back();       
+            if (segment_.size() > 0) segment_.pop_back();       
     }
     Ptr<Location> location(const unsigned int index) const { return (index < location_.size() && index >= 0)?location_[index]:NULL; }
     Ptr<Segment> segment(const unsigned int index) const { return (index < segment_.size() && index >= 0)?segment_[index]:NULL; }
@@ -89,7 +89,7 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     void sourceIs(const Ptr<Location> source) { if (source_ == source) return; source_ = source; isConnAttributeChange = true; }
     
     Ptr<Path> path(unsigned int index);
-    unsigned int paths() const { return path_.size(); }
+    unsigned int paths();
     Hour maxTime() const { return maxTime_; }
     void maxTimeIs(const Hour maxTime) { if (maxTime_ == maxTime) return; maxTime_ = maxTime; isConnAttributeChange = true;}
     Mile maxDistance() const { return maxDistance_; }
@@ -127,7 +127,8 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
 
     Segment::ExpediteSupport expedite_;
     ShippingNetwork(const ShippingNetwork& o);
-    Ptr<Path> explore(Ptr<Location> curLocation, list<Ptr<Location> > visitedNodes, Ptr<Path> curPath);
+    void explore(Ptr<Location> curLocation, list<Ptr<Location> > visitedNodes, Ptr<Path> curPath);
+    list<Ptr<Location> > visitedNodes;
     Ptr<Path> conn() const;
 };
 

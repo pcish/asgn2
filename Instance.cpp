@@ -290,6 +290,7 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
     } else if (name == "return segment") {
         Ptr<Segment> segment = manager_->cast_instance<Segment, SegmentRep>(v);
         engineObject_->returnSegmentIs(segment);
+        segment->returnSegmentIs(engineObject_); // added by luyota 
     } else if (name == "difficulty") {
         engineObject_->difficultyIs(atof(v.c_str()));
     } else if (name == "expedite support") {
@@ -386,15 +387,45 @@ string ConnRep::attribute(const string& name) {
         Ptr<ShippingNetwork> network = manager_->engineManager()->shippingNetwork();
 //        Ptr<LocationRep> locationInstance = dynamic_cast<LocationRep*> (manager_->instance(location));
         network->sourceIs( Ptr<LocationRep>((LocationRep*)manager_->instance(source).ptr() )->engineObject() );
+        network->destinationIs(NULL);
         network->maxCostIs(maxCost);
         network->maxDistanceIs(maxDistance);
         network->maxTimeIs(maxTime);
+        for (unsigned int i = 0; i < network->paths(); i ++) {
+            Ptr<Path> path = network->path(i);
+            if (path) {
+                for (int j = 0; j < path->locations(); j ++) {
+                    Ptr<Location> loc = path->location(j);
+                    if (j != path->locations() - 1) {
+                        Ptr<Segment> seg = path->segment(j);
+                        cout << loc->name() << "(" << seg->name() << ":" << seg->length().value() << ":" << seg->returnSegment()->name() << ") ";
+                        //cout << loc->name() << "(";
+                    }
+                }
+                cout << endl;
+            }
+        }
     }
     else if (cmd.compare("connect") == 0) {
         Ptr<ShippingNetwork> network = manager_->engineManager()->shippingNetwork();
         is >> source >> dummy >> dest;
         network->sourceIs( Ptr<LocationRep>((LocationRep*)manager_->instance(source).ptr() )->engineObject() );
         network->destinationIs( Ptr<LocationRep>((LocationRep*)manager_->instance(dest).ptr() )->engineObject() );
+        for (unsigned int i = 0; i < network->paths(); i ++) {
+            Ptr<Path> path = network->path(i);
+            if (path) {
+                cout << path->cost().value() << " " << path->hour().value() << " " << ((path->expedite()==Segment::available())?"yes":"no") << "; ";
+                for (int j = 0; j < path->locations(); j ++) {
+                    Ptr<Location> loc = path->location(j);
+                    if (j != path->locations() - 1) {
+                        Ptr<Segment> seg = path->segment(j);
+                        cout << loc->name() << "(" << seg->name() << ":" << seg->length().value() << ":" << seg->returnSegment()->name() << ") ";
+                        //cout << loc->name() << "(";
+                    }
+                }
+                cout << endl;
+            }
+        }
     }
     else {
     }

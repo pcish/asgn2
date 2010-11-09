@@ -1,3 +1,8 @@
+Nov 8
+16:30
+if A is the return segment of B, do we have to also make B the return segment of A?
+From the test case, if we don't, it got segmentation fault.
+
 Nov 7 luyota
 ==1==
 Changes engineObject_ to be protected and only provides engineObject() in the Location class and removed the engineObject() in its subclass.
