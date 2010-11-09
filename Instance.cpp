@@ -363,7 +363,7 @@ string ConnRep::attribute(const string& name) {
     Segment::ExpediteSupport expedite = Segment::unavailable();
     Mile maxDistance;
     USD maxCost;
-    int maxTime;
+    Hour maxTime;
 
     Ptr<ShippingNetwork> network = manager_->engineManager()->shippingNetwork();
 
@@ -378,7 +378,7 @@ string ConnRep::attribute(const string& name) {
             else {
                 //is >> val;
                 if (attr.compare("distance") == 0){
-                    int raw;
+                    double raw;
                     is >> raw;
                     maxDistance = raw;
                 }
@@ -388,7 +388,7 @@ string ConnRep::attribute(const string& name) {
                     maxCost = raw;
                 }
                 else if (attr.compare("time") == 0){
-                    int raw;
+                    double raw;
                     is >> raw;
                     maxTime = raw;
                 }
@@ -422,7 +422,7 @@ string ConnRep::attribute(const string& name) {
                     os << "(" << seg->name() << ":" << seg->length().value() << ":" << seg->returnSegment()->name() << ") ";
                 }
             }
-            os << endl;
+            if (i < network->paths()-1) os << endl;
         }
     }
 

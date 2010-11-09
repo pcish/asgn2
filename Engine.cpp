@@ -8,14 +8,14 @@ namespace Shipping {
 Ptr<Path> Path::clone() {
 //    Ptr<Path> newPath (const_cast<Ptr<Path> >(this) );
     Ptr<Path> newPath = Path::pathNew();
-    
+
     newPath->cost_ = cost_;
     newPath->distance_ = distance_;
     newPath->expedite_ = expedite_;
     newPath->hour_ = hour_;
     newPath->location_ = location_;
     newPath->segment_ = segment_;
-    
+
     return newPath;
 }
 void ShippingNetwork::computePath() {
@@ -50,7 +50,7 @@ void ShippingNetwork::explore(const Ptr<Location> curLocation, set<string> visit
     Mile curDistance;
     Hour curTime;
     bool isLast = true;
-//    cerr << "Now at location: " << curLocation->name() << endl;
+    //cerr << "Now at location: " << curLocation->name() << endl;
     curPath->locationIs(curLocation);
     if (!destination_ || (curLocation->name() == destination_->name() ))
         if (curPath->locations() > 1) {
@@ -90,12 +90,13 @@ void ShippingNetwork::explore(const Ptr<Location> curLocation, set<string> visit
         /* implement search algorithm (should be using like hash map or set)*/
         if (visitedNodes.find(nextLocation->name() ) != visitedNodes.end() )
             visited = true;
-        if ( !visited && 
+        //cerr << "c" << curPath->hour().value() << "s"<<segTime.value() << "m"<<maxTime_.value() << endl;
+        if ( !visited &&
                 !(maxDistance_ > 0 && curPath->distance() + seg->length() > maxDistance_) &&
                 !(maxCost_ > 0 && curPath->cost() + segCost > maxCost_) &&
-                !(maxTime_ > 0 && curPath->hour() + segTime > maxTime_) &&
+                !(maxTime_.value() > 0 && curPath->hour().value() + segTime.value() > maxTime_.value()) &&
                 !(expedite_ == Segment::available() && seg->expediteSupport() == Segment::unavailable() ) ) {
-            //    cerr << "successull" << endl;
+        //        cerr << "successull" << endl;
             isLast = false;
             //visitedNotes.push_back(nextLocation ); // get its return segment's source
             //curPath->locationIs(nextLocation);
@@ -109,7 +110,7 @@ void ShippingNetwork::explore(const Ptr<Location> curLocation, set<string> visit
             curPath->hourIs(curPath->hour().value() - segTime.value());
         }
         else {
-            //    cerr << "fail because of insatisfaction of the condition" << endl;
+        //        cerr << "fail because of insatisfaction of the condition" << endl;
         }
     }
     curPath->locationIs(NULL);
