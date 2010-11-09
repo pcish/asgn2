@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+/*<<<<<<< HEAD
 // Copyright (c) 1993-2007 David R. Cheriton, all rights reserved.
 // PtrInterface.h
 
@@ -51,7 +51,7 @@ PtrInterface<T>::referencesDec( U32 dec ) const {
 }
 
 #endif
-=======
+=======*/
 // Copyright (c) 1993-2007 David R. Cheriton, all rights reserved.
 // PtrInterface.h
 
@@ -78,4 +78,4 @@ private:
 }
 
 #endif
->>>>>>> 69d8f1dec362d6d9fc2e070a6e742ac666f68a12
+//>>>>>>> 69d8f1dec362d6d9fc2e070a6e742ac666f68a12

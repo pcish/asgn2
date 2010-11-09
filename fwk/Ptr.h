@@ -1,3 +1,4 @@
+/*
 <<<<<<< HEAD
 // Copyright (C) 1993-2002 David R. Cheriton.  All rights reserved.
 
@@ -64,9 +65,10 @@ Ptr<T>::operator=( Ptr<T>& mp ) {
     if( save ) save->deleteRef();
   }
 
-}
-#endif /* PTR_h */
-=======
+}*/
+//#endif /* PTR_h */
+//=======
+
 // Copyright (C) 1993-2002 David R. Cheriton.  All rights reserved.
 
 #ifndef FWK_PTR_H
@@ -142,4 +144,3 @@ Ptr<T> ptr_cast(Ptr<U> mp) {
 }
 
 #endif /* FWK_PTR_H */
->>>>>>> 69d8f1dec362d6d9fc2e070a6e742ac666f68a12

@@ -42,7 +42,6 @@ void ShippingNetwork::explore(const Ptr<Location> curLocation, list<Ptr<Location
     Hour curTime;
     bool isLast = true;
 
-<<<<<<< HEAD
 //    cerr << "Now at location: " << curLocation->name() << endl;
     visitedNodes.push_back(curLocation);
     for (unsigned int i = 0; i < curLocation->segments(); ++i) {
@@ -72,35 +71,6 @@ void ShippingNetwork::explore(const Ptr<Location> curLocation, list<Ptr<Location
         //    cerr << "Comparing " << (*scannerPtr)->name() << " and " << nextLocation->name() << "...";
             if ((*scannerPtr).ptr() == nextLocation.ptr() ) {
                 visited = true;
-=======
-    bfsQueue.push(source_);
-    while (!bfsQueue.empty() ) {
-        curLocation = bfsQueue.front();
-        bfsQueue.pop();
-        for (unsigned int i = 0; i < curLocation->segments(); ++i) {
-            WeakPtr<Segment> seg = curLocation->segment(i);
-            USD segCost;
-            Hour segTime;
-            //Computes time and cost here
-            if (seg->transportationMode() == Segment::truck() ) {
-                segCost = truckFleet->cost().value() * seg->length().value();
-                segTime = seg->length().value() / truckFleet->speed().value();
-            } else if (seg->transportationMode() == Segment::plane() ) {
-                segCost = planeFleet->cost().value() * seg->length().value();
-                segTime = seg->length().value() / planeFleet->speed().value();
-            } else if (seg->transportationMode() == Segment::boat() ) {
-                segCost = boatFleet->cost().value() * seg->length().value();
-                segTime = seg->length().value() / boatFleet->speed().value();
-            }
-            if ( !(maxDistance_ > 0 && curDistance + seg->length() > maxDistance_) &&
-                 !(maxCost_ > 0 && curCost + segCost > maxCost_) &&
-                 !(maxTime_ > 0 && curTime + segTime > maxTime_) &&
-                 !(expedite_ == Segment::available() && seg->expediteSupport() == Segment::unavailable() ) ) {
-                //push location and segment into path
-                bfsQueue.push(seg->returnSegment()->source() ); // get its return segment's source
-            }
-            else { //reaches the limit
->>>>>>> 69d8f1dec362d6d9fc2e070a6e742ac666f68a12
             }
         }
         if ( !visited && 
