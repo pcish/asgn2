@@ -57,7 +57,7 @@ class Segment : public Fwk::PtrInterface<Segment> {
     string name() const { return name_; }
     Ptr<Location> source() const { return source_; }
     void sourceIs(const Ptr<Location> source) { if (source_ == source) return; source_ = source; if (notifiee_) notifiee_->onSource(); }
-    Ptr<Segment> returnSegment() const { return returnSegment_; }
+    WeakPtr<Segment> returnSegment() const { return returnSegment_; }
     void returnSegmentIs(const Ptr<Segment> returnSegment) { if (returnSegment_ == returnSegment) return; returnSegment_ = returnSegment; if (notifiee_) notifiee_->onReturnSegment(); }
     TransportationMode transportationMode() const { return transportationMode_; }
     SegmentDifficultyUnit difficulty() const { return difficulty_; }
@@ -92,7 +92,7 @@ class Segment : public Fwk::PtrInterface<Segment> {
     Ptr<Segment::Notifiee> notifiee() const { return notifiee_; }
   protected:
     Segment(const string name, const TransportationMode transportationMode) : name_(name), transportationMode_(transportationMode) {
-        expediteSupport_ = unavailable_;        
+        expediteSupport_ = unavailable_;
     }
     Ptr<Segment::Notifiee> notifiee_;
     void notifieeIs(Segment::Notifiee* n) const {
@@ -104,7 +104,7 @@ class Segment : public Fwk::PtrInterface<Segment> {
     ExpediteSupport expediteSupport_;
     string name_;
     Ptr<Location> source_;
-    Ptr<Segment> returnSegment_;
+    WeakPtr<Segment> returnSegment_;
     TransportationMode transportationMode_;
     SegmentDifficultyUnit difficulty_;
     Mile length_;

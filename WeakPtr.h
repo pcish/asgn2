@@ -15,6 +15,7 @@ public:
 
     WeakPtr<T>& operator=( const WeakPtr<T>& mp );
     WeakPtr<T>& operator=( WeakPtr<T>& mp );
+    WeakPtr<T>& operator=( const Ptr<T>& mp );
     WeakPtr<T>& operator=( Ptr<T>& mp );
     WeakPtr<T>& operator=( T* p );
 
@@ -50,6 +51,12 @@ WeakPtr<T>::operator=( const WeakPtr<T>& mp ) {
 template<class T> WeakPtr<T>&
 WeakPtr<T>::operator=( WeakPtr<T>& mp ) {
     ptr_ = mp.ptr_;
+    return *this;
+}
+
+template<class T> WeakPtr<T>&
+WeakPtr<T>::operator=( const Ptr<T>& mp ) {
+    ptr_ = mp.ptr();
     return *this;
 }
 

@@ -27,6 +27,9 @@ class SegmentReactor : public Segment::Notifiee {
             while (notifier_->source()->segment(i).ptr() != notifier_.ptr() && i < notifier_->source()->segments()) i++;
             notifier_->source()->segmentIs(i, NULL);
         }
+        if (notifier_->returnSegment() != NULL) {
+            notifier_->returnSegment()->returnSegmentIs(NULL);
+        }
     }
     virtual void onExpediteSupport() {
         int delta;
@@ -55,7 +58,13 @@ class SegmentReactor : public Segment::Notifiee {
         previousSource_ = notifier_->source().ptr();
     }
     virtual void onReturnSegment() {
-        notifier_->returnSegment()->returnSegmentIs(notifier_.ptr());
+        if (previousReturnSegment_ != NULL && previousReturnSegment_->returnSegment() == notifier_) {
+            previousReturnSegment_->returnSegmentIs(NULL);
+        }
+        if (notifier_->returnSegment() != NULL) {
+            notifier_->returnSegment()->returnSegmentIs(notifier_.ptr());
+        }
+        previousReturnSegment_ = notifier_->returnSegment();
     }
     static Fwk::Ptr<SegmentReactor> segmentReactorNew() {
         Fwk::Ptr<SegmentReactor> n = new SegmentReactor();
@@ -64,8 +73,12 @@ class SegmentReactor : public Segment::Notifiee {
   protected:
     SegmentReactor() {
         previousSource_ = NULL;
+        previousReturnSegment_ = NULL;
+        handlingReturnSegment_ = false;
     }
     Location *previousSource_;
+    WeakPtr<Segment> previousReturnSegment_;
+    bool handlingReturnSegment_;
 };
 class CustomerReactor : public Customer::Notifiee {
   public:
