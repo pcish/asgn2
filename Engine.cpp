@@ -45,10 +45,6 @@ Ptr<Path> ShippingNetwork::path(unsigned int index) {
     return (index < path_.size() && index >= 0)?path_[index]:NULL;
 }
 void ShippingNetwork::explore(const Ptr<Location> curLocation, set<string> visitedNodes, Ptr<Path> curPath) {
-    USD curCost;
-    Mile curDistance;
-    Hour curTime;
-    bool isLast = true;
     //cerr << "Now at location: " << curLocation->name() << endl;
     curPath->locationIs(curLocation);
     if (!destination_ || (curLocation->name() == destination_->name() ))
@@ -73,13 +69,13 @@ void ShippingNetwork::explore(const Ptr<Location> curLocation, set<string> visit
         Hour segTime;
         //Computes time and cost here
         if (seg->transportationMode() == Segment::truck() ) {
-            segCost = truckFleet_->cost().value() * seg->length().value();
+            segCost = truckFleet_->cost().value() * seg->length().value() * seg->difficulty().value();
             segTime = seg->length().value() / truckFleet_->speed().value();
         } else if (seg->transportationMode() == Segment::plane() ) {
-            segCost = planeFleet_->cost().value() * seg->length().value();
+            segCost = planeFleet_->cost().value() * seg->length().value() * seg->difficulty().value();
             segTime = seg->length().value() / planeFleet_->speed().value();
         } else if (seg->transportationMode() == Segment::boat() ) {
-            segCost = boatFleet_->cost().value() * seg->length().value();
+            segCost = boatFleet_->cost().value() * seg->length().value() * seg->difficulty().value();
             segTime = seg->length().value() / boatFleet_->speed().value();
         }
         if (expedite_ == Segment::available() ) {
@@ -87,6 +83,8 @@ void ShippingNetwork::explore(const Ptr<Location> curLocation, set<string> visit
             segTime = segTime.value() / 1.3;
         }
         //cerr << "Try Segment: " << seg->name() << " Destination: " << seg->returnSegment()->name() << "...";
+        //cerr << "Segment cost: " << segCost.value() << endl;
+        //cerr << "Current Path Cost: " << curPath->cost().value() << endl;
         bool visited = false;
         /* implement search algorithm (should be using like hash map or set)*/
         if (visitedNodes.find(nextLocation->name() ) != visitedNodes.end() )
@@ -97,7 +95,6 @@ void ShippingNetwork::explore(const Ptr<Location> curLocation, set<string> visit
                 !(maxTime_.value() > 0 && curPath->hour().value() + segTime.value() > maxTime_.value()) &&
                 !(expedite_ == Segment::available() && seg->expediteSupport() == Segment::unavailable() ) ) {
         //        cerr << "successull" << endl;
-            isLast = false;
             //visitedNotes.push_back(nextLocation ); // get its return segment's source
             //curPath->locationIs(nextLocation);
             curPath->segmentIs(seg);
