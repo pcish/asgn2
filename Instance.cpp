@@ -1,14 +1,11 @@
 #include <iostream>
 #include <stdlib.h>
 #include <map>
-#include <vector>
 #include <sstream>
-
 
 #include "Instance.h"
 #include "entities.h"
 #include "Engine.h"
-
 
 namespace Shipping {
 
@@ -43,7 +40,7 @@ private:
 class SegmentRep;
 
 class LocationRep : public Instance {
-public:
+  public:
     virtual string attribute(const string& name);
     virtual void attributeIs(const string& name, const string& v);
 
@@ -57,7 +54,6 @@ public:
 
   private:
     int segmentNumber(const string& name);
-    //Ptr<Location> engineObject_;
 };
 
 class PortRep : public LocationRep {
@@ -66,10 +62,6 @@ class PortRep : public LocationRep {
         LocationRep(name, manager) {
         engineObject_ = manager->engineManager()->portNew(name);
     }
-    //Ptr<Port> engineObject() const { return engineObject_; }
-
-  //private:
-  //  Ptr<Port> engineObject_;
 };
 
 class CustomerRep : public LocationRep {
@@ -78,10 +70,6 @@ class CustomerRep : public LocationRep {
         LocationRep(name, manager) {
         engineObject_ = manager->engineManager()->customerNew(name);
     }
-    //Ptr<Customer> engineObject() const { return engineObject_; }
-
-  //private:
-  //  Ptr<Customer> engineObject_;
 };
 
 class TerminalRep : public LocationRep {
@@ -90,13 +78,9 @@ class TerminalRep : public LocationRep {
         LocationRep(name, manager), mode_(_mode) {
           engineObject_ = manager_->engineManager()->terminalNew(name, _mode);
     }
-    //Ptr<Terminal> engineObject() const { return engineObject_; }
 
   protected:
     Segment::TransportationMode mode_;
-
-  //private:
-   // Ptr<Terminal> engineObject_;
 };
 
 class SegmentRep : public Instance {
@@ -123,8 +107,9 @@ class SegmentRep : public Instance {
 class StatsRep : public Instance {
   public:
     static Ptr<StatsRep> instance(const string& name, ManagerImpl *_manager) {
-        if (instance_ == NULL)
+        if (instance_ == NULL) {
             instance_ = new StatsRep(name, _manager);
+        }
         return instance_;
     }
 
@@ -270,7 +255,9 @@ void LocationRep::attributeIs(const string& name, const string& v) {
 string SegmentRep::attribute(const string& name) {
     ostringstream os;
     if (name == "source") {
-        os << engineObject_->source()->name();
+        if (engineObject_->source() != NULL) {
+            os << engineObject_->source()->name();
+        }
     } else if (name == "length") {
         os << engineObject_->length().value();
     } else if (name == "return segment") {
@@ -377,13 +364,13 @@ string ConnRep::attribute(const string& name) {
     if (cmd.compare("explore") == 0) {
         is >> source;
         is >> dummy; // colon
-        while (!is.eof () ){
+        while (!is.eof ()) {
             is >> attr;
             if (attr.compare("expedited") == 0)
                 expedite = Segment::available();
             else {
                 //is >> val;
-                if (attr.compare("distance") == 0){
+                if (attr.compare("distance") == 0) {
                     double raw;
                     is >> raw;
                     maxDistance = raw;
@@ -393,14 +380,16 @@ string ConnRep::attribute(const string& name) {
                     is >> raw;
                     maxCost = raw;
                 }
-                else if (attr.compare("time") == 0){
+                else if (attr.compare("time") == 0) {
                     double raw;
                     is >> raw;
                     maxTime = raw;
                 }
             }
         }
-        network->sourceIs( Ptr<LocationRep>((LocationRep*)manager_->instance(source).ptr() )->engineObject() );
+        network->sourceIs(Ptr<LocationRep>((LocationRep*) manager_->
+                          instance(source).ptr())->engineObject()
+        );
         network->destinationIs(NULL);
         network->expediteIs(expedite);
         network->maxCostIs(maxCost);
@@ -410,43 +399,49 @@ string ConnRep::attribute(const string& name) {
     else if (cmd.compare("connect") == 0) {
         Ptr<ShippingNetwork> network = manager_->engineManager()->shippingNetwork();
         is >> source >> dummy >> dest;
-        network->sourceIs( Ptr<LocationRep>((LocationRep*)manager_->instance(source).ptr() )->engineObject() );
-        network->destinationIs( Ptr<LocationRep>((LocationRep*)manager_->instance(dest).ptr() )->engineObject() );
+        network->sourceIs(Ptr<LocationRep>((LocationRep*)manager_->
+                          instance(source).ptr() )->engineObject()
+        );
+        network->destinationIs(Ptr<LocationRep>((LocationRep*)manager_->
+                               instance(dest).ptr() )->engineObject()
+        );
         network->maxCostIs(0);
         network->maxDistanceIs(0);
         network->maxTimeIs(0);
     }
-    os.setf(ios::fixed,ios::floatfield);
+    os.setf(ios::fixed, ios::floatfield);
     os.precision(2);
-    for (unsigned int i = 0; i < network->paths(); i ++) {
+    for (unsigned int i = 0; i < network->paths(); i++) {
         Ptr<Path> path = network->path(i);
         if (path) {
-            if ( dest != "") {
-                os << path->cost().value() << " " << path->hour().value() << " " << ((path->expedite()==Segment::available())?"yes":"no") << "; ";
+            if (dest != "") {
+                os << path->cost().value() << " " << path->hour().value() << " " <<
+                ((path->expedite() == Segment::available()) ? "yes" : "no") << "; ";
             }
-            for (unsigned int j = 0; j < path->locations(); j ++) {
+            for (unsigned int j = 0; j < path->locations(); j++) {
                 Ptr<Location> loc = path->location(j);
                 os << loc->name();
                 if (j != path->locations() - 1) {
                     WeakPtr<Segment> seg = path->segment(j);
-                    os << "(" << seg->name() << ":" << seg->length().value() << ":" << seg->returnSegment()->name() << ") ";
+                    os << "(" << seg->name() << ":" << seg->length().value() <<
+                    ":" << seg->returnSegment()->name() << ") ";
                 }
             }
-            if (i < network->paths()-1) os << endl;
+            if (i < network->paths() - 1) os << endl;
         }
     }
-
     return os.str();
 }
 
 string FleetRep::attribute(const string& name) {
-    int commaPos = name.find_first_of (',');
-    string mode = name.substr (0, commaPos), property = name.substr (commaPos + 1, name.length());
+    int commaPos = name.find_first_of(',');
+    string mode = name.substr(0, commaPos);
+    string property = name.substr(commaPos + 1, name.length());
     //trim the string
-    mode = mode.substr (mode.find_first_not_of(' '));
-    mode = mode.substr (0, mode.find_last_not_of (' ') + 1);
-    property = property.substr (property.find_first_not_of(' ') );
-    property = property.substr (0, property.find_last_not_of(' ') + 1);
+    mode = mode.substr(mode.find_first_not_of(' '));
+    mode = mode.substr(0, mode.find_last_not_of (' ') + 1);
+    property = property.substr(property.find_first_not_of(' ') );
+    property = property.substr(0, property.find_last_not_of(' ') + 1);
     Ptr<Fleet> fleet_;
     if (mode == "Truck") fleet_ = truckfleet_;
     if (mode == "Boat") fleet_ = boatfleet_;
@@ -457,9 +452,9 @@ string FleetRep::attribute(const string& name) {
     os.precision(2);
     if (property == "speed") {
         os << fleet_->speed().value();
-    } else if (property == "cost"){
+    } else if (property == "cost") {
         os << fleet_->cost().value();
-    } else if (property == "capacity"){
+    } else if (property == "capacity") {
         os << fleet_->capacity().value();
     } else {
         return "";
@@ -468,13 +463,14 @@ string FleetRep::attribute(const string& name) {
 }
 
 void FleetRep::attributeIs(const string& name, const string& v) {
-    int commaPos = name.find_first_of (',');
-    string mode = name.substr (0, commaPos), property = name.substr (commaPos + 1, name.length());
+    int commaPos = name.find_first_of(',');
+    string mode = name.substr(0, commaPos);
+    string property = name.substr(commaPos + 1, name.length());
     //trim the string
-    mode = mode.substr (mode.find_first_not_of(' '));
-    mode = mode.substr (0, mode.find_last_not_of (' ') + 1);
-    property = property.substr (property.find_first_not_of(' ') );
-    property = property.substr (0, property.find_last_not_of(' ') + 1);
+    mode = mode.substr(mode.find_first_not_of(' '));
+    mode = mode.substr(0, mode.find_last_not_of (' ') + 1);
+    property = property.substr(property.find_first_not_of(' '));
+    property = property.substr(0, property.find_last_not_of(' ') + 1);
     Ptr<Fleet> fleet_;
     if (mode == "Truck") fleet_ = truckfleet_;
     if (mode == "Boat") fleet_ = boatfleet_;
