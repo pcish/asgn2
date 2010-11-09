@@ -15,7 +15,6 @@ Ptr<Path> Path::clone() {
     newPath->hour_ = hour_;
     newPath->location_ = location_;
     newPath->segment_ = segment_;
-
     return newPath;
 }
 void ShippingNetwork::computePath() {
@@ -59,6 +58,8 @@ void ShippingNetwork::explore(const Ptr<Location> curLocation, set<string> visit
             path_.push_back(newPath);
         }
     if (destination_ && curLocation->name() == destination_->name() ) {
+        if (curPath->locations() > 1)
+            curPath->segmentIs(NULL); // pop the node because it already reached the destination
         curPath->locationIs(NULL); // pop the node because it already reached the destination
         return;
     }
@@ -90,7 +91,6 @@ void ShippingNetwork::explore(const Ptr<Location> curLocation, set<string> visit
         /* implement search algorithm (should be using like hash map or set)*/
         if (visitedNodes.find(nextLocation->name() ) != visitedNodes.end() )
             visited = true;
-        //cerr << "c" << curPath->hour().value() << "s"<<segTime.value() << "m"<<maxTime_.value() << endl;
         if ( !visited &&
                 !(maxDistance_ > 0 && curPath->distance() + seg->length() > maxDistance_) &&
                 !(maxCost_ > 0 && curPath->cost() + segCost > maxCost_) &&
@@ -101,6 +101,7 @@ void ShippingNetwork::explore(const Ptr<Location> curLocation, set<string> visit
             //visitedNotes.push_back(nextLocation ); // get its return segment's source
             //curPath->locationIs(nextLocation);
             curPath->segmentIs(seg);
+        //    cerr << "push seg: " << seg->name() << " into path" << endl;
             curPath->distanceIs(curPath->distance().value() + seg->length().value() );
             curPath->costIs(curPath->cost().value() + segCost.value());
             curPath->hourIs(curPath->hour().value() + segTime.value());
@@ -110,12 +111,12 @@ void ShippingNetwork::explore(const Ptr<Location> curLocation, set<string> visit
             curPath->hourIs(curPath->hour().value() - segTime.value());
         }
         else {
-        //        cerr << "fail because of insatisfaction of the condition" << endl;
+         //       cerr << "fail" << endl;
         }
     }
-    curPath->locationIs(NULL);
     if (curPath->locations() > 1)
         curPath->segmentIs(NULL);
+    curPath->locationIs(NULL);
     visitedNodes.erase(curLocation->name() );
 }
 class EngineReactor : public EngineManager::Notifiee {
