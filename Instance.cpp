@@ -362,6 +362,8 @@ string ConnRep::attribute(const string& name) {
     USD maxCost;
     int maxTime;
 
+    Ptr<ShippingNetwork> network = manager_->engineManager()->shippingNetwork();
+
     is >> cmd;
     if (cmd.compare("explore") == 0) {
         is >> source;
@@ -389,54 +391,38 @@ string ConnRep::attribute(const string& name) {
                 }
             }
         }
-        Ptr<ShippingNetwork> network = manager_->engineManager()->shippingNetwork();
-//        Ptr<LocationRep> locationInstance = dynamic_cast<LocationRep*> (manager_->instance(location));
         network->sourceIs( Ptr<LocationRep>((LocationRep*)manager_->instance(source).ptr() )->engineObject() );
         network->destinationIs(NULL);
         network->maxCostIs(maxCost);
         network->maxDistanceIs(maxDistance);
         network->maxTimeIs(maxTime);
-        for (unsigned int i = 0; i < network->paths(); i ++) {
-            Ptr<Path> path = network->path(i);
-            if (path) {
-                for (int j = 0; j < path->locations(); j ++) {
-                    Ptr<Location> loc = path->location(j);
-                    if (j != path->locations() - 1) {
-                        Ptr<Segment> seg = path->segment(j);
-                        cout << loc->name() << "(" << seg->name() << ":" << seg->length().value() << ":" << seg->returnSegment()->name() << ") ";
-                        //cout << loc->name() << "(";
-                    }
-                }
-                cout << endl;
-            }
-        }
     }
     else if (cmd.compare("connect") == 0) {
         Ptr<ShippingNetwork> network = manager_->engineManager()->shippingNetwork();
         is >> source >> dummy >> dest;
         network->sourceIs( Ptr<LocationRep>((LocationRep*)manager_->instance(source).ptr() )->engineObject() );
         network->destinationIs( Ptr<LocationRep>((LocationRep*)manager_->instance(dest).ptr() )->engineObject() );
-        for (unsigned int i = 0; i < network->paths(); i ++) {
-            Ptr<Path> path = network->path(i);
-            if (path) {
-                cout << path->cost().value() << " " << path->hour().value() << " " << ((path->expedite()==Segment::available())?"yes":"no") << "; ";
-                for (int j = 0; j < path->locations(); j ++) {
-                    Ptr<Location> loc = path->location(j);
-                    if (j != path->locations() - 1) {
-                        Ptr<Segment> seg = path->segment(j);
-                        cout << loc->name() << "(" << seg->name() << ":" << seg->length().value() << ":" << seg->returnSegment()->name() << ") ";
-                        //cout << loc->name() << "(";
-                    }
-                }
-                cout << endl;
+    }
+    os.setf(ios::fixed,ios::floatfield);
+    os.precision(2);
+    for (unsigned int i = 0; i < network->paths(); i ++) {
+        Ptr<Path> path = network->path(i);
+        if (path) {
+            if ( dest != "") {
+                os << path->cost().value() << " " << path->hour().value() << " " << ((path->expedite()==Segment::available())?"yes":"no") << "; ";
             }
+            for (unsigned int j = 0; j < path->locations(); j ++) {
+                Ptr<Location> loc = path->location(j);
+                os << loc->name();
+                if (j != path->locations() - 1) {
+                    WeakPtr<Segment> seg = path->segment(j);
+                    os << "(" << seg->name() << ":" << seg->length().value() << ":" << seg->returnSegment()->name() << ") ";
+                }
+            }
+            os << endl;
         }
     }
-    else {
-    }
 
-//  call low level to compute attribute here
-//
     return os.str();
 }
 

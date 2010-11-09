@@ -1,5 +1,5 @@
 #include <queue>
-#include <list>
+#include <set>
 
 #include "Engine.h"
 #include "entityReactor.h"
@@ -18,34 +18,55 @@ Ptr<Path> Path::clone() {
     
     return newPath;
 }
+void ShippingNetwork::computePath() {
+    path_.clear();
+    if (source_ == NULL) return;
+    if (destination_) { // conn
+        expedite_ = Segment::unavailable();
+        explore (source_, set<string>(), Path::pathNew() );
+        expedite_ = Segment::available();
+        explore (source_, set<string>(), Path::pathNew() );
+    }
+    else { //explore
+        explore (source_, set<string>(), Path::pathNew() );
+    }
+}
 unsigned int ShippingNetwork::paths() {
     if (isConnAttributeChange) {
-        if (source_ == NULL) return 0;
-        list<Ptr<Location> > visitedNodes;
-        explore (source_, visitedNodes, Path::pathNew() );
+        computePath();
         isConnAttributeChange = false;
     }
     return path_.size();
 }
 Ptr<Path> ShippingNetwork::path(unsigned int index) {
     if (isConnAttributeChange) {
-        if (source_ == NULL) return NULL;
-        list<Ptr<Location> > visitedNodes;
-        explore (source_, visitedNodes, Path::pathNew() );
+        computePath();
         isConnAttributeChange = false;
     }
     return (index < path_.size() && index >= 0)?path_[index]:NULL;
 }
-void ShippingNetwork::explore(const Ptr<Location> curLocation, list<Ptr<Location> > visitedNodes, Ptr<Path> curPath) {
+void ShippingNetwork::explore(const Ptr<Location> curLocation, set<string> visitedNodes, Ptr<Path> curPath) {
     USD curCost;
     Mile curDistance;
     Hour curTime;
     bool isLast = true;
-
 //    cerr << "Now at location: " << curLocation->name() << endl;
-    visitedNodes.push_back(curLocation);
+    curPath->locationIs(curLocation);
+    if (!destination_ || (curLocation->name() == destination_->name() ))
+        if (curPath->locations() > 1) {
+            Ptr<Path> newPath = curPath->clone();
+            newPath->expediteIs(expedite_);
+            path_.push_back(newPath);
+        }
+    if (destination_ && curLocation->name() == destination_->name() ) {
+        curPath->locationIs(NULL); // pop the node because it already reached the destination
+        return;
+    }
+
+    visitedNodes.insert(curLocation->name());
+
     for (unsigned int i = 0; i < curLocation->segments(); ++i) {
-        Ptr<Segment> seg = curLocation->segment(i);
+        WeakPtr<Segment> seg = curLocation->segment(i);
         Ptr<Location> nextLocation = seg->returnSegment()->source();
         USD segCost;
         Hour segTime;
@@ -67,36 +88,34 @@ void ShippingNetwork::explore(const Ptr<Location> curLocation, list<Ptr<Location
         //cerr << "Try Segment: " << seg->name() << " Destination: " << seg->returnSegment()->name() << "...";
         bool visited = false;
         /* implement search algorithm (should be using like hash map or set)*/
-        for (list<Ptr<Location> >::iterator scannerPtr = visitedNodes.begin(); scannerPtr != visitedNodes.end(); scannerPtr ++) {
-        //    cerr << "Comparing " << (*scannerPtr)->name() << " and " << nextLocation->name() << "...";
-            if ((*scannerPtr).ptr() == nextLocation.ptr() ) {
-                visited = true;
-            }
-        }
+        if (visitedNodes.find(nextLocation->name() ) != visitedNodes.end() )
+            visited = true;
         if ( !visited && 
-             !(maxDistance_ > 0 && curPath->distance() + seg->length() > maxDistance_) &&
-             !(maxCost_ > 0 && curPath->cost() + segCost > maxCost_) &&
-             !(maxTime_ > 0 && curPath->hour() + segTime > maxTime_) &&
-             !(expedite_ == Segment::available() && seg->expediteSupport() == Segment::unavailable() ) ) {
-        //    cerr << "successull" << endl;
+                !(maxDistance_ > 0 && curPath->distance() + seg->length() > maxDistance_) &&
+                !(maxCost_ > 0 && curPath->cost() + segCost > maxCost_) &&
+                !(maxTime_ > 0 && curPath->hour() + segTime > maxTime_) &&
+                !(expedite_ == Segment::available() && seg->expediteSupport() == Segment::unavailable() ) ) {
+            //    cerr << "successull" << endl;
             isLast = false;
             //visitedNotes.push_back(nextLocation ); // get its return segment's source
-            curPath->locationIs(nextLocation);
+            //curPath->locationIs(nextLocation);
             curPath->segmentIs(seg);
+            curPath->distanceIs(curPath->distance().value() + seg->length().value() );
+            curPath->costIs(curPath->cost().value() + segCost.value());
+            curPath->hourIs(curPath->hour().value() + segTime.value());
             explore (nextLocation, visitedNodes, curPath);
+            curPath->distanceIs(curPath->distance().value() - seg->length().value() );
+            curPath->costIs(curPath->cost().value() - segCost.value());
+            curPath->hourIs(curPath->hour().value() - segTime.value());
         }
         else {
-        //    cerr << "fail because of insatisfaction of the condition" << endl;
+            //    cerr << "fail because of insatisfaction of the condition" << endl;
         }
     }
-    if (isLast) {
-        Ptr<Path> newPath = curPath->clone();
-        path_.push_back(newPath);
-    }
-    cerr << curPath->locations();
     curPath->locationIs(NULL);
-    curPath->segmentIs(NULL);
-    visitedNodes.pop_back();
+    if (curPath->locations() > 1)
+        curPath->segmentIs(NULL);
+    visitedNodes.erase(curLocation->name() );
 }
 class EngineReactor : public EngineManager::Notifiee {
     public:

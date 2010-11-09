@@ -4,6 +4,7 @@
 #include "Ptr.h"
 #include "PtrInterface.h"
 #include <vector>
+#include <set>
 
 namespace Shipping {
 class EngineReactor;
@@ -20,14 +21,14 @@ public:
         else
             if (location_.size() > 0) location_.pop_back();
     }    
-    void segmentIs(Ptr<Segment> _segment ) { 
+    void segmentIs(WeakPtr<Segment> _segment ) { 
         if (_segment)
             segment_.push_back (_segment); 
         else
             if (segment_.size() > 0) segment_.pop_back();       
     }
     Ptr<Location> location(const unsigned int index) const { return (index < location_.size() && index >= 0)?location_[index]:NULL; }
-    Ptr<Segment> segment(const unsigned int index) const { return (index < segment_.size() && index >= 0)?segment_[index]:NULL; }
+    WeakPtr<Segment> segment(const unsigned int index) const { return (index < segment_.size() && index >= 0)?segment_[index]:NULL; }
     unsigned int locations() const { return location_.size(); }
     unsigned int segments() const { return segment_.size(); }
     void hourIs(const Hour _hour) { hour_ = _hour; }
@@ -43,7 +44,7 @@ private:
     Path() {}
     Path(Path&) {}
     vector<Ptr<Location> > location_;
-    vector<Ptr<Segment> > segment_;
+    vector<WeakPtr<Segment> > segment_;
     USD cost_;
     Mile distance_;
     Segment::ExpediteSupport expedite_;
@@ -127,9 +128,9 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
 
     Segment::ExpediteSupport expedite_;
     ShippingNetwork(const ShippingNetwork& o);
-    void explore(Ptr<Location> curLocation, list<Ptr<Location> > visitedNodes, Ptr<Path> curPath);
+    void computePath();
+    void explore(Ptr<Location> curLocation, set<string> visitedNodes, Ptr<Path> curPath);
     list<Ptr<Location> > visitedNodes;
-    Ptr<Path> conn() const;
 };
 
 class EngineManager : public Fwk::PtrInterface<EngineManager> {
