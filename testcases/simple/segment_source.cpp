@@ -62,6 +62,13 @@ int main(int argc, char *argv[]) {
     cout << port->attribute("segment2") << endl;
     cout << port->attribute("segment3") << endl;
 
+    t->attributeIs("source", "testPort");
+    cout << "After adding the segment back" << endl;
+    cout << port->attribute("segment1") << endl;
+    cout << port->attribute("segment2") << endl;
+    cout << port->attribute("segment3") << endl;
+    cout << port->attribute("segment4") << endl;
+
     cerr << "Done!" << endl;
 
     return 0;
