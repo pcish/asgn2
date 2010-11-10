@@ -17,10 +17,9 @@ example: example.o $(OBJECTS)
 clean:
 	rm -f tes1 test1.o test.o test.exe $(OBJECTS) *~
 
-Instance.o: Instance.cpp Instance.h PtrInterface.h Ptr.h Engine.h
-EngineManager.o: EngineManager.h Engine.h
-entities.o: entities.cpp entities.h
-Engine.o: Engine.h Engine.cpp types.h error.h
-test.o: test1.cpp Instance.h PtrInterface.h Ptr.h
-test1.o: test1.cpp Instance.h PtrInterface.h Ptr.h
-example.o: example.cpp Instance.h
+entities.o: entities.cpp entities.h Ptr.h WeakPtr.h PtrInterface.h Instance.h Nominal.h types.h
+Engine.o: Engine.cpp Engine.h entityReactor.h entities.o
+Instance.o: Instance.cpp Instance.h Engine.o entities.o
+test.o: test1.cpp Instance.o Engine.o entities.o
+test1.o: test1.cpp Instance.o Engine.o entities.o
+example.o: example.cpp Instance.o Engine.o entities.o
