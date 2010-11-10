@@ -1,60 +1,39 @@
 #include <string>
 #include <ostream>
 #include <iostream>
+#include <string>
 #include "Instance.h"
 
 using std::cout;
 using std::cerr;
 using std::endl;
-
-static void badInstanceManager();
-static void badTruckTerminal();
-static void badTruckSegment();
+using std::string;
 
 int main(int argc, char *argv[]) {
     Ptr<Instance::Manager> manager = shippingInstanceManager();
 
-    if (manager == NULL) {
-        badInstanceManager();
-        return 1;
-    }
+    Ptr<Instance> fleet = manager->instanceNew("myFleet", "Fleet");
+    fleet->attributeIs("Truck, speed", "-80");
+    fleet->attributeIs("Truck, speed", "8.8");
+    fleet->attributeIs("Truck, speed", "6bc");
+    fleet->attributeIs("Truck, speed", "b5c");
+    fleet->attributeIs("Truck, capacity", "5.5");
+    fleet->attributeIs("Truck, capacity", "-50");
+    fleet->attributeIs("Truck, cost", "6.6");
+    fleet->attributeIs("Truck, cost", "-100");
+    cout << "===== Fleet attributes =====" << endl;
+    cout << "[Truck]" << endl;
+    cout << "Speed: " << fleet->attribute("Truck, speed") << endl;
+    cout << "Capacity: " << fleet->attribute("Truck, capacity") << endl;
+    cout << "Cost: " << fleet->attribute("Truck, cost") << endl;
 
-    Ptr<Instance> a = manager->instanceNew("terminal1", "Truck terminal");
+    Ptr<Instance> t = manager->instanceNew("ts2", "Truck segment");
+    t->attributeIs("difficulty", "0.5");
+    t->attributeIs("length", "0.5");
+    t->attributeIs("length", "-5");
+    cout << t->attribute("length") << endl;
 
-    if (a == NULL) {
-        badTruckTerminal();
-        return 1;
-    }
-
-    Ptr<Instance> b = manager->instanceNew("seg1", "Truck segment");
-    Ptr<Instance> c = manager->instanceNew("seg2", "Truck segment");
-
-    if (b == NULL || c == NULL) {
-        badTruckSegment();
-	return 1;
-    }
-
-    b->attributeIs("source", "terminal1");
-    c->attributeIs("source", "terminal1");
-
-    cout << a->attribute("segment1") << endl;
-    cout << a->attribute("segment2") << endl;
-
-    cout << "Done!" << endl;
+    cerr << "Done!" << endl;
 
     return 0;
-}
-
-static void badInstanceManager() {
-    cerr << "Unexpected Null pointer from shippingInstanceManager" << endl;
-}
-
-static void badTruckTerminal() {
-    cerr << "Unable to create terminal1" << endl;
-}
-
-static void badTruckSegment() {
-    cerr << "You need to update the "
-        "instanceNew() function to create all types " << endl <<
-        "of nodes and interfaces." << endl;
 }

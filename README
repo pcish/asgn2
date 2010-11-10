@@ -1,0 +1,46 @@
+user: luyota
+user: pcish
+
+Submission Notes for TA:
+All our test cases are under the directory: 
+testcases/simple
+
+In this assignment our design has 3 layers: the Engine Layer, the Representation Layer and the Client layer, as required by the assignment description. The execution flow is: the Client Layer sends string commands to the Representation Layer in order to execute tasks, then the Representation Layer translates these string commands into corresponding calls on the Engine Layer interface, which includes creating/deleting objects in the Engine Layer as well as setting/reading the attributes of these objects.
+
+The following explains our design of the Engine Layer and the Representation Layer.
+
+The Engine Layer
+    The Engine Layer represents the real world objects (entities) using the following classes:
+- Location (subclases: Customer, Port, and Terminal)
+- Segment
+- Fleet(subclasses: Truck Fleet/Boat Fleet/Plane Fleet)
+    The Engine Layer also has a ShippingNetwork class that keeps track of the shipping network settings and an EngineManager class that acts as the factory for the above entities.
+
+1. Transportation Method
+    This system has to support three kinds of transportation types. In our design, we provide a enumeration type that encodes this information in Segment, which is Segment::TransportationMode. Entities such as Segment and Terminal then use this type to indicate their own transportation mode. 
+
+2. Location, Customer, Port, and Terminal
+    Since Customer, Port, and Terminal are three kinds of different Locations, the base class Location is shared amongst them. Besides the general interface provided by Location, such as adding new segments to a Location, Customer, Port, and Terminal have their own notifiee interfaces. When one of these objects is destoyed, it notifies its notifiee (reactor) about its deletion. In our design, the reactor then updates the number of instances of this class in the ShippingNetwork. This is how we update the statistics.
+ 
+3. Segment
+    Besides keeping its own attributes, a Segment object is also used by Location to determine if its connecting segments follow the restrictions applied on the Location. For example, a Terminal object can only connect to Segments with the same transportation mode. In addition, similar to Location, Segment¡¦s reactors are used to update the statistics.
+
+4. EngineManager
+    EngineManager is the factory for instantiating the entities objects. Also, since all entities are instantiated from here, it notifies its reactor about the instantiation so that the reactor can update the statistics.
+
+5.  ShippingNetwork
+    ShippingNetwork records the system wide information, including statistics as well as the paths between different nodes under some restrictions, which matches to the Stats and Conn requirement.
+
+6. Fleet, TruckFleet, PlaneFleet, and BoatFleet
+    Since Fleet is used to store the system wide settings for 3 different kinds of transportation modes and should be a singleton, we use the subclasses of TruckFleet, PlaneFleet and BoatFleet which are all singletons for this purpose instead of using Segment::TransportationMode in a single Fleet  class to avoid the possible misunderstanding about whether the Fleet class is a singleton or not.
+
+The Representation Layer
+    The Representation Layer acts as an intermediate layer that interprets the message from the client as a series of actions performed on the Engine Layer and also translates the attributes in the Engine Layer into string format and passes them back to the client. Different requirements in the system have their corresponding classes in this layer, such as SegmentRep, ConnRep. Moreover, almost every Rep object has a corresponding Engine object to perform its logic operations. The only 2 exceptions are ConnRep and StatsRep, which utilize ShippingNetwork to get the information they need.
+    Like the Engine Layer, the instances in the Representation Layer are managed by the manager, ManagerImp that is in charge of new/delete and indexing other Rep objects. The reason that every Rep classes are subclasses of Instance is because in that way their instances can be easily indexed and managed by ManagerImp.
+
+Issues:
+1. Dealing with Connectivity
+    When deciding the data structure for storing and passing the path for exploring or connectivity in the Engine Layer, we discussed several options. The accessor for this path attribute could either return a path tree or a path of a given index. However, we considered the path tree a bad solution in that in the logical aspect it is actually returning a collection of paths. Instead, we believe a better solution is to call the path function with an index k as its parameter, and it returns a single path which is the k-th path in the path collection. In this case, the client code could manipulate these paths such as making comparisons (although not required in this assignment) without having to deal with the path tree by itself.
+
+2. Using of smart pointer:
+    While implementing the Notifier and Notifiee design, we discovered that we needed a pointer to the notifier in the notifiee, yet the pointer must not contribute to the reference count or else the notifier will never be deleted. To solve this, we created a WeakPtr class corresponding to the weak reference concept discussed in the textbook. Ideally WeakPtr should be a superclass of Ptr, but being unsure whether Ptr can be modified we simply kept them as two unrelated classes.
