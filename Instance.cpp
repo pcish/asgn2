@@ -106,9 +106,9 @@ class SegmentRep : public Instance {
 
 class StatsRep : public Instance {
   public:
-    static Ptr<StatsRep> instance(const string& name, ManagerImpl *_manager) {
+    static Ptr<StatsRep> instance(const string& name, ManagerImpl *manager) {
         if (instance_ == NULL) {
-            instance_ = new StatsRep(name, _manager);
+            instance_ = new StatsRep(name, manager);
         }
         return instance_;
     }
@@ -132,7 +132,7 @@ class ConnRep : public Instance {
     void attributeIs(const string& name, const string& v) {}
     static Ptr<ConnRep> instance(const string &name, ManagerImpl *manager) {
         if (instance_ == NULL)
-            instance_ = new ConnRep (name, manager);
+            instance_ = new ConnRep(name, manager);
         return instance_;
     }
 
@@ -183,11 +183,22 @@ ManagerImpl::ManagerImpl() {
 }
 
 Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
+    Ptr<Instance> t;
+    if (type == "Stats") {
+        t = StatsRep::instance(name, this);
+    } else if (type == "Fleet") {
+        t = FleetRep::instance(name, this);
+    } else if (type == "Conn") {
+        t = ConnRep::instance(name, this);
+    }
+    if (t != NULL) {
+        instance_[t->name()] = t;
+        return t;
+    }
     if (instance_.find(name) != instance_.end()) {
         cerr << "Attempt to new instances of the same names!" << endl;
         return NULL;
     }
-    Ptr<Instance> t;
     if (type == "Truck terminal") {
         t = new TerminalRep(name, this, Segment::truck());
     } else if (type == "Truck segment") {
@@ -204,16 +215,10 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
         t = new PortRep(name, this);
     } else if (type == "Customer") {
         t = new CustomerRep(name, this);
-    } else if (type == "Stats") {
-        t = StatsRep::instance(name, this);
-    } else if (type == "Fleet") {
-        t = FleetRep::instance(name, this);
-    } else if (type == "Conn") {
-        t = ConnRep::instance(name, this);
     } else {
         return NULL;
     }
-    instance_[name] = t;
+    instance_[t->name()] = t;
     return t;
 }
 
