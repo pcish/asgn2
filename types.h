@@ -7,19 +7,25 @@ namespace Shipping {
 
 class Mile : public Ordinal<Mile, double> {
   public:
+    static const double minimum = 0.0;
     Mile(double num = 0) : Ordinal<Mile, double>(num) {
+        if (num < minimum) throw ValueError("Mile must be a positive number");
     }
 };
 
 class USD : public Ordinal<USD, double> {
   public:
+    static const double minimum = 0.0;
     USD(double num = 0.0) : Ordinal<USD, double>(num) {
+        if (num < minimum) throw ValueError("USD must be a positive number");
     }
 };
 
-class PackageUnit : public Ordinal<PackageUnit, unsigned int> {
+class PackageUnit : public Ordinal<PackageUnit, int> {
   public:
-    PackageUnit(unsigned int num = 0) : Ordinal<PackageUnit, unsigned int>(num) {
+    static const int minimum = 0;
+    PackageUnit(int num = 0) : Ordinal<PackageUnit, int>(num) {
+        if (num < minimum) throw ValueError("USD must be a positive number");
     }
 };
 

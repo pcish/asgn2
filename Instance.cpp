@@ -285,26 +285,30 @@ string SegmentRep::attribute(const string& name) {
 }
 
 void SegmentRep::attributeIs(const string& name, const string& v) {
-    if (name == "source") {
-        if (v != "") {
-            Ptr<Location> location = manager_->cast_instance<Location, LocationRep>(v);
-            engineObject_->sourceIs(location);
+    try {
+        if (name == "source") {
+            if (v != "") {
+                Ptr<Location> location = manager_->cast_instance<Location, LocationRep>(v);
+                engineObject_->sourceIs(location);
+            }
+            else engineObject_->sourceIs(NULL);
+        } else if (name == "length") {
+            engineObject_->lengthIs(atof(v.c_str()));
+        } else if (name == "return segment") {
+            if (v != "") {
+                Ptr<Segment> segment = manager_->cast_instance<Segment, SegmentRep>(v);
+                engineObject_->returnSegmentIs(segment);
+            }
+            else engineObject_->returnSegmentIs(NULL);
+        } else if (name == "difficulty") {
+            engineObject_->difficultyIs(atof(v.c_str()));
+        } else if (name == "expedite support") {
+            if (v == "yes") engineObject_->expediteSupportIs(Segment::available());
+            else if (v == "no") engineObject_->expediteSupportIs(Segment::unavailable());
+        } else {
         }
-        else engineObject_->sourceIs(NULL);
-    } else if (name == "length") {
-        engineObject_->lengthIs(atof(v.c_str()));
-    } else if (name == "return segment") {
-        if (v != "") {
-            Ptr<Segment> segment = manager_->cast_instance<Segment, SegmentRep>(v);
-            engineObject_->returnSegmentIs(segment);
-        }
-        else engineObject_->returnSegmentIs(NULL);
-    } else if (name == "difficulty") {
-        engineObject_->difficultyIs(atof(v.c_str()));
-    } else if (name == "expedite support") {
-        if (v == "yes") engineObject_->expediteSupportIs(Segment::available());
-        else if (v == "no") engineObject_->expediteSupportIs(Segment::unavailable());
-    } else {
+    } catch (ValueError e) {
+        cerr << e.what() << endl;
     }
 }
 
@@ -470,34 +474,38 @@ string FleetRep::attribute(const string& name) {
 }
 
 void FleetRep::attributeIs(const string& name, const string& v) {
-    int commaPos = name.find_first_of(',');
-    string mode = name.substr(0, commaPos);
-    string property = name.substr(commaPos + 1, name.length());
-    //trim the string
-    mode = mode.substr(mode.find_first_not_of(' '));
-    mode = mode.substr(0, mode.find_last_not_of (' ') + 1);
-    property = property.substr(property.find_first_not_of(' '));
-    property = property.substr(0, property.find_last_not_of(' ') + 1);
-    Ptr<Fleet> fleet_;
-    if (mode == "Truck") fleet_ = truckfleet_;
-    if (mode == "Boat") fleet_ = boatfleet_;
-    if (mode == "Plane") fleet_ = planefleet_;
+    try {
+        int commaPos = name.find_first_of(',');
+        string mode = name.substr(0, commaPos);
+        string property = name.substr(commaPos + 1, name.length());
+        //trim the string
+        mode = mode.substr(mode.find_first_not_of(' '));
+        mode = mode.substr(0, mode.find_last_not_of (' ') + 1);
+        property = property.substr(property.find_first_not_of(' '));
+        property = property.substr(0, property.find_last_not_of(' ') + 1);
+        Ptr<Fleet> fleet_;
+        if (mode == "Truck") fleet_ = truckfleet_;
+        if (mode == "Boat") fleet_ = boatfleet_;
+        if (mode == "Plane") fleet_ = planefleet_;
 
-    istringstream is(v);
-    if (property == "speed") {
-        double propertyValue;
-        is >> propertyValue;
-        fleet_->speedIs(Mile(propertyValue));
-    }
-    if (property == "cost") {
-        double propertyValue;
-        is >> propertyValue;
-        fleet_->costIs(USD(propertyValue));
-    }
-    if (property == "capacity") {
-        int propertyValue;
-        is >> propertyValue;
-        fleet_->capacityIs(PackageUnit(propertyValue));
+        istringstream is(v);
+        if (property == "speed") {
+            string propertyValue;
+            is >> propertyValue;
+            fleet_->speedIs(Mile(atof(propertyValue.c_str())));
+        }
+        if (property == "cost") {
+            string propertyValue;
+            is >> propertyValue;
+            fleet_->costIs(USD(atof(propertyValue.c_str())));
+        }
+        if (property == "capacity") {
+            string propertyValue;
+            is >> propertyValue;
+            fleet_->capacityIs(PackageUnit(atoi(propertyValue.c_str())));
+        }
+    } catch (ValueError e) {
+        cerr << e.what() << endl;
     }
 }
 

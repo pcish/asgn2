@@ -15,6 +15,7 @@ class Error : public std::exception {
     virtual const char* what() const throw() {
         return errorMessage_.c_str();
     }
+
   private:
     string errorMessage_;
 };
