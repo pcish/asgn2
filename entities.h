@@ -58,7 +58,7 @@ class Segment : public Fwk::PtrInterface<Segment> {
     Ptr<Location> source() const { return source_; }
     void sourceIs(const Ptr<Location> source) { if (source_ == source) return; source_ = source; if (notifiee_) notifiee_->onSource(); }
     WeakPtr<Segment> returnSegment() const { return returnSegment_; }
-    void returnSegmentIs(const Ptr<Segment> returnSegment) { if (returnSegment_ == returnSegment) return; returnSegment_ = returnSegment; if (notifiee_) notifiee_->onReturnSegment(); }
+    void returnSegmentIs(const Ptr<Segment> returnSegment);
     TransportationMode transportationMode() const { return transportationMode_; }
     SegmentDifficultyUnit difficulty() const { return difficulty_; }
     void difficultyIs(const SegmentDifficultyUnit difficulty) { if (difficulty_ == difficulty) return; difficulty_ = difficulty; if (notifiee_) notifiee_->onDifficulty(); }
@@ -231,6 +231,8 @@ class Terminal : public Location {
   public:
     ~Terminal() { if (notifiee_) notifiee_->onDel(this); }
     Segment::TransportationMode transportationMode() const { return transportationMode_; }
+    virtual void segmentIs(const WeakPtr<Segment> segment);
+    virtual void segmentIs(const unsigned int index, WeakPtr<Segment> segment);
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<Terminal> notifier) {

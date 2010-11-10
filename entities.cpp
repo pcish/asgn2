@@ -10,9 +10,8 @@ void Location::segmentIs(const WeakPtr<Segment> seg) {
         cerr << "Can't add NULL segment" << endl;
         return;
     }
-    segments_.push_back (seg.ptr());
-    if (notifiee_)
-        notifiee_->onSegment ();
+    segments_.push_back(seg.ptr());
+    if (notifiee_) notifiee_->onSegment();
 }
 
 void Location::segmentIs(const unsigned int index, WeakPtr<Segment> seg) {
@@ -20,42 +19,58 @@ void Location::segmentIs(const unsigned int index, WeakPtr<Segment> seg) {
         cerr <<  "Index out of bound exception" << endl;
         return;
     }
-    if (seg == NULL) { //delete segment
+    if (seg == NULL) {
         segments_.erase(segments_.begin() + index);
     }
-    else { //put segment at that position
+    else {
         segments_.insert(segments_.begin() + index, seg.ptr());
     }
 }
-//unsigned int Location::segments () { return segments_.size(); }
 
 WeakPtr<Segment> Location::segment(const unsigned int index) const {
-    if (index < 0 || index >= segments_.size () ){
+    if (index < 0 || index >= segments_.size()) {
          cerr << "Segment # out of bound exception" << endl;
          return NULL;
     }
     return segments_[index];
 }
-/*
-void Terminal::segmentIs (Ptr<Segment> seg) {
-    if (seg == NULL) {// empty
+
+void Terminal::segmentIs(const WeakPtr<Segment> seg) {
+    if (seg == NULL) {
         cerr << "Can't add NULL segment" << endl;
         return;
     }
-    else if (seg->transportationMode() != transMode_ ) {
+    else if (seg->transportationMode() != transportationMode_) {
         cerr << "Terminal must connect two segments with the same transportation mode" << endl;
         return;
     }
-    Location::segmentIs (seg);
-}
-void Terminal::segmentIs (unsigned int index, Ptr<Segment> seg) {
-    if (seg != NULL && seg->transportationMode() != transMode_ ) {// insert node rather than delete
-        cerr << "Terminal must connect two segments with the same transportation mode" << endl;
-        return;
-    }
-    Location::segmentIs (index, seg);
+    Location::segmentIs(seg);
 }
 
+void Terminal::segmentIs(const unsigned int index, WeakPtr<Segment> seg) {
+    if (index < 0 || index >= segments()) {
+        cerr <<  "Index out of bound exception" << endl;
+        return;
+    }
+    if (seg == NULL) {
+        Location::segmentIs(index, seg);
+    }
+    else {
+        if (seg->transportationMode() != transportationMode_) {
+            cerr << "Terminal must connect two segments with the same transportation mode" << endl;
+            return;
+        }
+        Location::segmentIs(index, seg);
+    }
+}
+
+void Segment::returnSegmentIs(const Ptr<Segment> returnSegment) {
+    if (returnSegment_ == returnSegment) return;
+    if (returnSegment->transportationMode() != transportationMode_) return;
+    returnSegment_ = returnSegment;
+    if (notifiee_) notifiee_->onReturnSegment();
+}
+/*
 Ptr<Fleet> Fleet::instance() {
     if (Fleet::instance_ == NULL)
         instance_ = new Fleet ();
