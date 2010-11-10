@@ -66,7 +66,7 @@ void Terminal::segmentIs(const unsigned int index, WeakPtr<Segment> seg) {
 
 void Segment::returnSegmentIs(const Ptr<Segment> returnSegment) {
     if (returnSegment_ == returnSegment) return;
-    if (returnSegment->transportationMode() != transportationMode_) return;
+    if (returnSegment != NULL && returnSegment->transportationMode() != transportationMode_) return;
     returnSegment_ = returnSegment;
     if (notifiee_) notifiee_->onReturnSegment();
 }
