@@ -15,7 +15,7 @@ void Location::segmentIs(const WeakPtr<Segment> seg) {
 }
 
 void Location::segmentIs(const unsigned int index, WeakPtr<Segment> seg) {
-    if (index < 0 || index >= segments_.size() ) {
+    if (index < 0 || index >= segments_.size()) {
         cerr <<  "Index out of bound exception" << endl;
         return;
     }
@@ -70,25 +70,6 @@ void Segment::returnSegmentIs(const Ptr<Segment> returnSegment) {
     returnSegment_ = returnSegment;
     if (notifiee_) notifiee_->onReturnSegment();
 }
-/*
-Ptr<Fleet> Fleet::instance() {
-    if (Fleet::instance_ == NULL)
-        instance_ = new Fleet ();
-    return instance_;
-
-}
-Fleet::Fleet () {
-    speed_.insert (make_pair(Segment::truck(), Mile(0) ) );
-    cost_.insert (make_pair(Segment::truck(), USD(0) ) );
-    capacity_.insert (make_pair(Segment::truck(), PackageUnit(0) ) );
-    speed_.insert (make_pair(Segment::boat(), Mile(0) ) );
-    cost_.insert (make_pair(Segment::boat(), USD(0) ) );
-    capacity_.insert (make_pair(Segment::boat(), PackageUnit(0) ) );
-    speed_.insert (make_pair(Segment::plane(), Mile(0) ) );
-    cost_.insert (make_pair(Segment::plane(), USD(0) ) );
-    capacity_.insert (make_pair(Segment::plane(), PackageUnit(0) ) );
-}
-Ptr<Fleet> Fleet::instance_ = NULL;*/
 
 } /* end namespace */
 

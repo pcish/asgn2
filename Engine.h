@@ -16,19 +16,19 @@ class Path : public Fwk::PtrInterface<Path> {
 public:
     static Ptr<Path> pathNew() { return new Path(); }
     void locationIs (Ptr<Location> _location) {
-        if (_location)
-            location_.push_back(_location);
-        else
-            if (location_.size() > 0) location_.pop_back();
+        if (_location) location_.push_back(_location);
+        else if (location_.size() > 0) location_.pop_back();
     }
-    void segmentIs(WeakPtr<Segment> _segment ) {
-        if (_segment)
-            segment_.push_back (_segment);
-        else
-            if (segment_.size() > 0) segment_.pop_back();
+    void segmentIs(WeakPtr<Segment> _segment) {
+        if (_segment) segment_.push_back(_segment);
+        else if (segment_.size() > 0) segment_.pop_back();
     }
-    Ptr<Location> location(const unsigned int index) const { return (index < location_.size() && index >= 0)?location_[index]:NULL; }
-    WeakPtr<Segment> segment(const unsigned int index) const { return (index < segment_.size() && index >= 0)?segment_[index]:NULL; }
+    Ptr<Location> location(const unsigned int index) const {
+        return (index < location_.size() && index >= 0) ? location_[index]:NULL;
+    }
+    WeakPtr<Segment> segment(const unsigned int index) const {
+        return (index < segment_.size() && index >= 0) ? segment_[index] : NULL;
+    }
     unsigned int locations() const { return location_.size(); }
     unsigned int segments() const { return segment_.size(); }
     void hourIs(const Hour _hour) { hour_ = _hour; }
@@ -58,7 +58,7 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     friend class PortReactor;
     friend class TerminalReactor;
   public:
-    ~ShippingNetwork(){}
+    ~ShippingNetwork() {}
     int customers() const { return customers_; }
     int segments() const { return truckSegments_ + planeSegments_ + boatSegments_; }
     int truckSegments() const {
@@ -138,18 +138,18 @@ class EngineManager : public Fwk::PtrInterface<EngineManager> {
     EngineManager();
     Ptr<ShippingNetwork> shippingNetwork() const { return network_; }
     Ptr<Customer> customerNew(const string name);
-    Ptr<PlaneFleet> planeFleetNew(){
+    Ptr<PlaneFleet> planeFleetNew() {
         Ptr<PlaneFleet> m = new PlaneFleet();
         if (notifiee_) notifiee_->onPlaneFleetNew(m);
         return m;
     }
-    Ptr<TruckFleet> truckFleetNew(){
+    Ptr<TruckFleet> truckFleetNew() {
         Ptr<TruckFleet> m = new TruckFleet();
         if (notifiee_) notifiee_->onTruckFleetNew(m);
         return m;
     }
     Ptr<Terminal> terminalNew(const string name, const Segment::TransportationMode transportationMode);
-    Ptr<BoatFleet> boatFleetNew(){
+    Ptr<BoatFleet> boatFleetNew() {
         Ptr<BoatFleet> m = new BoatFleet();
         if (notifiee_) notifiee_->onBoatFleetNew(m);
         return m;

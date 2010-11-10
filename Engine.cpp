@@ -5,8 +5,8 @@
 #include "entityReactor.h"
 
 namespace Shipping {
+
 Ptr<Path> Path::clone() {
-//    Ptr<Path> newPath (const_cast<Ptr<Path> >(this) );
     Ptr<Path> newPath = Path::pathNew();
 
     newPath->cost_ = cost_;
@@ -17,19 +17,21 @@ Ptr<Path> Path::clone() {
     newPath->segment_ = segment_;
     return newPath;
 }
+
 void ShippingNetwork::computePath() {
     path_.clear();
     if (source_ == NULL) return;
     if (destination_) { // conn
         expedite_ = Segment::unavailable();
-        explore (source_, set<string>(), Path::pathNew() );
+        explore (source_, set<string>(), Path::pathNew());
         expedite_ = Segment::available();
-        explore (source_, set<string>(), Path::pathNew() );
+        explore (source_, set<string>(), Path::pathNew());
     }
     else { //explore
-        explore (source_, set<string>(), Path::pathNew() );
+        explore (source_, set<string>(), Path::pathNew());
     }
 }
+
 unsigned int ShippingNetwork::paths() {
     if (isConnAttributeChange) {
         computePath();
@@ -37,25 +39,26 @@ unsigned int ShippingNetwork::paths() {
     }
     return path_.size();
 }
+
 Ptr<Path> ShippingNetwork::path(unsigned int index) {
     if (isConnAttributeChange) {
         computePath();
         isConnAttributeChange = false;
     }
-    return (index < path_.size() && index >= 0)?path_[index]:NULL;
+    return (index < path_.size() && index >= 0) ? path_[index] : NULL;
 }
+
 void ShippingNetwork::explore(const Ptr<Location> curLocation, set<string> visitedNodes, Ptr<Path> curPath) {
-    //cerr << "Now at location: " << curLocation->name() << endl;
     curPath->locationIs(curLocation);
-    if (!destination_ || (curLocation->name() == destination_->name() ))
+    if (!destination_ || (curLocation->name() == destination_->name())) {
         if (curPath->locations() > 1) {
             Ptr<Path> newPath = curPath->clone();
             newPath->expediteIs(expedite_);
             path_.push_back(newPath);
         }
+    }
     if (destination_ && curLocation->name() == destination_->name() ) {
-        if (curPath->locations() > 1)
-            curPath->segmentIs(NULL); // pop the node because it already reached the destination
+        if (curPath->locations() > 1) curPath->segmentIs(NULL); // pop the node because it already reached the destination
         curPath->locationIs(NULL); // pop the node because it already reached the destination
         return;
     }
@@ -67,59 +70,59 @@ void ShippingNetwork::explore(const Ptr<Location> curLocation, set<string> visit
         Ptr<Location> nextLocation = seg->returnSegment()->source();
         USD segCost;
         Hour segTime;
-        //Computes time and cost here
-        if (seg->transportationMode() == Segment::truck() ) {
-            segCost = truckFleet_->cost().value() * seg->length().value() * seg->difficulty().value();
+
+        if (seg->transportationMode() == Segment::truck()) {
+            segCost = truckFleet_->cost().value();
             segTime = seg->length().value() / truckFleet_->speed().value();
-        } else if (seg->transportationMode() == Segment::plane() ) {
-            segCost = planeFleet_->cost().value() * seg->length().value() * seg->difficulty().value();
+        } else if (seg->transportationMode() == Segment::plane()) {
+            segCost = planeFleet_->cost().value();
             segTime = seg->length().value() / planeFleet_->speed().value();
-        } else if (seg->transportationMode() == Segment::boat() ) {
-            segCost = boatFleet_->cost().value() * seg->length().value() * seg->difficulty().value();
+        } else if (seg->transportationMode() == Segment::boat()) {
+            segCost = boatFleet_->cost().value();
             segTime = seg->length().value() / boatFleet_->speed().value();
         }
-        if (expedite_ == Segment::available() ) {
+        segCost = segCost.value() * seg->length().value() * seg->difficulty().value();
+        if (expedite_ == Segment::available()) {
             segCost = segCost.value() * 1.5;
             segTime = segTime.value() / 1.3;
         }
         bool visited = false;
-        /* implement search algorithm (should be using like hash map or set)*/
-        if (visitedNodes.find(nextLocation->name() ) != visitedNodes.end() )
+        if (visitedNodes.find(nextLocation->name() ) != visitedNodes.end()) {
             visited = true;
-        if ( !visited &&
-                !(maxDistance_ > 0 && curPath->distance() + seg->length() > maxDistance_) &&
-                !(maxCost_ > 0 && curPath->cost() + segCost > maxCost_) &&
-                !(maxTime_.value() > 0 && curPath->hour().value() + segTime.value() > maxTime_.value()) &&
-                !(expedite_ == Segment::available() && seg->expediteSupport() == Segment::unavailable() ) ) {
-            //visitedNotes.push_back(nextLocation ); // get its return segment's source
-            //curPath->locationIs(nextLocation);
+        }
+        if (!visited &&
+            !(maxDistance_ > 0 && curPath->distance() + seg->length() > maxDistance_) &&
+            !(maxCost_ > 0 && curPath->cost() + segCost > maxCost_) &&
+            !(maxTime_.value() > 0 && curPath->hour().value() + segTime.value() > maxTime_.value()) &&
+            !(expedite_ == Segment::available() && seg->expediteSupport() == Segment::unavailable())
+           ) {
             curPath->segmentIs(seg);
-            curPath->distanceIs(curPath->distance().value() + seg->length().value() );
+            curPath->distanceIs(curPath->distance().value() + seg->length().value());
             curPath->costIs(curPath->cost().value() + segCost.value());
             curPath->hourIs(curPath->hour().value() + segTime.value());
             explore (nextLocation, visitedNodes, curPath);
-            curPath->distanceIs(curPath->distance().value() - seg->length().value() );
+            curPath->distanceIs(curPath->distance().value() - seg->length().value());
             curPath->costIs(curPath->cost().value() - segCost.value());
             curPath->hourIs(curPath->hour().value() - segTime.value());
         }
         else {
         }
     }
-    if (curPath->locations() > 1)
-        curPath->segmentIs(NULL);
+    if (curPath->locations() > 1) curPath->segmentIs(NULL);
     curPath->locationIs(NULL);
-    visitedNodes.erase(curLocation->name() );
+    visitedNodes.erase(curLocation->name());
 }
+
 class EngineReactor : public EngineManager::Notifiee {
-    public:
-        virtual void onCustomerNew(Fwk::Ptr<Customer> p) {
-            notifier_->shippingNetwork()->customersInc();
-        }
-        virtual void onTerminalNew(Fwk::Ptr<Terminal> p) {
-            if (p->transportationMode() == Segment::truck()) {
-                notifier_->shippingNetwork()->truckTerminals_++;
-            } else if (p->transportationMode() == Segment::plane()) {
-                notifier_->shippingNetwork()->planeTerminals_++;
+  public:
+    virtual void onCustomerNew(Fwk::Ptr<Customer> p) {
+        notifier_->shippingNetwork()->customersInc();
+    }
+    virtual void onTerminalNew(Fwk::Ptr<Terminal> p) {
+        if (p->transportationMode() == Segment::truck()) {
+            notifier_->shippingNetwork()->truckTerminals_++;
+        } else if (p->transportationMode() == Segment::plane()) {
+            notifier_->shippingNetwork()->planeTerminals_++;
         } else if (p->transportationMode() == Segment::boat()) {
             notifier_->shippingNetwork()->boatTerminals_++;
         }
