@@ -18,7 +18,7 @@ do
   echo $f
   cp $f test.cpp
   make clean -s
-  make -s
+  make test -s
   ./$exename > test.out
   diff -y --suppress-common-lines -W 80 testcases/$folder`basename $f .cpp`.refout test.out
   rm -f test.out
