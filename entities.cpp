@@ -66,7 +66,7 @@ void Terminal::segmentIs(const unsigned int index, WeakPtr<Segment> seg) {
 
 void Segment::sourceIs(const Ptr<Location> source) { 
     if (source_ == source) return; 
-    if (source->locationType() == Location::terminal()) {
+    if (source != NULL && source->locationType() == Location::terminal()) {
         Location * src = const_cast<Location*>(source.ptr());
         Terminal * term = (Terminal*) src;
         if (term->transportationMode() != transportationMode_) {
