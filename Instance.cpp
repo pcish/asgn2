@@ -180,6 +180,9 @@ Ptr<FleetRep> FleetRep::instance_ = NULL;
 
 ManagerImpl::ManagerImpl() {
     engineManager_ = new EngineManager();
+    instance_["defaultFleet"] = FleetRep::instance("defaultFleet", this);
+    instance_["defaultStats"] = StatsRep::instance("defaultStats", this);
+    instance_["defaultConn"] = ConnRep::instance("defaultConn", this);
 }
 
 Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
@@ -233,7 +236,7 @@ void ManagerImpl::instanceDel(const string& name) {
         while (instance_[name]->references() > 1) instance_[name]->referencesDec();
         instance_.erase(t);
     } else {
-        cerr << "attempting to delete non-existant instance " << name << endl;
+        //cerr << "attempting to delete non-existant instance " << name << endl;
     }
 }
 
