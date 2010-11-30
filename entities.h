@@ -56,7 +56,8 @@ class Segment : public Fwk::PtrInterface<Segment> {
     void expediteSupportIs(const ExpediteSupport expediteSupport) { if (expediteSupport_ == expediteSupport) return; expediteSupport_ = expediteSupport; if (notifiee_) notifiee_->onExpediteSupport(); }
     string name() const { return name_; }
     Ptr<Location> source() const { return source_; }
-    void sourceIs(const Ptr<Location> source) { if (source_ == source) return; source_ = source; if (notifiee_) notifiee_->onSource(); }
+//    void sourceIs(const Ptr<Location> source) { if (source_ == source) return; source_ = source; if (notifiee_) notifiee_->onSource(); }
+    void sourceIs(const Ptr<Location> source);
     WeakPtr<Segment> returnSegment() const { return returnSegment_; }
     void returnSegmentIs(const Ptr<Segment> returnSegment);
     TransportationMode transportationMode() const { return transportationMode_; }
@@ -115,6 +116,17 @@ class Segment : public Fwk::PtrInterface<Segment> {
 class Location : public Fwk::PtrInterface<Location> {
     friend class EngineManager;
   public:
+    enum LocationType {
+        undefined_,
+        customer_,
+        port_,
+        terminal_
+    };
+    static inline LocationType customer() { return customer_; }
+    static inline LocationType port() { return port_; }
+    static inline LocationType terminal() { return terminal_; }
+    virtual LocationType locationType() const { return locationType_; }
+
     ~Location() { if (notifiee_) notifiee_->onDel(this); }
     virtual WeakPtr<Segment> segment(const unsigned int index) const;
     virtual unsigned int segments() const { return segments_.size(); }
@@ -144,7 +156,10 @@ class Location : public Fwk::PtrInterface<Location> {
     };
     Ptr<Location::Notifiee> notifiee() const { return notifiee_; }
   protected:
-    Location(const string name) : name_(name) {}
+    LocationType locationType_;
+    Location(const string name) : name_(name) {
+        locationType_ = undefined_;
+    }
     Ptr<Location::Notifiee> notifiee_;
     void notifieeIs(Location::Notifiee* n) const {
         Location* me = const_cast<Location*>(this);
@@ -181,7 +196,9 @@ class Customer : public Location {
     };
     Ptr<Customer::Notifiee> notifiee() const { return notifiee_; }
   protected:
-    Customer(const string name) : Location(name) {}
+    Customer(const string name) : Location(name) {
+        locationType_ = customer_;
+    }
     Ptr<Customer::Notifiee> notifiee_;
     void notifieeIs(Customer::Notifiee* n) const {
         Customer* me = const_cast<Customer*>(this);
@@ -215,7 +232,9 @@ class Port : public Location {
     };
     Ptr<Port::Notifiee> notifiee() const { return notifiee_; }
   protected:
-    Port(const string name) : Location(name) {}
+    Port(const string name) : Location(name) {
+        locationType_ = port_;
+    }
     Ptr<Port::Notifiee> notifiee_;
     void notifieeIs(Port::Notifiee* n) const {
         Port* me = const_cast<Port*>(this);
@@ -252,7 +271,9 @@ class Terminal : public Location {
     };
     Ptr<Terminal::Notifiee> notifiee() const { return notifiee_; }
   protected:
-    Terminal(const string name, const Segment::TransportationMode transportationMode) : Location(name), transportationMode_(transportationMode) {}
+    Terminal(const string name, const Segment::TransportationMode transportationMode) : Location(name), transportationMode_(transportationMode) {
+        locationType_ = terminal_;
+    }
     Ptr<Terminal::Notifiee> notifiee_;
     void notifieeIs(Terminal::Notifiee* n) const {
         Terminal* me = const_cast<Terminal*>(this);
