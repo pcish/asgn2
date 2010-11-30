@@ -266,6 +266,8 @@ string SegmentRep::attribute(const string& name) {
             os << engineObject_->source()->name();
         }
     } else if (name == "length") {
+        os.setf(ios::fixed,ios::floatfield);
+        os.precision(2);
         os << engineObject_->length().value();
     } else if (name == "return segment") {
         if (engineObject_->returnSegment() != NULL) {
