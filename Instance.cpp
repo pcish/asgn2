@@ -6,6 +6,9 @@
 #include "Instance.h"
 #include "entities.h"
 #include "Engine.h"
+#include "fwk/Exception.h"
+
+#include "Log.h"
 
 namespace Shipping {
 
@@ -196,8 +199,9 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
         return t;
     }
     if (instance_.find(name) != instance_.end()) {
-        cerr << "Attempt to new instances of the same names!" << endl;
-        return NULL;
+//        cerr << "Attempt to new instances of the same names!" << endl;
+        throw new Fwk::NameInUseException(name);
+//        return NULL;
     }
     if (type == "Truck terminal") {
         t = new TerminalRep(name, this, Segment::truck());
@@ -233,7 +237,8 @@ void ManagerImpl::instanceDel(const string& name) {
         while (instance_[name]->references() > 1) instance_[name]->referencesDec();
         instance_.erase(t);
     } else {
-        cerr << "attempting to delete non-existant instance " << name << endl;
+        throw Fwk::EntityNotFoundException(name);
+//        cerr << "attempting to delete non-existant instance " << name << endl;
     }
 }
 
@@ -241,7 +246,8 @@ template <typename T, typename TRep>
 Ptr<T> ManagerImpl::cast_instance(const string& v) {
     Ptr<Instance> ins = instance(v);
     if (ins == NULL)
-        cerr << "instance lookup for " << v << " failed" << endl;
+        throw Fwk::EntityNotFoundException(v);
+        //cerr << "instance lookup for " << v << " failed" << endl;
     return Ptr<TRep>((TRep*) ins.ptr())->engineObject();
 }
 
@@ -310,6 +316,7 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
     } catch (ValueError e) {
         cerr << e.what() << endl;
     }
+//    } catch (Fwk::RangeExa}
 }
 
 static const string segmentStr = "segment";
