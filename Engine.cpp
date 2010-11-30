@@ -67,6 +67,10 @@ void ShippingNetwork::explore(const Ptr<Location> curLocation, set<string> visit
 
     for (unsigned int i = 0; i < curLocation->segments(); ++i) {
         WeakPtr<Segment> seg = curLocation->segment(i);
+        if (!seg->returnSegment() ) {
+            cerr << "Invalid return segment" << endl;
+            continue;
+        }
         Ptr<Location> nextLocation = seg->returnSegment()->source();
         USD segCost;
         Hour segTime;
