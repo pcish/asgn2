@@ -1,7 +1,7 @@
 #ifndef ENGINE_TYPES_H
 #define ENGINE_TYPES_H
 
-#include "error.h"
+#include "fwk/Exception.h"
 
 namespace Shipping {
 
@@ -9,7 +9,8 @@ class Mile : public Ordinal<Mile, double> {
   public:
     static const double minimum = 0.0;
     Mile(double num = 0) : Ordinal<Mile, double>(num) {
-        if (num < minimum) throw ValueError("Mile must be a positive number");
+        //if (num < minimum) throw ValueError("Mile must be a positive number");
+        if (num < minimum) throw Fwk::RangeException("Mile must be a positive number");
     }
 };
 
@@ -17,7 +18,7 @@ class USD : public Ordinal<USD, double> {
   public:
     static const double minimum = 0.0;
     USD(double num = 0.0) : Ordinal<USD, double>(num) {
-        if (num < minimum) throw ValueError("USD must be a positive number");
+        if (num < minimum) throw Fwk::RangeException("USD must be a positive number");
     }
 };
 
@@ -25,7 +26,7 @@ class PackageUnit : public Ordinal<PackageUnit, int> {
   public:
     static const int minimum = 0;
     PackageUnit(int num = 0) : Ordinal<PackageUnit, int>(num) {
-        if (num < minimum) throw ValueError("USD must be a positive number");
+        if (num < minimum) throw Fwk::RangeException("USD must be a positive number");
     }
 };
 
@@ -34,7 +35,7 @@ class SegmentDifficultyUnit : public Ordinal<SegmentDifficultyUnit, float> {
     static const float minimum = 1.0;
     static const float maximum = 5.0;
     SegmentDifficultyUnit(float num = 1.0) : Ordinal<SegmentDifficultyUnit, float>(num) {
-        if (num < minimum || num > maximum) throw ValueError("Segment Difficulty must lie between 1.0 and 5.0");
+        if (num < minimum || num > maximum) throw Fwk::RangeException("Segment Difficulty must lie between 1.0 and 5.0");
     }
 };
 

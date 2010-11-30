@@ -183,6 +183,9 @@ Ptr<FleetRep> FleetRep::instance_ = NULL;
 
 ManagerImpl::ManagerImpl() {
     engineManager_ = new EngineManager();
+    instance_["defaultFleet"] = FleetRep::instance("defaultFleet", this);
+    instance_["defaultStats"] = StatsRep::instance("defaultStats", this);
+    instance_["defaultConn"] = ConnRep::instance("defaultConn", this);
 }
 
 Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
@@ -200,7 +203,7 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
     }
     if (instance_.find(name) != instance_.end()) {
 //        cerr << "Attempt to new instances of the same names!" << endl;
-        throw new Fwk::NameInUseException(name);
+        throw Fwk::NameInUseException("Attempt to new instances of the same name: "+name);
 //        return NULL;
     }
     if (type == "Truck terminal") {
@@ -237,7 +240,7 @@ void ManagerImpl::instanceDel(const string& name) {
         while (instance_[name]->references() > 1) instance_[name]->referencesDec();
         instance_.erase(t);
     } else {
-        throw Fwk::EntityNotFoundException(name);
+        throw Fwk::EntityNotFoundException("Attempt to delete non-existant instance " + name);
 //        cerr << "attempting to delete non-existant instance " << name << endl;
     }
 }
@@ -246,7 +249,7 @@ template <typename T, typename TRep>
 Ptr<T> ManagerImpl::cast_instance(const string& v) {
     Ptr<Instance> ins = instance(v);
     if (ins == NULL)
-        throw Fwk::EntityNotFoundException(v);
+        throw Fwk::EntityNotFoundException("Instance lookup for "+v + " failed");
         //cerr << "instance lookup for " << v << " failed" << endl;
     return Ptr<TRep>((TRep*) ins.ptr())->engineObject();
 }
@@ -272,6 +275,8 @@ string SegmentRep::attribute(const string& name) {
             os << engineObject_->source()->name();
         }
     } else if (name == "length") {
+        os.setf(ios::fixed,ios::floatfield);
+        os.precision(2);
         os << engineObject_->length().value();
     } else if (name == "return segment") {
         if (engineObject_->returnSegment() != NULL) {
@@ -291,7 +296,7 @@ string SegmentRep::attribute(const string& name) {
 }
 
 void SegmentRep::attributeIs(const string& name, const string& v) {
-    try {
+//    try {
         if (name == "source") {
             if (v != "") {
                 Ptr<Location> location = manager_->cast_instance<Location, LocationRep>(v);
@@ -313,9 +318,9 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
             else if (v == "no") engineObject_->expediteSupportIs(Segment::unavailable());
         } else {
         }
-    } catch (ValueError e) {
-        cerr << e.what() << endl;
-    }
+//    } catch (ValueError e) {
+//        cerr << e.what() << endl;
+//    }
 //    } catch (Fwk::RangeExa}
 }
 
@@ -481,7 +486,7 @@ string FleetRep::attribute(const string& name) {
 }
 
 void FleetRep::attributeIs(const string& name, const string& v) {
-    try {
+    //try {
         int commaPos = name.find_first_of(',');
         string mode = name.substr(0, commaPos);
         string property = name.substr(commaPos + 1, name.length());
@@ -511,9 +516,9 @@ void FleetRep::attributeIs(const string& name, const string& v) {
             is >> propertyValue;
             fleet_->capacityIs(PackageUnit(atoi(propertyValue.c_str())));
         }
-    } catch (ValueError e) {
-        cerr << e.what() << endl;
-    }
+    //} catch (ValueError e) {
+    //    cerr << e.what() << endl;
+    //}
 }
 
 }
