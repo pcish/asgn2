@@ -52,11 +52,11 @@ class ExperimentNetwork {
         try {
             srand(time(NULL));
             for (int s = 0; s < 100; s++) {
-                source[s]->attributeIs("Destination", "destination");
+                source[s]->attributeIs("destination", "destination");
                 stringstream size_str;
                 size_str << random_shipment_size ? rand() % 1000 + 1 : 100;
-                source[s]->attributeIs("Shipment size", size_str.str());
-                source[s]->attributeIs("Transfer Rate", "1");
+                source[s]->attributeIs("shipment size", size_str.str());
+                source[s]->attributeIs("transfer Rate", "1");
             }
         } catch (Fwk::Exception e) {
             cout << e.what() << endl;
@@ -82,6 +82,7 @@ int main(int argc, char* argv[]) {
     ExperimentNetwork * network = new ExperimentNetwork();
     network->setup();
     //cout << network->explore();
+    network->startShipments();
     delete network;
     return 0;
 }

@@ -177,6 +177,9 @@ class Customer : public Location {
     friend class EngineManager;
   public:
     ~Customer() { if (notifiee_) notifiee_->onDel(this); }
+    void destinationIs(const Ptr<Location> destination) { if (destination_ == destination) return; destination_ = destination; if (notifiee_) notifiee_->onDestination(); }
+    void shipmentSizeIs(const PackageUnit shipmentSize) { if (shipmentSize_ == shipmentSize) return; shipmentSize_ = shipmentSize; if (notifiee_) notifiee_->onShipmentSize(); }
+    void transferRateIs(const PackageUnit transferRate) { if (transferRate_ == transferRate) return; transferRate_ = transferRate; if (notifiee_) notifiee_->onTransferRate(); }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<Customer> notifier) {
@@ -190,6 +193,9 @@ class Customer : public Location {
             return n;
         }
         virtual void onDel(Customer *p) {}
+        virtual void onDestination() {}
+        virtual void onShipmentSize() {}
+        virtual void onTransferRate() {}
       protected:
         Fwk::WeakPtr<Customer> notifier_;
         Notifiee() : notifier_(0) {}
@@ -206,6 +212,9 @@ class Customer : public Location {
     }
 
   private:
+    WeakPtr<Location> destination_;
+    PackageUnit shipmentSize_;
+    PackageUnit transferRate_;
     Customer(const Customer& o);
 };
 

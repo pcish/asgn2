@@ -74,6 +74,10 @@ class CustomerRep : public LocationRep {
         LocationRep(name, manager) {
         engineObject_ = manager->engineManager()->customerNew(name);
     }
+    virtual string attribute(const string& name);
+    virtual void attributeIs(const string& name, const string& v);
+  protected:
+    Ptr<Customer> engineObject_;
 };
 
 class TerminalRep : public LocationRep {
@@ -267,6 +271,25 @@ string LocationRep::attribute(const string& name) {
 
 void LocationRep::attributeIs(const string& name, const string& v) {
     //location has no writable attributes
+}
+
+string CustomerRep::attribute(const string& name) {
+    ostringstream os;
+    return os.str();
+}
+
+void CustomerRep::attributeIs(const string& name, const string& v) {
+    if (name == "destination") {
+        if (v != "") {
+            Ptr<Location> location = manager_->cast_instance<Location, LocationRep>(v);
+            engineObject_->destinationIs(location);
+        }
+        else engineObject_->destinationIs(NULL);
+    } else if (name == "shipment size") {
+        engineObject_->shipmentSizeIs(PackageUnit(atoi(v.c_str())));
+    } else if (name == "transfer rate") {
+        engineObject_->transferRateIs(PackageUnit(atoi(v.c_str())));
+    }
 }
 
 string SegmentRep::attribute(const string& name) {
