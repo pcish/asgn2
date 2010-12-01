@@ -36,6 +36,7 @@ private:
     list<Fwk::Ptr<Notifiee> > notifiee_;
 };
 
+//Manager should be a singleton
 class ActivityImpl::ManagerImpl : public Activity::Manager {
 public:
     /* Write this class */
@@ -54,22 +55,29 @@ public:
         return p->second;
     }
 
-    virtual void activityDel(const string &name) {
-        activity_.erase(name);
-    }
-
-    virtual void lastActivityIs(Activity::Ptr act) {
-        activity_.insert(make_pair(act->name(), act) );
-    }
+    virtual void activityDel(const string &name) { activity_.erase(name); }
+    virtual void lastActivityIs(Activity::Ptr act) { activity_.insert(make_pair(act->name(), act) ); }    
 
     virtual Time now() const { return now_; }
     virtual void nowIs(Time _now) { now_ = _now;} 
+    static Fwk::Ptr<ManagerImpl> instance() {
+        if (instance_ == NULL)
+            instance_ = new ManagerImpl();
+        return instance_;
+    }
+
 private:
+    ManagerImpl() : now_(0) {}
     map<string, Activity::Ptr> activity_;
     Time now_;
+    static Fwk::Ptr<ManagerImpl> instance_;
 };
+Fwk::Ptr<ActivityImpl::ManagerImpl> ActivityImpl::ManagerImpl::instance_ = NULL;
 
+}
 
+Fwk::Ptr<Activity::Manager> activityManagerInstance() {
+    return ActivityImpl::ActivityImpl::ManagerImpl::instance();
 }
 
 #endif /* __ACTIVITY_IMPL_H__ */
