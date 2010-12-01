@@ -13,41 +13,41 @@ using std::string;
 
 /* Define the type 'Time' */
 class Time : public Ordinal<Time,double> {
-public:
-    Time(double time) : Ordinal<Time,double>(time)
+    public:
+        Time(double time) : Ordinal<Time,double>(time)
     {}
 };
 
 class Activity : public Fwk::PtrInterface<Activity> {
- public:
-    typedef Fwk::Ptr<Activity> Ptr;
-    
-    /* Notifiee class for Activities */
- class Notifiee : public Fwk::BaseNotifiee<Activity> {
     public:
-	typedef Fwk::Ptr<Notifiee> Ptr;
+        typedef Fwk::Ptr<Activity> Ptr;
 
-        Notifiee(Activity* act) : Fwk::BaseNotifiee<Activity>(act) {}
+        /* Notifiee class for Activities */
+        class Notifiee : public Fwk::BaseNotifiee<Activity> {
+            public:
+                typedef Fwk::Ptr<Notifiee> Ptr;
 
-        virtual void onNextTime() {}
-	virtual void onStatus() {}
-    };
+                Notifiee(Activity* act) : Fwk::BaseNotifiee<Activity>(act) {}
 
-    class Manager;
+                virtual void onNextTime() {}
+                virtual void onStatus() {}
+        };
 
-    enum Status {
-        free, waiting, ready, executing, nextTimeScheduled, deleted
-    };
+        class Manager;
 
-    virtual Status status() const = 0;
-    virtual void statusIs(Status s)  = 0;
-    
-    virtual Time nextTime() const = 0;
-    virtual void nextTimeIs(Time t) = 0;
+        enum Status {
+            free, waiting, ready, executing, nextTimeScheduled, deleted
+        };
 
-    virtual Fwk::Ptr<Notifiee> notifiee() const = 0;
+        virtual Status status() const = 0;
+        virtual void statusIs(Status s)  = 0;
 
-    virtual void lastNotifieeIs(Notifiee* n) = 0;
+        virtual Time nextTime() const = 0;
+        virtual void nextTimeIs(Time t) = 0;
+
+        virtual Fwk::Ptr<Notifiee> notifiee() const = 0;
+
+        virtual void lastNotifieeIs(Notifiee* n) = 0;
 
     virtual string name() const { return name_; }
 
