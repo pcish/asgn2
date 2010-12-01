@@ -57,7 +57,7 @@ public:
     virtual void lastActivityIs(Activity::Ptr act) { activity_.insert(make_pair(act->name(), act) ); }    
 
     virtual Time now() const { return now_; }
-    virtual void nowIs(Time _now) { now_ = _now;} 
+    virtual void nowIs(Time _now);
     static Fwk::Ptr<ManagerImpl> instance() {
         if (instance_ == NULL)
             instance_ = new ManagerImpl();
