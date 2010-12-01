@@ -3,7 +3,7 @@
   'constructor'=>'if (num < minimum) throw Fwk::RangeException("Mile must be a positive number");'},
   {'name'=>'USD', 'parent'=>'Ordinal', 'base'=>'double', 'default'=>'0.0', 'minimum'=>'0.0',
   'constructor'=>'if (num < minimum) throw Fwk::RangeException("USD must be a positive number");'},
-  {'name'=>'PackageUnit', 'parent'=>'Ordinal', 'base'=>'unsigned int', 'default'=>'0', 'minimum'=>'0',
+  {'name'=>'PackageUnit', 'parent'=>'Ordinal', 'base'=>'int', 'default'=>'0', 'minimum'=>'0',
   'constructor'=>'if (num < minimum) throw Fwk::RangeException("PackageUnit must be a positive number");'},
   {'name'=>'ShipmentCount', 'parent'=>'Ordinal', 'base'=>'unsigned int', 'default'=>'0', 'minimum'=>'0',
   'constructor'=>'if (num < minimum) throw Fwk::RangeException("ShipmentCount must be a positive number");'},

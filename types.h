@@ -21,10 +21,10 @@ class USD : public Ordinal<USD, double> {
     }
 };
 
-class PackageUnit : public Ordinal<PackageUnit, unsigned int> {
+class PackageUnit : public Ordinal<PackageUnit, int> {
   public:
-    static const unsigned int minimum = 0;
-    PackageUnit(unsigned int num = 0) : Ordinal<PackageUnit, unsigned int>(num) {
+    static const int minimum = 0;
+    PackageUnit(int num = 0) : Ordinal<PackageUnit, int>(num) {
         if (num < minimum) throw Fwk::RangeException("PackageUnit must be a positive number");
     }
 };
