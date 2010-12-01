@@ -4,6 +4,7 @@
 #include <string>
 #include "Instance.h"
 #include "fwk/Exception.h"
+#include "ActivityImpl.h"
 
 using std::cout;
 using std::cerr;
@@ -12,6 +13,7 @@ using std::string;
 
 int main(int argc, char *argv[]) {
  try {
+    Activity::Manager::Ptr activityManagerInstance();
     Ptr<Instance::Manager> manager = shippingInstanceManager();
 
     Ptr<Instance> instance1 = manager->instanceNew("fleet1", "Fleet");

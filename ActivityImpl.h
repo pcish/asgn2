@@ -9,8 +9,6 @@
 
 using namespace std;
 
-Ptr<Activity::Manager> activityManagerInstance();
-
 namespace ActivityImpl {
 
 class ActivityImpl : public Activity {
@@ -72,13 +70,12 @@ private:
     Time now_;
     static Fwk::Ptr<ManagerImpl> instance_;
 };
-Fwk::Ptr<ActivityImpl::ManagerImpl> ActivityImpl::ManagerImpl::instance_ = NULL;
 
 }
-
+/*
 Fwk::Ptr<Activity::Manager> activityManagerInstance() {
     return ActivityImpl::ActivityImpl::ManagerImpl::instance();
 }
-
+*/
 #endif /* __ACTIVITY_IMPL_H__ */
 
