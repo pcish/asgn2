@@ -98,9 +98,19 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     int ports() const { return ports_; }
     Segment::ExpediteSupport expedite() const { return expedite_; }
     void expediteIs(const Segment::ExpediteSupport expedite) { if (expedite_ == expedite) return; expedite_ = expedite; isConnAttributeChange = true; }
-    ShippingNetwork() : customers_(0), ports_(0), truckTerminals_(0), planeTerminals_(0), boatTerminals_(0), truckSegments_(0), planeSegments_(0), boatSegments_(0),
-    truckSegmentsExpediteAvailable_(0), planeSegmentsExpediteAvailable_(0), boatSegmentsExpediteAvailable_(0), isConnAttributeChange(false), expedite_(Segment::allAvailabilities()){
-    }
+    enum Routing {
+        __dijkstra, __bfs
+    };
+    static inline Routing dijkstra() { return __dijkstra; }
+    static inline Routing bfs(){ return __bfs; }
+    Routing routing() const { return routing_; }
+    void routingIs(const Routing _routing) { routing_ = _routing; }
+
+    ShippingNetwork() : customers_(0), ports_(0), truckTerminals_(0), planeTerminals_(0), boatTerminals_(0), 
+                        truckSegments_(0), planeSegments_(0), boatSegments_(0),    
+                        truckSegmentsExpediteAvailable_(0), planeSegmentsExpediteAvailable_(0), boatSegmentsExpediteAvailable_(0), 
+                        isConnAttributeChange(false), expedite_(Segment::allAvailabilities()), routing_(__bfs){}
+
   protected:
     void customersInc() { customers_++; }
   private:
@@ -116,6 +126,7 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     int planeSegmentsExpediteAvailable_;
     int boatSegmentsExpediteAvailable_;
     bool isConnAttributeChange;
+    
     Ptr<TruckFleet> truckFleet_;
     Ptr<PlaneFleet> planeFleet_;
     Ptr<BoatFleet> boatFleet_;
@@ -125,8 +136,9 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     vector<Ptr<Path> > path_;
     Hour maxTime_;
     Mile maxDistance_;
-
     Segment::ExpediteSupport expedite_;
+    Routing routing_;
+
     ShippingNetwork(const ShippingNetwork& o);
     void computePath();
     void explore(Ptr<Location> curLocation, set<string> visitedNodes, Ptr<Path> curPath);

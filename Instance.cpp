@@ -137,7 +137,7 @@ Ptr<StatsRep> StatsRep::instance_ = NULL;
 class ConnRep : public Instance {
   public:
     string attribute(const string& name);
-    void attributeIs(const string& name, const string& v) {}
+    void attributeIs(const string& name, const string& v);
     static Ptr<ConnRep> instance(const string &name, ManagerImpl *manager) {
         if (instance_ == NULL)
             instance_ = new ConnRep(name, manager);
@@ -228,7 +228,9 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
     } else if (type == "Customer") {
         t = new CustomerRep(name, this);
     } else {
-        return NULL;
+        //No matching type
+        throw Fwk::UnknownArgException("Unsupported type: " + type);
+//        return NULL;
     }
     instance_[t->name()] = t;
     return t;
@@ -289,6 +291,8 @@ void CustomerRep::attributeIs(const string& name, const string& v) {
         engineObject_->shipmentSizeIs(PackageUnit(atoi(v.c_str())));
     } else if (name == "transfer rate") {
         engineObject_->transferRateIs(ShipmentCount(atoi(v.c_str())));
+    } else {
+        throw Fwk::UnknownArgException("Unsupported attribute: " + name);
     }
 }
 
@@ -315,6 +319,7 @@ string SegmentRep::attribute(const string& name) {
         if (support == Segment::available()) os << "yes";
         else if (support == Segment::unavailable()) os << "no";
     } else {
+        throw Fwk::UnknownArgException("Unsupported attribute: " + name);
     }
     return os.str();
 }
@@ -341,6 +346,7 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
             if (v == "yes") engineObject_->expediteSupportIs(Segment::available());
             else if (v == "no") engineObject_->expediteSupportIs(Segment::unavailable());
         } else {
+            throw Fwk::UnknownArgException("Unsupported attribute: " + name);
         }
 //    } catch (ValueError e) {
 //        cerr << e.what() << endl;
@@ -392,9 +398,21 @@ string StatsRep::attribute(const string& name) {
         os.precision(2);
         os << ((float) expediteAvailable / (float) totalSegments) * 100.0;
     } else {
-        return "";
+        throw Fwk::UnknownArgException("Unsupported attribute: " + name);
+        //return "";
     }
     return os.str();
+}
+void ConnRep::attributeIs(const string& name, const string& v) {
+    if (name.compare("routing") == 0) {
+        Ptr<ShippingNetwork> network = manager_->engineManager()->shippingNetwork();
+        if (v.compare("dijkstra") == 0) {
+            network->routingIs(ShippingNetwork::dijkstra());
+        }
+        else if (v.compare("bfs") == 0) {
+            network->routingIs(ShippingNetwork::bfs());
+        }
+    }
 }
 string ConnRep::attribute(const string& name) {
     istringstream is(name);
@@ -455,6 +473,18 @@ string ConnRep::attribute(const string& name) {
         network->maxCostIs(0);
         network->maxDistanceIs(0);
         network->maxTimeIs(0);
+    }
+    else if (cmd.compare("routing") == 0) {
+        ShippingNetwork::Routing r = network->routing();
+        switch (r){
+            case ShippingNetwork::__dijkstra:
+                return "Dijkstra";
+            case ShippingNetwork::__bfs:
+                return "BFS";
+            default:
+            //this shouldn't happen
+                return "Unspecified";
+        }
     }
     os.setf(ios::fixed, ios::floatfield);
     os.precision(2);
