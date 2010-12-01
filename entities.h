@@ -179,7 +179,10 @@ class Customer : public Location {
     ~Customer() { if (notifiee_) notifiee_->onDel(this); }
     void destinationIs(const Ptr<Location> destination) { if (destination_ == destination) return; destination_ = destination; if (notifiee_) notifiee_->onDestination(); }
     void shipmentSizeIs(const PackageUnit shipmentSize) { if (shipmentSize_ == shipmentSize) return; shipmentSize_ = shipmentSize; if (notifiee_) notifiee_->onShipmentSize(); }
-    void transferRateIs(const PackageUnit transferRate) { if (transferRate_ == transferRate) return; transferRate_ = transferRate; if (notifiee_) notifiee_->onTransferRate(); }
+    void transferRateIs(const ShipmentCount transferRate) { if (transferRate_ == transferRate) return; transferRate_ = transferRate; if (notifiee_) notifiee_->onTransferRate(); }
+    ShipmentCount shipmentsReceived() const { return shipmentsReceived_; }
+    Hour averageLatency() const { return averageLatency_; }
+    USD totalCost() const { return totalCost_; }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<Customer> notifier) {
@@ -214,7 +217,10 @@ class Customer : public Location {
   private:
     WeakPtr<Location> destination_;
     PackageUnit shipmentSize_;
-    PackageUnit transferRate_;
+    ShipmentCount transferRate_;
+    ShipmentCount shipmentsReceived_;
+    Hour averageLatency_;
+    USD totalCost_;
     Customer(const Customer& o);
 };
 

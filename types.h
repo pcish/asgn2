@@ -9,7 +9,6 @@ class Mile : public Ordinal<Mile, double> {
   public:
     static const double minimum = 0.0;
     Mile(double num = 0) : Ordinal<Mile, double>(num) {
-        //if (num < minimum) throw ValueError("Mile must be a positive number");
         if (num < minimum) throw Fwk::RangeException("Mile must be a positive number");
     }
 };
@@ -22,11 +21,19 @@ class USD : public Ordinal<USD, double> {
     }
 };
 
-class PackageUnit : public Ordinal<PackageUnit, int> {
+class PackageUnit : public Ordinal<PackageUnit, unsigned int> {
   public:
-    static const int minimum = 0;
-    PackageUnit(int num = 0) : Ordinal<PackageUnit, int>(num) {
-        if (num < minimum) throw Fwk::RangeException("USD must be a positive number");
+    static const unsigned int minimum = 0;
+    PackageUnit(unsigned int num = 0) : Ordinal<PackageUnit, unsigned int>(num) {
+        if (num < minimum) throw Fwk::RangeException("PackageUnit must be a positive number");
+    }
+};
+
+class ShipmentCount : public Ordinal<ShipmentCount, unsigned int> {
+  public:
+    static const unsigned int minimum = 0;
+    ShipmentCount(unsigned int num = 0) : Ordinal<ShipmentCount, unsigned int>(num) {
+        if (num < minimum) throw Fwk::RangeException("ShipmentCount must be a positive number");
     }
 };
 
@@ -98,9 +105,10 @@ class PlaneTerminalCount : public Ordinal<PlaneTerminalCount, unsigned int> {
     PlaneTerminalCount(unsigned int num = 0) : Ordinal<PlaneTerminalCount, unsigned int>(num) {
     }
 };
+
 class Hour : public Ordinal<Hour, double> {
   public:
-    Hour (double num = 0.0) : Ordinal<Hour, double>(num) {
+    Hour(double num = 0.0) : Ordinal<Hour, double>(num) {
     }
 };
 

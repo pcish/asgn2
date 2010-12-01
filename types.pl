@@ -1,9 +1,14 @@
 @types = (
-  {'name'=>'Mile', 'parent'=>'Ordinal', 'base'=>'double', 'default'=>'0', 'constructor'=>''},
-  {'name'=>'USD', 'parent'=>'Ordinal', 'base'=>'double', 'default'=>'0.0', 'constructor'=>''},
-  {'name'=>'PackageUnit', 'parent'=>'Ordinal', 'base'=>'unsigned int', 'default'=>'0', 'constructor'=>''},
+  {'name'=>'Mile', 'parent'=>'Ordinal', 'base'=>'double', 'default'=>'0', 'minimum'=>'0.0',
+  'constructor'=>'if (num < minimum) throw Fwk::RangeException("Mile must be a positive number");'},
+  {'name'=>'USD', 'parent'=>'Ordinal', 'base'=>'double', 'default'=>'0.0', 'minimum'=>'0.0',
+  'constructor'=>'if (num < minimum) throw Fwk::RangeException("USD must be a positive number");'},
+  {'name'=>'PackageUnit', 'parent'=>'Ordinal', 'base'=>'unsigned int', 'default'=>'0', 'minimum'=>'0',
+  'constructor'=>'if (num < minimum) throw Fwk::RangeException("PackageUnit must be a positive number");'},
+  {'name'=>'ShipmentCount', 'parent'=>'Ordinal', 'base'=>'unsigned int', 'default'=>'0', 'minimum'=>'0',
+  'constructor'=>'if (num < minimum) throw Fwk::RangeException("ShipmentCount must be a positive number");'},
   {'name'=>'SegmentDifficultyUnit', 'parent'=>'Ordinal', 'base'=>'float', 'default'=>'1.0', 'minimum'=>'1.0', 'maximum'=>'5.0',
-  'constructor'=>'if (num < minimum || num > maximum) throw ValueError("Segment Difficulty must lie between 1.0 and 5.0");'},
+  'constructor'=>'if (num < minimum || num > maximum) throw Fwk::RangeException("Segment Difficulty must lie between 1.0 and 5.0");'},
   {'name'=>'SegmentCount', 'parent'=>'Ordinal', 'base'=>'unsigned int', 'default'=>'0', 'constructor'=>''},
   {'name'=>'TruckSegmentCount', 'parent'=>'Ordinal', 'base'=>'unsigned int', 'default'=>'0', 'constructor'=>''},
   {'name'=>'BoatSegmentCount', 'parent'=>'Ordinal', 'base'=>'unsigned int', 'default'=>'0', 'constructor'=>''},
@@ -23,7 +28,7 @@ open FILE, ">types.h";
 print FILE "#ifndef ENGINE_TYPES_H\n";
 print FILE "#define ENGINE_TYPES_H\n\n";
 
-print FILE "#include \"error.h\"\n\n";
+print FILE "#include \"fwk/Exception.h\"\n\n";
 
 print FILE "namespace Shipping {\n\n";
 

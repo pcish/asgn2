@@ -288,7 +288,7 @@ void CustomerRep::attributeIs(const string& name, const string& v) {
     } else if (name == "shipment size") {
         engineObject_->shipmentSizeIs(PackageUnit(atoi(v.c_str())));
     } else if (name == "transfer rate") {
-        engineObject_->transferRateIs(PackageUnit(atoi(v.c_str())));
+        engineObject_->transferRateIs(ShipmentCount(atoi(v.c_str())));
     }
 }
 
