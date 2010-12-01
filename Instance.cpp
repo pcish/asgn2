@@ -477,9 +477,9 @@ string ConnRep::attribute(const string& name) {
     else if (cmd.compare("routing") == 0) {
         ShippingNetwork::Routing r = network->routing();
         switch (r){
-            case ShippingNetwork::__dijkstra:
+            case ShippingNetwork::dijkstra__:
                 return "Dijkstra";
-            case ShippingNetwork::__bfs:
+            case ShippingNetwork::bfs__:
                 return "BFS";
             default:
             //this shouldn't happen

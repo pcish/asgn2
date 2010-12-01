@@ -99,17 +99,17 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     Segment::ExpediteSupport expedite() const { return expedite_; }
     void expediteIs(const Segment::ExpediteSupport expedite) { if (expedite_ == expedite) return; expedite_ = expedite; isConnAttributeChange = true; }
     enum Routing {
-        __dijkstra, __bfs
+        dijkstra__, bfs__
     };
-    static inline Routing dijkstra() { return __dijkstra; }
-    static inline Routing bfs(){ return __bfs; }
+    static inline Routing dijkstra() { return dijkstra__; }
+    static inline Routing bfs(){ return bfs__; }
     Routing routing() const { return routing_; }
     void routingIs(const Routing _routing) { routing_ = _routing; }
 
     ShippingNetwork() : customers_(0), ports_(0), truckTerminals_(0), planeTerminals_(0), boatTerminals_(0), 
                         truckSegments_(0), planeSegments_(0), boatSegments_(0),    
                         truckSegmentsExpediteAvailable_(0), planeSegmentsExpediteAvailable_(0), boatSegmentsExpediteAvailable_(0), 
-                        isConnAttributeChange(false), expedite_(Segment::allAvailabilities()), routing_(__bfs){}
+                        isConnAttributeChange(false), expedite_(Segment::allAvailabilities()), routing_(bfs__){}
 
   protected:
     void customersInc() { customers_++; }
