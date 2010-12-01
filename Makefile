@@ -14,6 +14,9 @@ test1:	test1.o $(OBJECTS)
 example: example.o $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIB)
 
+experiment: experiment.o $(OBJECTS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIB)
+	
 clean:
 	rm -f test1 test1.o test.o test.exe $(OBJECTS) *~
 
@@ -23,3 +26,4 @@ Instance.o: Instance.cpp Instance.h Engine.o entities.o
 test.o: test1.cpp Instance.o Engine.o entities.o
 test1.o: test1.cpp Instance.o Engine.o entities.o
 example.o: example.cpp Instance.o Engine.o entities.o
+experiment.o: experiment.cpp Instance.o Engine.o entities.o
