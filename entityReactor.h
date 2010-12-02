@@ -82,7 +82,7 @@ class SegmentReactor : public Segment::Notifiee {
     WeakPtr<Segment> previousReturnSegment_;
     bool handlingReturnSegment_;
 };
-class CustomerReactor : public Customer::Notifiee {
+class CustomerReactor : public Customer::Notifiee{
   public:
     virtual void onDel(Customer *p) {
         notifier_->shippingNetwork()->customers_--;
@@ -96,7 +96,6 @@ class CustomerReactor : public Customer::Notifiee {
     virtual void onTransferRate() {
         transferRateSet = true;
     }
-
     static Fwk::Ptr<CustomerReactor> customerReactorNew() {
         Fwk::Ptr<CustomerReactor> n = new CustomerReactor();
         return n;
@@ -104,14 +103,17 @@ class CustomerReactor : public Customer::Notifiee {
   private:
     void checkAndLaunch() {
         if (!started) {
-            if (destSet && shipmentSizeSet && transferRateSet) {
+            if (destSet && shipmentSizeSet && transferRateSet && notifier_) {
                 started = true;
                 //lauch the shipment
+                Activity::Manager::Ptr manager = activityManagerInstance();
+                activity_ = manager->activityNew(notifier_->name()); //use what name?
+                //activity_->lastNotifieeIs(this);
             }
         }
     }
     CustomerReactor() : destSet(false), shipmentSizeSet(false), transferRateSet(false), started(false) {}
-    Activity::Activity::Ptr activity;
+    Activity::Activity::Ptr activity_;
     bool destSet, shipmentSizeSet, transferRateSet, started;
     
 };
@@ -143,7 +145,11 @@ class TerminalReactor : public Terminal::Notifiee {
 };
 class ShipmentReactor : public Shipment::Notifiee {
   public:
-//    virtual ona
+     virtual void onDestination() {}
+     virtual void onSource() {}
+     virtual void onCurrentLocation() {}
+     virtual void onDel(Shipment *p) {}
+
 };
 }
 
