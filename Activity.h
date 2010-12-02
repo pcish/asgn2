@@ -8,16 +8,10 @@
 
 #include "Nominal.h"
 #include "Notifiee.h"
+#include "types.h"
 
 using std::string;
-
-/* Define the type 'Time' */
-
-class Time : public Ordinal<Time,double> {
-    public:
-        Time(double time) : Ordinal<Time,double>(time)
-    {}
-};
+using namespace Shipping;
 
 class Activity : public Fwk::PtrInterface<Activity> {
     public:
@@ -43,8 +37,8 @@ class Activity : public Fwk::PtrInterface<Activity> {
         virtual Status status() const = 0;
         virtual void statusIs(Status s)  = 0;
 
-        virtual Time nextTime() const = 0;
-        virtual void nextTimeIs(Time t) = 0;
+        virtual Hour nextTime() const = 0;
+        virtual void nextTimeIs(Hour t) = 0;
 
         virtual Fwk::Ptr<Notifiee> notifiee() const = 0;
 
@@ -59,7 +53,7 @@ protected:
 
 private:
     string name_;
-    
+
 };
 
 class Activity::Manager : public Fwk::PtrInterface<Activity::Manager> {
@@ -74,8 +68,8 @@ public:
 
     virtual void lastActivityIs(Activity::Ptr) = 0;
 
-    virtual Time now() const = 0;
-    virtual void nowIs(Time) = 0;
+    virtual Hour now() const = 0;
+    virtual void nowIs(Hour) = 0;
 
 
 private:

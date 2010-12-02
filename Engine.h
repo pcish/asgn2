@@ -12,6 +12,8 @@ class SegmentReactor;
 class CustomerReactor;
 class PortReactor;
 class TerminalReactor;
+class ShipmentReactor;
+
 class Path : public Fwk::PtrInterface<Path> {
 public:
     static Ptr<Path> pathNew() { return new Path(); }
@@ -49,14 +51,15 @@ private:
     Mile distance_;
     Segment::ExpediteSupport expedite_;
     Hour hour_;
-
 };
+
 class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     friend class EngineReactor;
     friend class SegmentReactor;
     friend class CustomerReactor;
     friend class PortReactor;
     friend class TerminalReactor;
+    friend class ShipmentReactor;
   public:
     ~ShippingNetwork() {}
     int customers() const { return customers_; }
@@ -106,6 +109,7 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     Routing routing() const { return routing_; }
     void routingIs(const Routing _routing) { routing_ = _routing; }
     Ptr<Shipment> shipmentNew(const string name);
+    Ptr<Path> nextHop(const WeakPtr<Shipment> shipment);
 
     ShippingNetwork() : customers_(0), ports_(0), truckTerminals_(0), planeTerminals_(0), boatTerminals_(0),
                         truckSegments_(0), planeSegments_(0), boatSegments_(0),
@@ -114,6 +118,7 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
 
   protected:
     void customersInc() { customers_++; }
+    void deliverShipment(WeakPtr<Shipment> shipment);
   private:
     int customers_;
     int ports_;

@@ -45,7 +45,7 @@ namespace ActivityImpl {
         }
 
         // dont throw an exception (accessor)
-        return NULL; 
+        return NULL;
     }
 
     void ManagerImpl::activityDel(const string& name) {
@@ -56,21 +56,21 @@ namespace ActivityImpl {
         scheduledActivities_.push(activity);
     }
 
-    void ManagerImpl::nowIs(Time t) {
+    void ManagerImpl::nowIs(Hour t) {
         //find the most recent activites to run and run them in order
         while (!scheduledActivities_.empty()) {
 
             //figure out the next activity to run
             Activity::Ptr nextToRun = scheduledActivities_.top();
 
-            //if the next time is greater than the specified time, break
+            //if the next Hour is greater than the specified time, break
             //the loop
             if (nextToRun->nextTime() > t) {
                 break;
             }
 
-            //calculate amount of time to sleep
-            Time diff = Time(nextToRun->nextTime().value() - now_.value());
+            //calculate amount of Hour to sleep
+            Hour diff = Hour(nextToRun->nextTime().value() - now_.value());
 
             //sleep 100ms (100,000 microseconds) for every unit of time
             usleep(( ((int)diff.value()) * 100000));
@@ -80,7 +80,7 @@ namespace ActivityImpl {
             //print out size of queue
             cout << "size of queue: " << queue_->size() << endl;
 
-            //run the minimum time activity and remove it from the queue
+            //run the minimum Hour activity and remove it from the queue
             scheduledActivities_.pop();
 
             nextToRun->statusIs(Activity::executing);

@@ -127,6 +127,13 @@ Ptr<Shipment> ShippingNetwork::shipmentNew(const string name) {
     return m;
 }
 
+void ShippingNetwork::deliverShipment(WeakPtr<Shipment> shipment) {
+}
+
+Ptr<Path> ShippingNetwork::nextHop(const WeakPtr<Shipment> shipment) {
+    return Path::pathNew();
+}
+
 class EngineReactor : public EngineManager::Notifiee {
   public:
     virtual void onCustomerNew(Fwk::Ptr<Customer> p) {
