@@ -145,7 +145,7 @@ class SegmentReactor : public Segment::Notifiee {
     WeakPtr<Segment> previousReturnSegment_;
     bool handlingReturnSegment_;
 };
-class CustomerReactor : public Customer::Notifiee {
+class CustomerReactor : public Customer::Notifiee{
   public:
     virtual void onDel(Customer *p) {
         notifier_->shippingNetwork()->customers_--;
@@ -159,22 +159,41 @@ class CustomerReactor : public Customer::Notifiee {
     virtual void onTransferRate() {
         transferRateSet = true;
     }
-
     static Fwk::Ptr<CustomerReactor> customerReactorNew() {
         Fwk::Ptr<CustomerReactor> n = new CustomerReactor();
         return n;
     }
   private:
+    class ActivityNotifiee : public Activity::Activity::Notifiee {
+      public:
+        ActivityNotifiee(Activity::Activity *activity, CustomerReactor *_parent) : Activity::Activity::Notifiee(activity), activity_(activity), parent_(_parent){}
+        virtual void onStatus() {
+            Activity::Activity::Status status = activity_->status();
+            if (status == Activity::Activity::executing) { //run
+                parent_->shipmentNew();
+            }
+        }
+        virtual void onNextTime() {}
+      private:
+        Activity::Activity *activity_;
+        CustomerReactor *parent_;
+    };
     void checkAndLaunch() {
         if (!started) {
-            if (destSet && shipmentSizeSet && transferRateSet) {
+            if (destSet && shipmentSizeSet && transferRateSet && notifier_) {
                 started = true;
                 //lauch the shipment
+                Activity::Manager::Ptr manager = activityManagerInstance();
+                activity_ = manager->activityNew(notifier_->name()); //use what name?
+                activityNotifiee_ = new ActivityNotifiee(activity_.ptr(), this);
+                activity_->lastNotifieeIs(activityNotifiee_.ptr());
             }
         }
     }
+    void shipmentNew() {}
     CustomerReactor() : destSet(false), shipmentSizeSet(false), transferRateSet(false), started(false) {}
-    Activity::Activity::Ptr activity;
+    Activity::Activity::Ptr activity_;
+    Fwk::Ptr<ActivityNotifiee> activityNotifiee_;
     bool destSet, shipmentSizeSet, transferRateSet, started;
 
 };
