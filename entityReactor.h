@@ -40,7 +40,7 @@ class ShipmentReactor : public Shipment::Notifiee {
                 activity_->lastNotifieeIs(activityNotifiee_.ptr());
 
                 nextSegment->usedCapacityInc();
-                notifier_->costInc(fleet->cost().value() * nextSegment->difficulty().value());
+                notifier_->costInc(fleet->cost().value() * nextSegment->difficulty().value() * nextSegment->length().value());
                 notifier_->transitTimeInc(transitTime);
             } else {
             }
