@@ -129,8 +129,11 @@ class Segment : public Fwk::PtrInterface<Segment> {
     void capacityIs(const ShipmentCount capacity) { if (capacity_ == capacity) return; capacity_ = capacity; if (notifiee_) notifiee_->onCapacity(); }
     ShipmentCount availableCapacity() const { return ShipmentCount(capacity_.value() - usedCapacity_.value()); }
     void usedCapacityInc() { if (usedCapacity_ >= capacity_) throw Fwk::InternalException("no available capacity"); usedCapacity_ = usedCapacity_.value() + 1; }
+    void usedCapacityDec() { usedCapacity_ = usedCapacity_.value() - 1; }
     ShipmentCount shipmentsRefused() { return shipmentsRefused_; }
     ShipmentCount shipmentsReceived() { return shipmentsReceived_; }
+    void shipmentsRefusedInc() { shipmentsRefused_ = shipmentsRefused_.value() + 1; }
+    void shipmentsReceivedInc() { shipmentsReceived_ = shipmentsReceived_.value() + 1; }
     ShippingNetwork* shippingNetwork() const { return shippingNetwork_; }
     void shippingNetworkIs(ShippingNetwork* shippingNetwork) { if (shippingNetwork_ == shippingNetwork) return; shippingNetwork_ = shippingNetwork; if (notifiee_) notifiee_->onShippingNetwork(); }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
