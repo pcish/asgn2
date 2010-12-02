@@ -105,10 +105,11 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     static inline Routing bfs(){ return bfs__; }
     Routing routing() const { return routing_; }
     void routingIs(const Routing _routing) { routing_ = _routing; }
+    Ptr<Shipment> shipmentNew(const string name);
 
-    ShippingNetwork() : customers_(0), ports_(0), truckTerminals_(0), planeTerminals_(0), boatTerminals_(0), 
-                        truckSegments_(0), planeSegments_(0), boatSegments_(0),    
-                        truckSegmentsExpediteAvailable_(0), planeSegmentsExpediteAvailable_(0), boatSegmentsExpediteAvailable_(0), 
+    ShippingNetwork() : customers_(0), ports_(0), truckTerminals_(0), planeTerminals_(0), boatTerminals_(0),
+                        truckSegments_(0), planeSegments_(0), boatSegments_(0),
+                        truckSegmentsExpediteAvailable_(0), planeSegmentsExpediteAvailable_(0), boatSegmentsExpediteAvailable_(0),
                         isConnAttributeChange(false), expedite_(Segment::allAvailabilities()), routing_(bfs__){}
 
   protected:
@@ -126,7 +127,7 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     int planeSegmentsExpediteAvailable_;
     int boatSegmentsExpediteAvailable_;
     bool isConnAttributeChange;
-    
+
     Ptr<TruckFleet> truckFleet_;
     Ptr<PlaneFleet> planeFleet_;
     Ptr<BoatFleet> boatFleet_;
@@ -138,6 +139,7 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     Mile maxDistance_;
     Segment::ExpediteSupport expedite_;
     Routing routing_;
+    vector<Ptr<Shipment> > shipment_;
 
     ShippingNetwork(const ShippingNetwork& o);
     void computePath();

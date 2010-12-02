@@ -7,6 +7,20 @@
 
 namespace Shipping {
 class ShippingNetwork;
+
+class ShipmentReactor : public Shipment::Notifiee {
+  public:
+    virtual void onCurrentLocation() {
+        if (notifier_->currentLocation() == notifier_->destination()) {
+        } else {
+        }
+    }
+    static Fwk::Ptr<ShipmentReactor> shipmentReactorNew() {
+        Fwk::Ptr<ShipmentReactor> n = new ShipmentReactor();
+        return n;
+    }
+};
+
 class SegmentReactor : public Segment::Notifiee {
   public:
     virtual void onDel(Segment *p) {
@@ -87,7 +101,7 @@ class CustomerReactor : public Customer::Notifiee {
     virtual void onDel(Customer *p) {
         notifier_->shippingNetwork()->customers_--;
     }
-    virtual void onDestination() { 
+    virtual void onDestination() {
         destSet = true;
     }
     virtual void onShipmentSize() {
@@ -113,7 +127,7 @@ class CustomerReactor : public Customer::Notifiee {
     CustomerReactor() : destSet(false), shipmentSizeSet(false), transferRateSet(false), started(false) {}
     Activity::Activity::Ptr activity;
     bool destSet, shipmentSizeSet, transferRateSet, started;
-    
+
 };
 class PortReactor : public Port::Notifiee {
   public:
@@ -141,10 +155,7 @@ class TerminalReactor : public Terminal::Notifiee {
         return n;
     }
 };
-class ShipmentReactor : public Shipment::Notifiee {
-  public:
-//    virtual ona
-};
+
 }
 
 #endif

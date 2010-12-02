@@ -32,7 +32,7 @@ class Segment;
 class Port;
 
 class Shipment : public Fwk::NamedInterface {
-    friend class EngineManager;
+    friend class ShippingNetwork;
   public:
     ~Shipment() { if (notifiee_) notifiee_->onDel(this); }
     PackageUnit load() const { return load_; }
@@ -45,6 +45,8 @@ class Shipment : public Fwk::NamedInterface {
     Hour transitTime() const { return transitTime_; }
     Ptr<Location> currentLocation() const { return currentLocation_; }
     void currentLocationIs(const Ptr<Location> currentLocation) { if (currentLocation_ == currentLocation) return; currentLocation_ = currentLocation; if (notifiee_) notifiee_->onCurrentLocation(); }
+    ShippingNetwork* shippingNetwork() const { return shippingNetwork_; }
+    void shippingNetworkIs(ShippingNetwork* shippingNetwork) { if (shippingNetwork_ == shippingNetwork) return; shippingNetwork_ = shippingNetwork; }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<Shipment> notifier) {
@@ -68,7 +70,7 @@ class Shipment : public Fwk::NamedInterface {
     };
     Ptr<Shipment::Notifiee> notifiee() const { return notifiee_; }
   protected:
-    Shipment(const USD cost, const Hour transitTime) : NamedInterface(""), cost_(cost), transitTime_(transitTime) {}
+    Shipment(Fwk::String name) : NamedInterface(name) {}
     Ptr<Shipment::Notifiee> notifiee_;
     void notifieeIs(Shipment::Notifiee* n) const {
         Shipment* me = const_cast<Shipment*>(this);
@@ -82,6 +84,7 @@ class Shipment : public Fwk::NamedInterface {
     USD cost_;
     Hour transitTime_;
     Ptr<Location> currentLocation_;
+    ShippingNetwork* shippingNetwork_;
     Shipment(const Shipment& o);
 };
 

@@ -118,6 +118,15 @@ void ShippingNetwork::explore(const Ptr<Location> curLocation, set<string> visit
     visitedNodes.erase(curLocation->name());
 }
 
+Ptr<Shipment> ShippingNetwork::shipmentNew(const string name) {
+    Ptr<Shipment> m = new Shipment(name);
+    m->shippingNetworkIs(this);
+    Fwk::Ptr<ShipmentReactor> r = ShipmentReactor::shipmentReactorNew();
+    r->notifierIs(m);
+    shipment_.push_back(m);
+    return m;
+}
+
 class EngineReactor : public EngineManager::Notifiee {
   public:
     virtual void onCustomerNew(Fwk::Ptr<Customer> p) {
