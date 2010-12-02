@@ -178,12 +178,15 @@ class CustomerReactor : public Customer::Notifiee{
     }
     virtual void onDestination() {
         destSet = true;
+        checkAndLaunch();
     }
     virtual void onShipmentSize() {
         shipmentSizeSet = true;
+        checkAndLaunch();
     }
     virtual void onTransferRate() {
         transferRateSet = true;
+        checkAndLaunch();
     }
     static Fwk::Ptr<CustomerReactor> customerReactorNew() {
         Fwk::Ptr<CustomerReactor> n = new CustomerReactor();
@@ -191,7 +194,8 @@ class CustomerReactor : public Customer::Notifiee{
     }
   private:
     class ActivityNotifiee : public Activity::Activity::Notifiee {
-      public:
+      public: 
+      //Pointer here may need to be refined
         ActivityNotifiee(Activity::Activity *activity, CustomerReactor *_parent) : Activity::Activity::Notifiee(activity), activity_(activity), parent_(_parent){}
         virtual void onStatus() {
             Activity::Activity::Status status = activity_->status();
@@ -210,13 +214,28 @@ class CustomerReactor : public Customer::Notifiee{
                 started = true;
                 //lauch the shipment
                 Activity::Manager::Ptr manager = activityManagerInstance();
+                //name here
                 activity_ = manager->activityNew(notifier_->name()); //use what name?
+                activity_->nextTimeIs(manager->now());
+                //here we need to set the time for activity
                 activityNotifiee_ = new ActivityNotifiee(activity_.ptr(), this);
                 activity_->lastNotifieeIs(activityNotifiee_.ptr());
             }
         }
     }
-    void shipmentNew() {}
+    void shipmentNew(){
+        //name need to be refined
+        
+        //string name = "shipment_" + notifier_.name() + "_" + notifier_->destination->name();
+        string name = "shipment_";
+        Fwk::Ptr<Shipment> shipment = notifier_->shippingNetwork()->shipmentNew(name);
+        shipment->sourceIs(notifier_.ptr() );
+        shipment->destinationIs(dynamic_cast<Customer*>(notifier_->destination().ptr()) );
+        //shipment->loadIs(notifier_->shipmentSize() );
+        Activity::Manager::Ptr manager = activityManagerInstance();
+        activity_->nextTimeIs(manager->now().value() + 24);
+        manager->lastActivityIs(activity_.ptr());
+    }
     CustomerReactor() : destSet(false), shipmentSizeSet(false), transferRateSet(false), started(false) {}
     Activity::Activity::Ptr activity_;
     Fwk::Ptr<ActivityNotifiee> activityNotifiee_;
