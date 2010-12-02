@@ -12,6 +12,7 @@
 using std::string;
 
 /* Define the type 'Time' */
+
 class Time : public Ordinal<Time,double> {
     public:
         Time(double time) : Ordinal<Time,double>(time)
@@ -58,7 +59,7 @@ protected:
 
 private:
     string name_;
-
+    
 };
 
 class Activity::Manager : public Fwk::PtrInterface<Activity::Manager> {

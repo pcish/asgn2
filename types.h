@@ -1,6 +1,7 @@
 #ifndef ENGINE_TYPES_H
 #define ENGINE_TYPES_H
 
+#include "Nominal.h"
 #include "fwk/Exception.h"
 
 namespace Shipping {

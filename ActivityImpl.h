@@ -15,7 +15,7 @@ class ActivityImpl : public Activity {
 public:
     /* Write this class */
     virtual Status status() const { return status_; }
-    virtual void statusIs(const Status _status){ status_ = _status; }
+    virtual void statusIs(const Status _status);
     virtual Time nextTime() const {return nextTime_;}
     virtual void nextTimeIs(Time _nextTime){ nextTime_ = _nextTime; }
     virtual Fwk::Ptr<Notifiee> notifiee() const { 
@@ -27,6 +27,8 @@ public:
         notifiee_.push_back(nptr); 
     }
     class ManagerImpl;
+protected:
+    void execute();
 private:
     ActivityImpl(const string &name) : Activity(name), nextTime_(0) {}
     Status status_;
@@ -37,6 +39,7 @@ private:
 //Manager should be a singleton
 class ActivityImpl::ManagerImpl : public Activity::Manager {
 public:
+    enum TimeSteppingType {realtime__, virtualtime__};
     /* Write this class */
     virtual Activity::Ptr activityNew(const string &name) {
         if (activity_.find(name) != activity_.end() )
@@ -58,6 +61,9 @@ public:
 
     virtual Time now() const { return now_; }
     virtual void nowIs(Time _now);
+
+    virtual TimeSteppingType timeStepping() { return timeStepping_; }
+    virtual void timeSteppingIs(TimeSteppingType _timeStepping) { timeStepping_ = _timeStepping;} 
     static Fwk::Ptr<ManagerImpl> instance() {
         if (instance_ == NULL)
             instance_ = new ManagerImpl();
@@ -68,6 +74,7 @@ private:
     ManagerImpl() : now_(0) {}
     map<string, Activity::Ptr> activity_;
     Time now_;
+    TimeSteppingType timeStepping_;
     static Fwk::Ptr<ManagerImpl> instance_;
 };
 
