@@ -16,7 +16,9 @@ class ShipmentReactor : public Shipment::Notifiee {
         } else {
             Fwk::Ptr<Path> nextHop = notifier_->shippingNetwork()->nextHop(notifier_);
             WeakPtr<Segment> nextSegment = nextHop->segment(0);
-            if (!nextSegment) throw Fwk::InternalException("");
+            if (!nextSegment || nextHop->location(1)) {
+                throw Fwk::InternalException("nextHop return invalid path");
+            }
             if (nextSegment->availableCapacity() > 0) {
                 Fwk::Ptr<Fleet> fleet;
                 if (nextSegment->transportationMode() == Segment::truck()) {
@@ -32,7 +34,8 @@ class ShipmentReactor : public Shipment::Notifiee {
 
                 Activity::Manager::Ptr manager = activityManagerInstance();
                 activity_ = manager->activityNew(notifier_->name());
-                activityNotifiee_ = new ActivityNotifiee(activity_.ptr(), notifier_.ptr(), nextHop->location(0));
+                activityNotifiee_ = new ActivityNotifiee(
+                    activity_.ptr(), notifier_.ptr(), nextHop->location(1));
                 activity_->nextTimeIs(manager->now().value() + transitTime.value());
                 activity_->lastNotifieeIs(activityNotifiee_.ptr());
 
