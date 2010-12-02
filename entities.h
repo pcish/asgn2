@@ -30,6 +30,57 @@ class BoatFleet;
 class Fleet;
 class Segment;
 class Port;
+
+class Shipment : public Fwk::NamedInterface {
+    friend class EngineManager;
+  public:
+    ~Shipment() { if (notifiee_) notifiee_->onDel(this); }
+    PackageUnit load() const { return load_; }
+    void loadIs(const PackageUnit load) { if (load_ == load) return; load_ = load; if (notifiee_) notifiee_->onLoad(); }
+    Ptr<Customer> source() const { return source_; }
+    void sourceIs(const Ptr<Customer> source) { if (source_ == source) return; source_ = source; if (notifiee_) notifiee_->onSource(); }
+    USD cost() const { return cost_; }
+    Hour transitTime() const { return transitTime_; }
+    Ptr<Customer> destination() const { return destination_; }
+    void destinationIs(const Ptr<Customer> destination) { if (destination_ == destination) return; destination_ = destination; if (notifiee_) notifiee_->onDestination(); }
+    class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
+      public:
+        virtual void notifierIs(Fwk::Ptr<Shipment> notifier) {
+            if (notifier_ == notifier) return;
+            if (notifier_) notifier->notifieeIs(0);
+            notifier_ = notifier;
+            notifier_->notifieeIs(this);
+        }
+        static Fwk::Ptr<Shipment::Notifiee> notifieeNew() {
+            Fwk::Ptr<Shipment::Notifiee> n = new Notifiee();
+            return n;
+        }
+        virtual void onLoad() {}
+        virtual void onSource() {}
+        virtual void onDestination() {}
+        virtual void onDel(Shipment *p) {}
+      protected:
+        Fwk::WeakPtr<Shipment> notifier_;
+        Notifiee() : notifier_(0) {}
+    };
+    Ptr<Shipment::Notifiee> notifiee() const { return notifiee_; }
+  protected:
+    Shipment(Fwk::String name, const USD cost, const Hour transitTime) : NamedInterface(name), cost_(cost), transitTime_(transitTime) {}
+    Ptr<Shipment::Notifiee> notifiee_;
+    void notifieeIs(Shipment::Notifiee* n) const {
+        Shipment* me = const_cast<Shipment*>(this);
+        me->notifiee_ = n;
+    }
+
+  private:
+    PackageUnit load_;
+    Ptr<Customer> source_;
+    USD cost_;
+    Hour transitTime_;
+    Ptr<Customer> destination_;
+    Shipment(const Shipment& o);
+};
+
 class Segment : public Fwk::PtrInterface<Segment> {
     friend class EngineManager;
   public:
@@ -65,6 +116,10 @@ class Segment : public Fwk::PtrInterface<Segment> {
     void difficultyIs(const SegmentDifficultyUnit difficulty) { if (difficulty_ == difficulty) return; difficulty_ = difficulty; if (notifiee_) notifiee_->onDifficulty(); }
     Mile length() const { return length_; }
     void lengthIs(const Mile length) { if (length_ == length) return; length_ = length; if (notifiee_) notifiee_->onLength(); }
+    ShipmentCount capacity() const { return capacity_; }
+    void capacityIs(const ShipmentCount capacity) { if (capacity_ == capacity) return; capacity_ = capacity; if (notifiee_) notifiee_->onCapacity(); }
+    ShipmentCount shipmentsRefused() { return shipmentsRefused_; }
+    ShipmentCount shipmentsReceived() { return shipmentsReceived_; }
     ShippingNetwork* shippingNetwork() const { return shippingNetwork_; }
     void shippingNetworkIs(ShippingNetwork* shippingNetwork) { if (shippingNetwork_ == shippingNetwork) return; shippingNetwork_ = shippingNetwork; if (notifiee_) notifiee_->onShippingNetwork(); }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
@@ -84,6 +139,7 @@ class Segment : public Fwk::PtrInterface<Segment> {
         virtual void onReturnSegment() {}
         virtual void onDifficulty() {}
         virtual void onLength() {}
+        virtual void onCapacity() {}
         virtual void onShippingNetwork() {}
         virtual void onDel(Segment *p) {}
       protected:
@@ -94,6 +150,7 @@ class Segment : public Fwk::PtrInterface<Segment> {
   protected:
     Segment(const string name, const TransportationMode transportationMode) : name_(name), transportationMode_(transportationMode) {
         expediteSupport_ = unavailable_;
+        capacity_ = ShipmentCount(10);
     }
     Ptr<Segment::Notifiee> notifiee_;
     void notifieeIs(Segment::Notifiee* n) const {
@@ -109,6 +166,9 @@ class Segment : public Fwk::PtrInterface<Segment> {
     TransportationMode transportationMode_;
     SegmentDifficultyUnit difficulty_;
     Mile length_;
+    ShipmentCount capacity_;
+    ShipmentCount shipmentsRefused_;
+    ShipmentCount shipmentsReceived_;
     ShippingNetwork* shippingNetwork_;
     Segment(const Segment& o);
 };

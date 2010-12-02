@@ -168,6 +168,10 @@ class EngineManager : public Fwk::PtrInterface<EngineManager> {
     }
     Ptr<Segment> segmentNew(const Segment::TransportationMode transportationMode, const string name);
     Ptr<Port> portNew(const string name);
+    void customerDel(Ptr<Customer> o);
+    void terminalDel(Ptr<Terminal> o);
+    void portDel(Ptr<Port> o);
+    void segmentDel(Ptr<Segment> o);
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<EngineManager> notifier) {
@@ -194,6 +198,7 @@ class EngineManager : public Fwk::PtrInterface<EngineManager> {
         Notifiee() : notifier_(0) {}
     };
     Ptr<EngineManager::Notifiee> notifiee() const { return notifiee_; }
+
   protected:
     Ptr<ShippingNetwork> network_;
     Ptr<EngineManager::Notifiee> notifiee_;
@@ -202,6 +207,7 @@ class EngineManager : public Fwk::PtrInterface<EngineManager> {
         //me->notifiee_ = n;
         notifiee_ = n;
     }
+    void locationDel(Ptr<Location> o);
 };
 
 
