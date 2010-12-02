@@ -1,5 +1,6 @@
 #include <queue>
 #include <set>
+#include <algorithm>
 
 #include "Engine.h"
 #include "entityReactor.h"
@@ -152,7 +153,7 @@ Ptr<Path> ShippingNetwork::getBfsPath(const WeakPtr<Shipment> shipment) {
             WeakPtr<Segment> returnSeg = seg->returnSegment();
             if (returnSeg) {
                 Ptr<Location> nextLocation = returnSeg->source();
-                if (visited.find(nextLocation->name()) != visited.end() ){
+                if (visited.find(nextLocation->name()) == visited.end() ){
                     visited.insert(nextLocation->name());
                     path->locationIs(nextLocation);
                     path->segmentIs(seg.ptr());
@@ -172,6 +173,49 @@ Ptr<Path> ShippingNetwork::getBfsPath(const WeakPtr<Shipment> shipment) {
     return NULL;
 }
 Ptr<Path> ShippingNetwork::getDijkstraPath(const WeakPtr<Shipment> shipment) {
+    Ptr<Location> from = shipment->currentLocation();  
+    Ptr<Location> to = shipment->destination();
+//    set<string> visited;
+    list<Ptr<DistanceTuple<Mile> > > distanceTuple; //used to store which nodes are waiting to be used in the next round of optimization
+    map<string, Ptr<DistanceTuple<Mile> > > lookup;
+    
+    Ptr<DistanceTuple<Mile> > t = new DistanceTuple<Mile>(from, NULL, 0);
+    distanceTuple.push_back(t);
+    lookup[from->name()] = t;
+//    visited.insert(from->name());
+    while (!distanceTuple.empty() ) {
+        //min_element(distanceTuple.begin(), distanceTuple.end(), DistanceTuple<Mile>::DistanceTupleComp() );
+        Ptr<DistanceTuple<Mile> > best = distanceTuple.front();
+        distanceTuple.pop_front();
+        Ptr<Location> curLocation = best->location();
+        for (unsigned int i = 0; i < curLocation->segments(); ++i) {
+            WeakPtr<Segment> seg = curLocation->segment(i);
+            WeakPtr<Segment> returnSeg = seg->returnSegment();
+            if (returnSeg) {
+                Ptr<Location> nextLocation = returnSeg->source();
+                //if (visited.find(nextLocation->name()) == visited.end() ){ //this node is visited for the first time
+                //    visited.insert(nextLocation->name());
+                if (lookup.find(nextLocation->name() ) == lookup.end() ) {
+                    t = new DistanceTuple<Mile>(nextLocation, seg.ptr(), best->distance().value() + seg->length().value());
+                    distanceTuple.push_back(t);
+                    lookup[nextLocation->name()] = t;
+                }
+                else { //try to update the tuple value
+                    t = lookup[nextLocation->name()];
+                    if (best->distance().value() + seg->length().value() < t->distance().value() ){
+                        t->distanceIs(best->distance().value() + seg->length().value());
+                        t->segmentIs(seg.ptr());
+                    }
+                }
+            }
+            else {
+                //ignore invalid return segment
+            }
+        }
+
+    }
+
+    Ptr<Path> path = Path::pathNew();
     return NULL;
 }
 

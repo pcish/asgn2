@@ -149,10 +149,34 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     ShippingNetwork(const ShippingNetwork& o);
     void computePath();
     void explore(Ptr<Location> curLocation, set<string> visitedNodes, Ptr<Path> curPath);
+
     Ptr<Path> getBfsPath(const WeakPtr<Shipment>);
+    template <typename T> //T must be Ordinal
+    class DistanceTuple : public Fwk::PtrInterface<DistanceTuple<T> > {
+      public:
+        DistanceTuple(Ptr<Location> _location, Ptr<Segment> _segment, T _distance) : location_(_location), segment_(_segment), distance_(_distance) {}
+        void locationIs(const Ptr<Location> _location) { location_ = _location; }
+        void segmentIs(const Ptr<Segment> _segment) { segment_ = _segment; }
+        void distanceIs(const T _distance) { distance_ = _distance; }
+        Ptr<Location> location() const { return location_; }
+        Ptr<Segment> segment() const { return segment_; }
+        T distance() const { return distance_; }
+        class DistanceTupleComp {
+            public:
+                DistanceTupleComp() {}
+                bool operator()(DistanceTuple a, DistanceTuple b) const {
+                    return (a.distance.value() > b.distance.value());
+                }
+        };
+      private:
+        Ptr<Location> location_; //Current Location
+        Ptr<Segment> segment_; //Previous Segment
+        T distance_;
+    };
+
     Ptr<Path> getDijkstraPath(const WeakPtr<Shipment>);
     
-    list<Ptr<Location> > visitedNodes;
+    //list<Ptr<Location> > visitedNodes;
 };
 
 class EngineManager : public Fwk::PtrInterface<EngineManager> {
