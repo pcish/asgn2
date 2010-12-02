@@ -24,10 +24,14 @@ class ShipmentReactor : public Shipment::Notifiee {
     }
     void changeLocation(Fwk::Ptr<Location> nextLocation) {
         if (notifier_->currentLocation() == nextLocation) forwardShipment();
-        else notifier_->currentLocationIs(nextLocation);
+        else {
+            previousSegment_->usedCapacityDec();
+            notifier_->currentLocationIs(nextLocation);
+        }
     }
 
   private:
+    ShipmentReactor() { previousSegment_ = NULL; }
     void forwardShipment() {
         Fwk::Ptr<Path> nextHop = notifier_->shippingNetwork()->nextHop(notifier_);
         WeakPtr<Segment> nextSegment = nextHop->segment(0);
@@ -54,10 +58,13 @@ class ShipmentReactor : public Shipment::Notifiee {
             activity_->nextTimeIs(manager->now().value() + transitTime.value());
             activity_->lastNotifieeIs(activityNotifiee_.ptr());
 
+            previousSegment_ = nextSegment.ptr();
             nextSegment->usedCapacityInc();
+            nextSegment->shipmentsReceivedInc();
             notifier_->costInc(fleet->cost().value() * nextSegment->difficulty().value() * nextSegment->length().value());
             notifier_->transitTimeInc(transitTime);
         } else {
+            nextSegment->shipmentsRefusedInc();
             Activity::Manager::Ptr manager = activityManagerInstance();
             activity_ = manager->activityNew(notifier_->name());
             activityNotifiee_ = new ActivityNotifiee(
@@ -85,6 +92,7 @@ class ShipmentReactor : public Shipment::Notifiee {
     };
     Activity::Activity::Ptr activity_;
     Fwk::Ptr<ActivityNotifiee> activityNotifiee_;
+    Fwk::Ptr<Segment> previousSegment_;
 };
 Hour ShipmentReactor::retryTime = Hour(1.0);
 

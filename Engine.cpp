@@ -4,6 +4,8 @@
 
 #include "Engine.h"
 #include "entityReactor.h"
+#include "routing/bfs.h"
+#include "routing/random_walk.h"
 
 namespace Shipping {
 
@@ -132,11 +134,15 @@ void ShippingNetwork::deliverShipment(WeakPtr<Shipment> shipment) {
 }
 
 Ptr<Path> ShippingNetwork::nextHop(const WeakPtr<Shipment> shipment) {
+    Ptr<Bfs> bfs = Bfs::instance(this);
+    bfs->nextHop(shipment);
+    Ptr<RandomWalk> rw = RandomWalk::instance(this);
+    rw->nextHop(shipment);
     return Path::pathNew();
 }
 //BFS to find the path with the smallest number of locations
 Ptr<Path> ShippingNetwork::getBfsPath(const WeakPtr<Shipment> shipment) {
-    Ptr<Location> from = shipment->currentLocation();  
+    Ptr<Location> from = shipment->currentLocation();
     Ptr<Location> to = shipment->destination();
     Ptr<Path> path = Path::pathNew();
     set<string> visited;
@@ -162,7 +168,7 @@ Ptr<Path> ShippingNetwork::getBfsPath(const WeakPtr<Shipment> shipment) {
                     }
                     else {
                         loc.push(nextLocation);
-                    }                
+                    }
                 }
             }
             else {
