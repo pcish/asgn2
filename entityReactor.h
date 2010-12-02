@@ -101,6 +101,20 @@ class CustomerReactor : public Customer::Notifiee{
         return n;
     }
   private:
+    class ActivityNotifiee : public Activity::Activity::Notifiee {
+      public: 
+        ActivityNotifiee(Activity::Activity *activity, CustomerReactor *_parent) : Activity::Activity::Notifiee(activity), activity_(activity), parent_(_parent){}
+        virtual void onStatus() {
+            Activity::Activity::Status status = activity_->status();
+            if (status == Activity::Activity::executing) { //run
+                parent_->shipmentNew();
+            }
+        }
+        virtual void onNextTime() {}
+      private:
+        Activity::Activity *activity_;
+        CustomerReactor *parent_;
+    };
     void checkAndLaunch() {
         if (!started) {
             if (destSet && shipmentSizeSet && transferRateSet && notifier_) {
@@ -108,12 +122,15 @@ class CustomerReactor : public Customer::Notifiee{
                 //lauch the shipment
                 Activity::Manager::Ptr manager = activityManagerInstance();
                 activity_ = manager->activityNew(notifier_->name()); //use what name?
-                //activity_->lastNotifieeIs(this);
+                activityNotifiee_ = new ActivityNotifiee(activity_.ptr(), this);
+                activity_->lastNotifieeIs(activityNotifiee_.ptr());
             }
         }
     }
+    void shipmentNew() {}
     CustomerReactor() : destSet(false), shipmentSizeSet(false), transferRateSet(false), started(false) {}
     Activity::Activity::Ptr activity_;
+    Fwk::Ptr<ActivityNotifiee> activityNotifiee_;
     bool destSet, shipmentSizeSet, transferRateSet, started;
     
 };
