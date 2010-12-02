@@ -68,7 +68,7 @@ class Shipment : public Fwk::NamedInterface {
     };
     Ptr<Shipment::Notifiee> notifiee() const { return notifiee_; }
   protected:
-    Shipment(const USD cost, const Hour transitTime) : cost_(cost), transitTime_(transitTime) {}
+    Shipment(const USD cost, const Hour transitTime) : NamedInterface(""), cost_(cost), transitTime_(transitTime) {}
     Ptr<Shipment::Notifiee> notifiee_;
     void notifieeIs(Shipment::Notifiee* n) const {
         Shipment* me = const_cast<Shipment*>(this);

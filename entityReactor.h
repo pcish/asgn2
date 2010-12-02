@@ -3,6 +3,8 @@
 
 #include "entities.h"
 #include "Engine.h"
+#include "ActivityImpl.h"
+
 namespace Shipping {
 class ShippingNetwork;
 class SegmentReactor : public Segment::Notifiee {
@@ -85,10 +87,33 @@ class CustomerReactor : public Customer::Notifiee {
     virtual void onDel(Customer *p) {
         notifier_->shippingNetwork()->customers_--;
     }
+    virtual void onDestination() { 
+        destSet = true;
+    }
+    virtual void onShipmentSize() {
+        shipmentSizeSet = true;
+    }
+    virtual void onTransferRate() {
+        transferRateSet = true;
+    }
+
     static Fwk::Ptr<CustomerReactor> customerReactorNew() {
         Fwk::Ptr<CustomerReactor> n = new CustomerReactor();
         return n;
     }
+  private:
+    void checkAndLaunch() {
+        if (!started) {
+            if (destSet && shipmentSizeSet && transferRateSet) {
+                started = true;
+                //lauch the shipment
+            }
+        }
+    }
+    CustomerReactor() : destSet(false), shipmentSizeSet(false), transferRateSet(false), started(false) {}
+    Activity::Activity::Ptr activity;
+    bool destSet, shipmentSizeSet, transferRateSet, started;
+    
 };
 class PortReactor : public Port::Notifiee {
   public:
@@ -115,6 +140,10 @@ class TerminalReactor : public Terminal::Notifiee {
         Fwk::Ptr<TerminalReactor> n = new TerminalReactor();
         return n;
     }
+};
+class ShipmentReactor : public Shipment::Notifiee {
+  public:
+//    virtual ona
 };
 }
 
