@@ -218,11 +218,12 @@ class CustomerReactor : public Customer::Notifiee{
     void shipmentNew(){
         //name need to be refined
         
-        string name = "shipment_" + notifier_->source() + "_" + notifier_->destination();
+        //string name = "shipment_" + notifier_.name() + "_" + notifier_->destination->name();
+        string name = "shipment_";
         Fwk::Ptr<Shipment> shipment = notifier_->shippingNetwork()->shipmentNew(name);
-        shipment->sourceIs(notifier->source() );
-        shipment->destinationIs(notifier->source() );
-        shipment->loadIs(notifier->transferRate() );
+        shipment->sourceIs(notifier_.ptr() );
+        shipment->destinationIs(dynamic_cast<Customer*>(notifier_->destination().ptr()) );
+        //shipment->loadIs(notifier_->shipmentSize() );
         Activity::Manager::Ptr manager = activityManagerInstance();
         activity_->nextTimeIs(manager->now().value() + 24);
         manager->lastActivityIs(activity_.ptr());
