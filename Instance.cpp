@@ -45,16 +45,16 @@ class SegmentRep;
 
 class LocationRep : public Instance {
   public:
+    virtual ~LocationRep() { }
     virtual string attribute(const string& name);
     virtual void attributeIs(const string& name, const string& v);
 
-    Ptr<Location> engineObject() const { return engineObject_; }
+    virtual Ptr<Location> engineObject() const = 0;
   protected:
     LocationRep(const string& name, ManagerImpl* manager) :
         Instance(name), manager_(manager) {
     }
     Ptr<ManagerImpl> manager_;
-    Ptr<Location> engineObject_;
 
   private:
     int segmentNumber(const string& name);
@@ -66,6 +66,11 @@ class PortRep : public LocationRep {
         LocationRep(name, manager) {
         engineObject_ = manager->engineManager()->portNew(name);
     }
+    ~PortRep() { manager_->engineManager()->portDel(engineObject_); }
+    virtual Ptr<Location> engineObject() const { return engineObject_; }
+
+  protected:
+    Ptr<Port> engineObject_;
 };
 
 class CustomerRep : public LocationRep {
@@ -76,6 +81,9 @@ class CustomerRep : public LocationRep {
     }
     virtual string attribute(const string& name);
     virtual void attributeIs(const string& name, const string& v);
+    ~CustomerRep() { manager_->engineManager()->customerDel(engineObject_); }
+    virtual Ptr<Location> engineObject() const { return engineObject_; }
+
   protected:
     Ptr<Customer> engineObject_;
 };
@@ -86,8 +94,11 @@ class TerminalRep : public LocationRep {
         LocationRep(name, manager), mode_(_mode) {
           engineObject_ = manager_->engineManager()->terminalNew(name, _mode);
     }
+    ~TerminalRep() { manager_->engineManager()->terminalDel(engineObject_); }
+    virtual Ptr<Location> engineObject() const { return engineObject_; }
 
   protected:
+    Ptr<Terminal> engineObject_;
     Segment::TransportationMode mode_;
 };
 
@@ -97,6 +108,7 @@ class SegmentRep : public Instance {
         Instance(name), manager_(manager), mode_ (_mode) {
         engineObject_ = manager_->engineManager()->segmentNew(_mode, name);
     }
+    ~SegmentRep() { manager_->engineManager()->segmentDel(engineObject_); }
 
     string attribute(const string& name);
     void attributeIs(const string& name, const string& v);
@@ -264,8 +276,8 @@ Ptr<T> ManagerImpl::cast_instance(const string& v) {
 string LocationRep::attribute(const string& name) {
     int i = segmentNumber(name);
     if (i >= 0) {
-        if (engineObject_->segment(i) != NULL) {
-            return engineObject_->segment(i)->name();
+        if (engineObject()->segment(i) != NULL) {
+            return engineObject()->segment(i)->name();
         }
     }
     return "";

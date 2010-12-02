@@ -201,4 +201,34 @@ Ptr<Port> EngineManager::portNew(const string name){
     return m;
 }
 
+void EngineManager::locationDel(Ptr<Location> o) {
+    for (unsigned int i = 0; i < o->segments(); i++) {
+        o->segment(i)->sourceIs(NULL);
+    }
+}
+
+void EngineManager::customerDel(Ptr<Customer> o) {
+    locationDel(o);
+}
+
+void EngineManager::terminalDel(Ptr<Terminal> o) {
+    locationDel(o);
+}
+
+void EngineManager::portDel(Ptr<Port> o) {
+    locationDel(o);
+}
+
+void EngineManager::segmentDel(Ptr<Segment> o) {
+    if (o->returnSegment()) o->returnSegment()->returnSegmentIs(NULL);
+    if (o->source()) {
+        for (unsigned int i = 0; i < o->source()->segments(); i++) {
+            if (o->source()->segment(i) == o) {
+                o->source()->segmentIs(i, NULL);
+                break;
+            }
+        }
+    }
+}
+
 }
