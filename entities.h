@@ -65,6 +65,10 @@ class Segment : public Fwk::PtrInterface<Segment> {
     void difficultyIs(const SegmentDifficultyUnit difficulty) { if (difficulty_ == difficulty) return; difficulty_ = difficulty; if (notifiee_) notifiee_->onDifficulty(); }
     Mile length() const { return length_; }
     void lengthIs(const Mile length) { if (length_ == length) return; length_ = length; if (notifiee_) notifiee_->onLength(); }
+    ShipmentCount capacity() const { return capacity_; }
+    void capacityIs(const ShipmentCount capacity) { if (capacity_ == capacity) return; capacity_ = capacity; if (notifiee_) notifiee_->onCapacity(); }
+    ShipmentCount shipmentsRefused() { return shipmentsRefused_; }
+    ShipmentCount shipmentsReceived() { return shipmentsReceived_; }
     ShippingNetwork* shippingNetwork() const { return shippingNetwork_; }
     void shippingNetworkIs(ShippingNetwork* shippingNetwork) { if (shippingNetwork_ == shippingNetwork) return; shippingNetwork_ = shippingNetwork; if (notifiee_) notifiee_->onShippingNetwork(); }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
@@ -84,6 +88,7 @@ class Segment : public Fwk::PtrInterface<Segment> {
         virtual void onReturnSegment() {}
         virtual void onDifficulty() {}
         virtual void onLength() {}
+        virtual void onCapacity() {}
         virtual void onShippingNetwork() {}
         virtual void onDel(Segment *p) {}
       protected:
@@ -94,6 +99,7 @@ class Segment : public Fwk::PtrInterface<Segment> {
   protected:
     Segment(const string name, const TransportationMode transportationMode) : name_(name), transportationMode_(transportationMode) {
         expediteSupport_ = unavailable_;
+        capacity_ = ShipmentCount(10);
     }
     Ptr<Segment::Notifiee> notifiee_;
     void notifieeIs(Segment::Notifiee* n) const {
@@ -109,6 +115,9 @@ class Segment : public Fwk::PtrInterface<Segment> {
     TransportationMode transportationMode_;
     SegmentDifficultyUnit difficulty_;
     Mile length_;
+    ShipmentCount capacity_;
+    ShipmentCount shipmentsRefused_;
+    ShipmentCount shipmentsReceived_;
     ShippingNetwork* shippingNetwork_;
     Segment(const Segment& o);
 };

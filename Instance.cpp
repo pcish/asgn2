@@ -330,6 +330,12 @@ string SegmentRep::attribute(const string& name) {
         Segment::ExpediteSupport support = engineObject_->expediteSupport();
         if (support == Segment::available()) os << "yes";
         else if (support == Segment::unavailable()) os << "no";
+    } else if (name == "shipments refused") {
+        os << engineObject_->shipmentsRefused().value();
+    } else if (name == "shipments received") {
+        os << engineObject_->shipmentsReceived().value();
+    } else if (name == "capacity") {
+        os << engineObject_->capacity().value();
     } else {
         throw Fwk::UnknownArgException("Unsupported attribute: " + name);
     }
@@ -357,6 +363,8 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
         } else if (name == "expedite support") {
             if (v == "yes") engineObject_->expediteSupportIs(Segment::available());
             else if (v == "no") engineObject_->expediteSupportIs(Segment::unavailable());
+        } else if (name == "capacity") {
+            engineObject_->capacityIs(ShipmentCount(atoi(v.c_str())));
         } else {
             throw Fwk::UnknownArgException("Unsupported attribute: " + name);
         }
