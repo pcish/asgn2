@@ -7,6 +7,87 @@
 
 namespace Shipping {
 class ShippingNetwork;
+
+class ShipmentReactor : public Shipment::Notifiee {
+  public:
+    static Hour retryTime;
+    virtual void onCurrentLocation() {
+        if (notifier_->currentLocation() == notifier_->destination()) {
+            notifier_->shippingNetwork()->deliverShipment(notifier_);
+        } else {
+            forwardShipment();
+        }
+    }
+    static Fwk::Ptr<ShipmentReactor> shipmentReactorNew() {
+        Fwk::Ptr<ShipmentReactor> n = new ShipmentReactor();
+        return n;
+    }
+    void changeLocation(Fwk::Ptr<Location> nextLocation) {
+        if (notifier_->currentLocation() == nextLocation) forwardShipment();
+        else notifier_->currentLocationIs(nextLocation);
+    }
+
+  private:
+    void forwardShipment() {
+        Fwk::Ptr<Path> nextHop = notifier_->shippingNetwork()->nextHop(notifier_);
+        WeakPtr<Segment> nextSegment = nextHop->segment(0);
+        if (!nextSegment || nextHop->location(1)) {
+            throw Fwk::InternalException("nextHop return invalid path");
+        }
+        if (nextSegment->availableCapacity() > 0) {
+            Fwk::Ptr<Fleet> fleet;
+            if (nextSegment->transportationMode() == Segment::truck()) {
+                fleet = notifier_->shippingNetwork()->truckFleet_;
+            } else if (nextSegment->transportationMode() == Segment::plane()) {
+                fleet = notifier_->shippingNetwork()->planeFleet_;
+            } else if (nextSegment->transportationMode() == Segment::boat()) {
+                fleet = notifier_->shippingNetwork()->boatFleet_;
+            }
+            Hour transitTime =
+                ceil((double) notifier_->load().value() / (double) fleet->capacity().value()) *
+                (nextSegment->length().value() / fleet->speed().value());
+
+            Activity::Manager::Ptr manager = activityManagerInstance();
+            activity_ = manager->activityNew(notifier_->name());
+            activityNotifiee_ = new ActivityNotifiee(
+                activity_.ptr(), this, nextHop->location(1));
+            activity_->nextTimeIs(manager->now().value() + transitTime.value());
+            activity_->lastNotifieeIs(activityNotifiee_.ptr());
+
+            nextSegment->usedCapacityInc();
+            notifier_->costInc(fleet->cost().value() * nextSegment->difficulty().value() * nextSegment->length().value());
+            notifier_->transitTimeInc(transitTime);
+        } else {
+            Activity::Manager::Ptr manager = activityManagerInstance();
+            activity_ = manager->activityNew(notifier_->name());
+            activityNotifiee_ = new ActivityNotifiee(
+                activity_.ptr(), this, notifier_->currentLocation());
+            activity_->nextTimeIs(manager->now().value() + retryTime.value());
+            activity_->lastNotifieeIs(activityNotifiee_.ptr());
+        }
+    }
+    class ActivityNotifiee : public Activity::Activity::Notifiee {
+      public:
+        ActivityNotifiee(Activity::Activity *activity, ShipmentReactor *_parent, Fwk::Ptr<Location> nextLocation) :
+            Activity::Activity::Notifiee(activity), activity_(activity),
+            parent_(_parent), nextLocation_(nextLocation) {}
+        virtual void onStatus() {
+            Activity::Activity::Status status = activity_->status();
+            if (status == Activity::Activity::executing) {
+                parent_->changeLocation(nextLocation_);
+            }
+        }
+        virtual void onNextTime() {}
+      private:
+        Activity::Activity *activity_;
+        ShipmentReactor *parent_;
+        Fwk::Ptr<Location> nextLocation_;
+    };
+    Activity::Activity::Ptr activity_;
+    Fwk::Ptr<ActivityNotifiee> activityNotifiee_;
+};
+Hour ShipmentReactor::retryTime = Hour(1.0);
+
 class SegmentReactor : public Segment::Notifiee {
   public:
     virtual void onDel(Segment *p) {
@@ -87,7 +168,7 @@ class CustomerReactor : public Customer::Notifiee{
     virtual void onDel(Customer *p) {
         notifier_->shippingNetwork()->customers_--;
     }
-    virtual void onDestination() { 
+    virtual void onDestination() {
         destSet = true;
         checkAndLaunch();
     }
@@ -150,7 +231,7 @@ class CustomerReactor : public Customer::Notifiee{
     Activity::Activity::Ptr activity_;
     Fwk::Ptr<ActivityNotifiee> activityNotifiee_;
     bool destSet, shipmentSizeSet, transferRateSet, started;
-    
+
 };
 class PortReactor : public Port::Notifiee {
   public:
@@ -178,14 +259,7 @@ class TerminalReactor : public Terminal::Notifiee {
         return n;
     }
 };
-class ShipmentReactor : public Shipment::Notifiee {
-  public:
-     virtual void onDestination() {}
-     virtual void onSource() {}
-     virtual void onCurrentLocation() {}
-     virtual void onDel(Shipment *p) {}
 
-};
 }
 
 #endif

@@ -12,6 +12,8 @@ class SegmentReactor;
 class CustomerReactor;
 class PortReactor;
 class TerminalReactor;
+class ShipmentReactor;
+
 class Path : public Fwk::PtrInterface<Path> {
 public:
     static Ptr<Path> pathNew() { return new Path(); }
@@ -49,14 +51,15 @@ private:
     Mile distance_;
     Segment::ExpediteSupport expedite_;
     Hour hour_;
-
 };
+
 class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     friend class EngineReactor;
     friend class SegmentReactor;
     friend class CustomerReactor;
     friend class PortReactor;
     friend class TerminalReactor;
+    friend class ShipmentReactor;
   public:
     ~ShippingNetwork() {}
     int customers() const { return customers_; }
@@ -105,14 +108,17 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     static inline Routing bfs(){ return bfs__; }
     Routing routing() const { return routing_; }
     void routingIs(const Routing _routing) { routing_ = _routing; }
+    Ptr<Shipment> shipmentNew(const string name);
+    Ptr<Path> nextHop(const WeakPtr<Shipment> shipment);
 
-    ShippingNetwork() : customers_(0), ports_(0), truckTerminals_(0), planeTerminals_(0), boatTerminals_(0), 
-                        truckSegments_(0), planeSegments_(0), boatSegments_(0),    
-                        truckSegmentsExpediteAvailable_(0), planeSegmentsExpediteAvailable_(0), boatSegmentsExpediteAvailable_(0), 
+    ShippingNetwork() : customers_(0), ports_(0), truckTerminals_(0), planeTerminals_(0), boatTerminals_(0),
+                        truckSegments_(0), planeSegments_(0), boatSegments_(0),
+                        truckSegmentsExpediteAvailable_(0), planeSegmentsExpediteAvailable_(0), boatSegmentsExpediteAvailable_(0),
                         isConnAttributeChange(false), expedite_(Segment::allAvailabilities()), routing_(bfs__){}
 
   protected:
     void customersInc() { customers_++; }
+    void deliverShipment(WeakPtr<Shipment> shipment);
   private:
     int customers_;
     int ports_;
@@ -126,7 +132,7 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     int planeSegmentsExpediteAvailable_;
     int boatSegmentsExpediteAvailable_;
     bool isConnAttributeChange;
-    
+
     Ptr<TruckFleet> truckFleet_;
     Ptr<PlaneFleet> planeFleet_;
     Ptr<BoatFleet> boatFleet_;
@@ -138,6 +144,7 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     Mile maxDistance_;
     Segment::ExpediteSupport expedite_;
     Routing routing_;
+    vector<Ptr<Shipment> > shipment_;
 
     ShippingNetwork(const ShippingNetwork& o);
     void computePath();

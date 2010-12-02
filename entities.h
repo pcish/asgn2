@@ -32,7 +32,7 @@ class Segment;
 class Port;
 
 class Shipment : public Fwk::NamedInterface {
-    friend class EngineManager;
+    friend class ShippingNetwork;
   public:
     ~Shipment() { if (notifiee_) notifiee_->onDel(this); }
     PackageUnit load() const { return load_; }
@@ -42,9 +42,13 @@ class Shipment : public Fwk::NamedInterface {
     Ptr<Customer> source() const { return source_; }
     void sourceIs(const Ptr<Customer> source) { if (source_ == source) return; source_ = source; if (notifiee_) notifiee_->onSource(); }
     USD cost() const { return cost_; }
+    void costInc(USD increment) { cost_ = cost_.value() + increment.value(); }
     Hour transitTime() const { return transitTime_; }
+    void transitTimeInc(Hour increment) { transitTime_ = transitTime_.value() + increment.value(); }
     Ptr<Location> currentLocation() const { return currentLocation_; }
     void currentLocationIs(const Ptr<Location> currentLocation) { if (currentLocation_ == currentLocation) return; currentLocation_ = currentLocation; if (notifiee_) notifiee_->onCurrentLocation(); }
+    ShippingNetwork* shippingNetwork() const { return shippingNetwork_; }
+    void shippingNetworkIs(ShippingNetwork* shippingNetwork) { if (shippingNetwork_ == shippingNetwork) return; shippingNetwork_ = shippingNetwork; }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<Shipment> notifier) {
@@ -68,7 +72,7 @@ class Shipment : public Fwk::NamedInterface {
     };
     Ptr<Shipment::Notifiee> notifiee() const { return notifiee_; }
   protected:
-    Shipment(const USD cost, const Hour transitTime) : NamedInterface(""), cost_(cost), transitTime_(transitTime) {}
+    Shipment(Fwk::String name) : NamedInterface(name) {}
     Ptr<Shipment::Notifiee> notifiee_;
     void notifieeIs(Shipment::Notifiee* n) const {
         Shipment* me = const_cast<Shipment*>(this);
@@ -82,6 +86,7 @@ class Shipment : public Fwk::NamedInterface {
     USD cost_;
     Hour transitTime_;
     Ptr<Location> currentLocation_;
+    ShippingNetwork* shippingNetwork_;
     Shipment(const Shipment& o);
 };
 
@@ -122,6 +127,8 @@ class Segment : public Fwk::PtrInterface<Segment> {
     void lengthIs(const Mile length) { if (length_ == length) return; length_ = length; if (notifiee_) notifiee_->onLength(); }
     ShipmentCount capacity() const { return capacity_; }
     void capacityIs(const ShipmentCount capacity) { if (capacity_ == capacity) return; capacity_ = capacity; if (notifiee_) notifiee_->onCapacity(); }
+    ShipmentCount availableCapacity() const { return ShipmentCount(capacity_.value() - usedCapacity_.value()); }
+    void usedCapacityInc() { if (usedCapacity_ >= capacity_) throw Fwk::InternalException("no available capacity"); usedCapacity_ = usedCapacity_.value() + 1; }
     ShipmentCount shipmentsRefused() { return shipmentsRefused_; }
     ShipmentCount shipmentsReceived() { return shipmentsReceived_; }
     ShippingNetwork* shippingNetwork() const { return shippingNetwork_; }
@@ -171,6 +178,7 @@ class Segment : public Fwk::PtrInterface<Segment> {
     SegmentDifficultyUnit difficulty_;
     Mile length_;
     ShipmentCount capacity_;
+    ShipmentCount usedCapacity_;
     ShipmentCount shipmentsRefused_;
     ShipmentCount shipmentsReceived_;
     ShippingNetwork* shippingNetwork_;
@@ -241,6 +249,7 @@ class Customer : public Location {
     friend class EngineManager;
   public:
     ~Customer() { if (notifiee_) notifiee_->onDel(this); }
+    WeakPtr<Location> destination() const { return destination_; }
     void destinationIs(const Ptr<Location> destination) { if (destination_ == destination) return; destination_ = destination; if (notifiee_) notifiee_->onDestination(); }
     void shipmentSizeIs(const PackageUnit shipmentSize) { if (shipmentSize_ == shipmentSize) return; shipmentSize_ = shipmentSize; if (notifiee_) notifiee_->onShipmentSize(); }
     void transferRateIs(const ShipmentCount transferRate) { if (transferRate_ == transferRate) return; transferRate_ = transferRate; if (notifiee_) notifiee_->onTransferRate(); }

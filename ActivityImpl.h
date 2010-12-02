@@ -14,7 +14,7 @@ Fwk::Ptr<Activity::Manager> activityManagerInstance();
 
 namespace ActivityImpl {
 
-    //Comparison class for activities   
+    //Comparison class for activities
     class ActivityComp : public binary_function<Activity::Ptr, Activity::Ptr, bool> {
         public:
             ActivityComp() {}
@@ -38,8 +38,8 @@ namespace ActivityImpl {
                 }
             }
 
-            virtual Time nextTime() const { return nextTime_; }
-            virtual void nextTimeIs(Time t) {
+            virtual Hour nextTime() const { return nextTime_; }
+            virtual void nextTimeIs(Hour t) {
                 nextTime_ = t;
                 if (notifiee_ != NULL) {
                     notifiee_->onNextTime();
@@ -57,7 +57,7 @@ namespace ActivityImpl {
         private:
             friend class ManagerImpl;
             Status status_;
-            Time nextTime_;
+            Hour nextTime_;
             Notifiee* notifiee_;
             Fwk::Ptr<class ManagerImpl> manager_;
     };
@@ -71,8 +71,8 @@ namespace ActivityImpl {
             virtual Activity::Ptr activity(const string& name) const;
             virtual void activityDel(const string& name);
 
-            virtual Time now() const { return now_; }
-            virtual void nowIs(Time time);
+            virtual Hour now() const { return now_; }
+            virtual void nowIs(Hour time);
 
             static Fwk::Ptr<Activity::Manager> activityManagerInstance();
 
@@ -88,13 +88,13 @@ namespace ActivityImpl {
             //Data members
             priority_queue<Activity::Ptr, vector<Activity::Ptr>, ActivityComp> scheduledActivities_;
             map<string, Activity::Ptr> activities_; //pool of all activities
-            Time now_;
+            Hour now_;
 
             //specific to this example
             Queue::Ptr queue_;
 
             //singleton instance
-            static Fwk::Ptr<Activity::Manager> activityInstance_;	
+            static Fwk::Ptr<Activity::Manager> activityInstance_;
 
     };
 
