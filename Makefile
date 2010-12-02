@@ -1,7 +1,7 @@
 CXXFLAGS = -Wall -g
 LIB = fwk/BaseNotifiee.o fwk/Exception.o
 
-OBJECTS = Instance.o Engine.o entities.o Log.o ActivityImpl.o
+OBJECTS = Instance.o Engine.o entities.o Log.o ActivityImpl.o ActivityReactor.o
 
 default:	test1
 

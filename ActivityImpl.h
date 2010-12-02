@@ -1,88 +1,104 @@
 #ifndef __ACTIVITY_IMPL_H__
 #define __ACTIVITY_IMPL_H__
 
-#include <list>
 #include <map>
+#include <string>
+#include <queue>
 
-#include "fwk/Exception.h"
 #include "Activity.h"
+#include "Queue.h"
 
 using namespace std;
 
+Fwk::Ptr<Activity::Manager> activityManagerInstance();
+
 namespace ActivityImpl {
 
-class ActivityImpl : public Activity {
-public:
-    /* Write this class */
-    virtual Status status() const { return status_; }
-    virtual void statusIs(const Status _status);
-    virtual Time nextTime() const {return nextTime_;}
-    virtual void nextTimeIs(Time _nextTime){ nextTime_ = _nextTime; }
-    virtual Fwk::Ptr<Notifiee> notifiee() const { 
-        Fwk::Ptr<Notifiee> front = notifiee_.front();
-        return front; 
-    }
-    virtual void lastNotifieeIs(Notifiee *n) { 
-        Fwk::Ptr<Notifiee> nptr(n);
-        notifiee_.push_back(nptr); 
-    }
-    class ManagerImpl;
-protected:
-    void execute();
-private:
-    ActivityImpl(const string &name) : Activity(name), nextTime_(0) {}
-    Status status_;
-    Time nextTime_;
-    list<Fwk::Ptr<Notifiee> > notifiee_;
-};
+    //Comparison class for activities   
+    class ActivityComp : public binary_function<Activity::Ptr, Activity::Ptr, bool> {
+        public:
+            ActivityComp() {}
 
-//Manager should be a singleton
-class ActivityImpl::ManagerImpl : public Activity::Manager {
-public:
-    enum TimeSteppingType {realtime__, virtualtime__};
-    /* Write this class */
-    virtual Activity::Ptr activityNew(const string &name) {
-        if (activity_.find(name) != activity_.end() )
-            throw Fwk::NameInUseException("Activity already exists: " + name);
-        Activity::Ptr act = new ActivityImpl(name);
-        activity_[name] = act;
-        return act;
-    }
+            bool operator()(Activity::Ptr a, Activity::Ptr b) const {
+                return (a->nextTime() > b->nextTime());
+            }
+    };
 
-    virtual Activity::Ptr activity(const string &name) const {
-        map<string, Activity::Ptr>::const_iterator p = activity_.find(name);
-        if (p == activity_.end() )
-            return NULL;
-        return p->second;
-    }
+    class ActivityImpl : public Activity {
+        protected:
+            ActivityImpl(const string& name, Fwk::Ptr<class ManagerImpl> manager)
+                : Activity(name), status_(free), nextTime_(0.0), notifiee_(NULL), manager_(manager) {}
+            Fwk::Ptr<class ManagerImpl> manager() const { return manager_; }
 
-    virtual void activityDel(const string &name) { activity_.erase(name); }
-    virtual void lastActivityIs(Activity::Ptr act) { activity_.insert(make_pair(act->name(), act) ); }    
+            virtual Status status() const { return status_; }
+            virtual void statusIs(Status s) {
+                status_ = s;
+                if (notifiee_ != NULL) {
+                    notifiee_->onStatus();
+                }
+            }
 
-    virtual Time now() const { return now_; }
-    virtual void nowIs(Time _now);
+            virtual Time nextTime() const { return nextTime_; }
+            virtual void nextTimeIs(Time t) {
+                nextTime_ = t;
+                if (notifiee_ != NULL) {
+                    notifiee_->onNextTime();
+                }
+            }
 
-    virtual TimeSteppingType timeStepping() { return timeStepping_; }
-    virtual void timeSteppingIs(TimeSteppingType _timeStepping) { timeStepping_ = _timeStepping;} 
-    static Fwk::Ptr<ManagerImpl> instance() {
-        if (instance_ == NULL)
-            instance_ = new ManagerImpl();
-        return instance_;
-    }
+            virtual Notifiee::Ptr notifiee() const { return notifiee_; }
 
-private:
-    ManagerImpl() : now_(0) {}
-    map<string, Activity::Ptr> activity_;
-    Time now_;
-    TimeSteppingType timeStepping_;
-    static Fwk::Ptr<ManagerImpl> instance_;
-};
+            virtual void lastNotifieeIs(Notifiee* n) {
+                ActivityImpl* me = const_cast<ActivityImpl*>(this);
+                me->notifiee_ = n;
+            }
+
+
+        private:
+            friend class ManagerImpl;
+            Status status_;
+            Time nextTime_;
+            Notifiee* notifiee_;
+            Fwk::Ptr<class ManagerImpl> manager_;
+    };
+
+    class ManagerImpl : public Activity::Manager {
+
+        public:
+            typedef Fwk::Ptr<ManagerImpl> Ptr;
+
+            virtual Activity::Ptr activityNew(const string& name);
+            virtual Activity::Ptr activity(const string& name) const;
+            virtual void activityDel(const string& name);
+
+            virtual Time now() const { return now_; }
+            virtual void nowIs(Time time);
+
+            static Fwk::Ptr<Activity::Manager> activityManagerInstance();
+
+            virtual void lastActivityIs(Activity::Ptr activity);
+
+            //specific to this example
+            Queue::Ptr queue() const { return queue_; }
+        protected:
+            ManagerImpl() : now_(0) {
+                queue_ = new Queue();
+            }
+
+            //Data members
+            priority_queue<Activity::Ptr, vector<Activity::Ptr>, ActivityComp> scheduledActivities_;
+            map<string, Activity::Ptr> activities_; //pool of all activities
+            Time now_;
+
+            //specific to this example
+            Queue::Ptr queue_;
+
+            //singleton instance
+            static Fwk::Ptr<Activity::Manager> activityInstance_;	
+
+    };
 
 }
-/*
-Fwk::Ptr<Activity::Manager> activityManagerInstance() {
-    return ActivityImpl::ActivityImpl::ManagerImpl::instance();
-}
-*/
+
 #endif /* __ACTIVITY_IMPL_H__ */
 
