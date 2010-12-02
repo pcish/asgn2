@@ -149,6 +149,9 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     ShippingNetwork(const ShippingNetwork& o);
     void computePath();
     void explore(Ptr<Location> curLocation, set<string> visitedNodes, Ptr<Path> curPath);
+    Ptr<Path> getBfsPath(const WeakPtr<Shipment>);
+    Ptr<Path> getDijkstraPath(const WeakPtr<Shipment>);
+    
     list<Ptr<Location> > visitedNodes;
 };
 
