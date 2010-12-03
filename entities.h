@@ -411,7 +411,7 @@ class Fleet : public Fwk::NamedInterface {
     };
     Ptr<Fleet::Notifiee> notifiee() const { return notifiee_; }
   protected:
-    Fleet(Fwk::String name) : NamedInterface(name) {}
+    Fleet(Fwk::String name) : NamedInterface(name), cost_(1), speed_(1), capacity_(100) {}
     Ptr<Fleet::Notifiee> notifiee_;
     void notifieeIs(Fleet::Notifiee* n) const {
         Fleet* me = const_cast<Fleet*>(this);
@@ -420,9 +420,9 @@ class Fleet : public Fwk::NamedInterface {
 
   private:
     USD cost_;
+    Mile speed_;
     PackageUnit capacity_;
     Segment::TransportationMode transportationMode_;
-    Mile speed_;
     Fleet(const Fleet& o);
 };
 

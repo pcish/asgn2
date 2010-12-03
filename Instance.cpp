@@ -189,15 +189,6 @@ class FleetRep : public Instance {
         truckfleet_ = manager->shippingNetwork()->truckFleetNew(name+"_truck");
         planefleet_ = manager->shippingNetwork()->planeFleetNew(name+"_plane");
         boatfleet_ = manager->shippingNetwork()->boatFleetNew(name+"_boat");
-        truckfleet_->costIs(1);
-        truckfleet_->speedIs(1);
-        truckfleet_->capacityIs(100);
-        planefleet_->costIs(1);
-        planefleet_->speedIs(1);
-        planefleet_->capacityIs(100);
-        boatfleet_->costIs(1);
-        boatfleet_->speedIs(1);
-        boatfleet_->capacityIs(100);
     }
     Ptr<Fleet> truckfleet_, boatfleet_, planefleet_;
 
