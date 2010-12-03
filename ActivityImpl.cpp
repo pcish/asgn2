@@ -71,9 +71,10 @@ namespace ActivityImpl {
 
             //calculate amount of Hour to sleep
             Hour diff = Hour(nextToRun->nextTime().value() - now_.value());
-
-            //sleep 100ms (100,000 microseconds) for every unit of time
-            usleep(( ((int)diff.value()) * 100000));
+            
+            if (timeStepping_ == realtime__)
+                //sleep 100ms (100,000 microseconds) for every unit of time
+                usleep(( ((int)diff.value()) * 100000));
 
             now_ = nextToRun->nextTime();
 
