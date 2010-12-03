@@ -57,14 +57,20 @@ class Dijkstra : public RoutingAlgorithm<Dijkstra> {
         distanceTuple.push_back(t);
         lookup[from->name()] = t;
         while (!distanceTuple.empty() ) {
-            min_element(distanceTuple.begin(), distanceTuple.end(), DistanceTuple<Mile>::DistanceTupleComp() );
+            min_element(distanceTuple.begin(), distanceTuple.end(), DistanceTuple<Mile>::DistanceTupleComp());
             Ptr<DistanceTuple<Mile> > best = distanceTuple.front();
             distanceTuple.pop_front();
             Ptr<Location> curLocation = best->location();
-            if (curLocation->name() == to->name() ) {
+            if (curLocation->name() == to->name()) {
                 Ptr<Path> path = Path::pathNew();
-                //list<Ptr<Location> > locs;
-                //list<
+                path->locationIs(curLocation);
+                while (curLocation->name() != from->name()) {
+                    t = lookup[curLocation->name()];
+                    path->locationIs(t->location());
+                    path->segmentIs(t->segment().ptr());
+                    curLocation = t->location();
+                }
+                path->reversed();
             }
             for (unsigned int i = 0; i < curLocation->segments(); ++i) {
                 WeakPtr<Segment> seg = curLocation->segment(i);

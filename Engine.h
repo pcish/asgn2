@@ -5,6 +5,7 @@
 #include "PtrInterface.h"
 #include <vector>
 #include <set>
+#include <algorithm>
 
 namespace Shipping {
 class EngineReactor;
@@ -41,9 +42,17 @@ public:
     void expediteIs(const Segment::ExpediteSupport _expedite) { expedite_ = _expedite; }
     Mile distance() const { return distance_; }
     void distanceIs(const Mile _distance) { distance_ = _distance; }
+    void reversedIs (bool _reversed) { 
+        if (_reversed != reversed_) {
+            reverse(location_.begin(), location_.end());
+            reverse(segment_.begin(), segment_.end());
+            reversed_ = _reversed;
+        }
+    }
+    bool reversed() const { return reversed_; }
     Ptr<Path> clone();
 private:
-    Path() {}
+    Path() : reversed_(false) {}
     Path(Path&) {}
     vector<Ptr<Location> > location_;
     vector<WeakPtr<Segment> > segment_;
@@ -51,6 +60,7 @@ private:
     Mile distance_;
     Segment::ExpediteSupport expedite_;
     Hour hour_;
+    bool reversed_;
 };
 
 class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
