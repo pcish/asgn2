@@ -66,6 +66,7 @@ namespace ActivityImpl {
 
         public:
             typedef Fwk::Ptr<ManagerImpl> Ptr;
+            enum TimeStepping { virtualtime__, realtime__};
 
             virtual Activity::Ptr activityNew(const string& name);
             virtual Activity::Ptr activity(const string& name) const;
@@ -77,6 +78,8 @@ namespace ActivityImpl {
             static Fwk::Ptr<Activity::Manager> activityManagerInstance();
 
             virtual void lastActivityIs(Activity::Ptr activity);
+            void timeSteppingIs(const TimeStepping _timeStepping) { timeStepping_ = _timeStepping; }
+            TimeStepping timeStepping() { return timeStepping_; }
 
             //specific to this example
             Queue::Ptr queue() const { return queue_; }
@@ -89,6 +92,7 @@ namespace ActivityImpl {
             priority_queue<Activity::Ptr, vector<Activity::Ptr>, ActivityComp> scheduledActivities_;
             map<string, Activity::Ptr> activities_; //pool of all activities
             Hour now_;
+            TimeStepping timeStepping_;
 
             //specific to this example
             Queue::Ptr queue_;
