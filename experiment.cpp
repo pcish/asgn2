@@ -55,7 +55,8 @@ class ExperimentNetwork {
             for (int s = 0; s < 100; s++) {
                 source[s]->attributeIs("destination", "destination");
                 stringstream size_str;
-                size_str << random_shipment_size ? rand() % 1000 + 1 : 100;
+                int size = random_shipment_size ? rand() % 1000 + 1 : 100;
+                size_str << size;
                 source[s]->attributeIs("shipment size", size_str.str());
                 source[s]->attributeIs("transfer rate", "1");
             }

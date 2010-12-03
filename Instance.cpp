@@ -185,10 +185,13 @@ class FleetRep : public Instance {
         boatfleet_ = manager->engineManager()->boatFleetNew();
         truckfleet_->costIs(1);
         truckfleet_->speedIs(1);
+        truckfleet_->capacityIs(100);
         planefleet_->costIs(1);
         planefleet_->speedIs(1);
+        planefleet_->capacityIs(100);
         boatfleet_->costIs(1);
         boatfleet_->speedIs(1);
+        boatfleet_->capacityIs(100);
     }
     Ptr<Fleet> truckfleet_, boatfleet_, planefleet_;
 

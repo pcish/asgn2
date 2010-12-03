@@ -165,6 +165,7 @@ class Segment : public Fwk::PtrInterface<Segment> {
     Segment(const string name, const TransportationMode transportationMode) : name_(name), transportationMode_(transportationMode) {
         expediteSupport_ = unavailable_;
         capacity_ = ShipmentCount(10);
+        length_ = Mile(1);
     }
     Ptr<Segment::Notifiee> notifiee_;
     void notifieeIs(Segment::Notifiee* n) const {
@@ -254,6 +255,7 @@ class Customer : public Location {
     ~Customer() { if (notifiee_) notifiee_->onDel(this); }
     WeakPtr<Location> destination() const { return destination_; }
     void destinationIs(const Ptr<Location> destination) { if (destination_ == destination) return; destination_ = destination; if (notifiee_) notifiee_->onDestination(); }
+    PackageUnit shipmentSize() const { return shipmentSize_; }
     void shipmentSizeIs(const PackageUnit shipmentSize) { if (shipmentSize_ == shipmentSize) return; shipmentSize_ = shipmentSize; if (notifiee_) notifiee_->onShipmentSize(); }
     void transferRateIs(const ShipmentCount transferRate) { if (transferRate_ == transferRate) return; transferRate_ = transferRate; if (notifiee_) notifiee_->onTransferRate(); }
     ShipmentCount shipmentsReceived() const { return shipmentsReceived_; }

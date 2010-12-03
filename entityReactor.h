@@ -12,11 +12,13 @@ class ShipmentReactor : public Shipment::Notifiee {
   public:
     static Hour retryTime;
     virtual void onCurrentLocation() {
+        cerr << "on current location called" << endl;
         if (notifier_->currentLocation() == notifier_->destination()) {
             notifier_->shippingNetwork()->deliverShipment(notifier_);
         } else {
             forwardShipment();
         }
+        cerr << "on current location end" << endl;
     }
     static Fwk::Ptr<ShipmentReactor> shipmentReactorNew() {
         Fwk::Ptr<ShipmentReactor> n = new ShipmentReactor();
@@ -33,11 +35,15 @@ class ShipmentReactor : public Shipment::Notifiee {
   private:
     ShipmentReactor() { previousSegment_ = NULL; }
     void forwardShipment() {
+        cerr << "forward shipment called" << endl;
         Fwk::Ptr<Path> nextHop = notifier_->shippingNetwork()->nextHop(notifier_);
         WeakPtr<Segment> nextSegment = nextHop->segment(0);
-        if (!nextSegment || nextHop->location(1)) {
+        cerr << nextSegment->name() << endl;
+        if (nextSegment == NULL || nextHop->location(1) == NULL) {
             throw Fwk::InternalException("nextHop return invalid path");
         }
+        cerr << "capacity = " << nextSegment->availableCapacity().value() << endl;
+        cerr << nextHop->location(1)->name() << endl;
         if (nextSegment->availableCapacity() > 0) {
             Fwk::Ptr<Fleet> fleet;
             if (nextSegment->transportationMode() == Segment::truck()) {
@@ -50,13 +56,24 @@ class ShipmentReactor : public Shipment::Notifiee {
             Hour transitTime =
                 ceil((double) notifier_->load().value() / (double) fleet->capacity().value()) *
                 (nextSegment->length().value() / fleet->speed().value());
+            //cerr << "ceil(" << notifier_->load().value() << " / " << fleet->capacity().value() << ")" << endl;
+            //cerr << "* ("<< nextSegment->length().value() << " / " << fleet->speed().value() << ")" << endl;
+            cerr << "transit time = " << transitTime.value() << endl;
 
             Activity::Manager::Ptr manager = activityManagerInstance();
-            activity_ = manager->activityNew(notifier_->name());
+            if (activity_ == NULL) {
+                try {
+                    activity_ = manager->activityNew(notifier_->name());
+                } catch(Fwk::Exception& e) {
+                    cerr << "attempting to new activity with name=" << notifier_->name() << "returned: ";
+                    cout << e.what() << endl;
+                }
+            }
             activityNotifiee_ = new ActivityNotifiee(
                 activity_.ptr(), this, nextHop->location(1));
             activity_->nextTimeIs(manager->now().value() + transitTime.value());
             activity_->lastNotifieeIs(activityNotifiee_.ptr());
+            manager->lastActivityIs(activity_.ptr());
 
             previousSegment_ = nextSegment.ptr();
             nextSegment->usedCapacityInc();
@@ -66,12 +83,14 @@ class ShipmentReactor : public Shipment::Notifiee {
         } else {
             nextSegment->shipmentsRefusedInc();
             Activity::Manager::Ptr manager = activityManagerInstance();
-            activity_ = manager->activityNew(notifier_->name());
+            if(activity_ == NULL) activity_ = manager->activityNew(notifier_->name());
             activityNotifiee_ = new ActivityNotifiee(
                 activity_.ptr(), this, notifier_->currentLocation());
             activity_->nextTimeIs(manager->now().value() + retryTime.value());
             activity_->lastNotifieeIs(activityNotifiee_.ptr());
+            manager->lastActivityIs(activity_.ptr());
         }
+        cerr << "forward shipment return" << endl;
     }
     class ActivityNotifiee : public Activity::Activity::Notifiee {
       public:
@@ -112,14 +131,6 @@ class SegmentReactor : public Segment::Notifiee {
         } else if (p->transportationMode() == Segment::boat()) {
             notifier_->shippingNetwork()->boatSegments_--;
             notifier_->shippingNetwork()->boatSegmentsExpediteAvailable_ -= delta;
-        }
-        if (notifier_->source() != NULL) {
-            unsigned int i = 0;
-            while (notifier_->source()->segment(i).ptr() != notifier_.ptr() && i < notifier_->source()->segments()) i++;
-            notifier_->source()->segmentIs(i, NULL);
-        }
-        if (notifier_->returnSegment() != NULL) {
-            notifier_->returnSegment()->returnSegmentIs(NULL);
         }
     }
     virtual void onExpediteSupport() {
@@ -171,7 +182,8 @@ class SegmentReactor : public Segment::Notifiee {
     WeakPtr<Segment> previousReturnSegment_;
     bool handlingReturnSegment_;
 };
-class CustomerReactor : public Customer::Notifiee{
+
+class CustomerReactor : public Customer::Notifiee {
   public:
     virtual void onDel(Customer *p) {
         notifier_->shippingNetwork()->customers_--;
@@ -194,7 +206,7 @@ class CustomerReactor : public Customer::Notifiee{
     }
   private:
     class ActivityNotifiee : public Activity::Activity::Notifiee {
-      public: 
+      public:
       //Pointer here may need to be refined
         ActivityNotifiee(Activity::Activity *activity, CustomerReactor *_parent) : Activity::Activity::Notifiee(activity), activity_(activity), parent_(_parent){}
         virtual void onStatus() {
@@ -220,28 +232,28 @@ class CustomerReactor : public Customer::Notifiee{
                 //here we need to set the time for activity
                 activityNotifiee_ = new ActivityNotifiee(activity_.ptr(), this);
                 activity_->lastNotifieeIs(activityNotifiee_.ptr());
+                manager->lastActivityIs(activity_.ptr());
             }
         }
     }
-    void shipmentNew(){
-        //name need to be refined
-        
-        //string name = "shipment_" + notifier_.name() + "_" + notifier_->destination->name();
-        string name = "shipment_";
-        Fwk::Ptr<Shipment> shipment = notifier_->shippingNetwork()->shipmentNew(name);
-        shipment->sourceIs(notifier_.ptr() );
-        shipment->destinationIs(dynamic_cast<Customer*>(notifier_->destination().ptr()) );
-        //shipment->loadIs(notifier_->shipmentSize() );
+    void shipmentNew() {
+        Fwk::Ptr<Shipment> shipment = notifier_->shippingNetwork()->shipmentNew();
+        shipment->sourceIs(notifier_.ptr());
+        shipment->destinationIs(dynamic_cast<Customer*>(notifier_->destination().ptr()));
+        shipment->loadIs(notifier_->shipmentSize());
+        shipment->currentLocationIs(notifier_.ptr());
+
         Activity::Manager::Ptr manager = activityManagerInstance();
         activity_->nextTimeIs(manager->now().value() + 24);
         manager->lastActivityIs(activity_.ptr());
+        cerr << "shipment at " << notifier_->name() << " started" << endl;
     }
     CustomerReactor() : destSet(false), shipmentSizeSet(false), transferRateSet(false), started(false) {}
     Activity::Activity::Ptr activity_;
     Fwk::Ptr<ActivityNotifiee> activityNotifiee_;
     bool destSet, shipmentSizeSet, transferRateSet, started;
-
 };
+
 class PortReactor : public Port::Notifiee {
   public:
     virtual void onDel(Port *p) {

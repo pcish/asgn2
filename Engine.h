@@ -42,7 +42,7 @@ public:
     void expediteIs(const Segment::ExpediteSupport _expedite) { expedite_ = _expedite; }
     Mile distance() const { return distance_; }
     void distanceIs(const Mile _distance) { distance_ = _distance; }
-    void reversedIs (bool _reversed) { 
+    void reversedIs (bool _reversed) {
         if (_reversed != reversed_) {
             reverse(location_.begin(), location_.end());
             reverse(segment_.begin(), segment_.end());
@@ -118,7 +118,7 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     static inline Routing bfs(){ return bfs__; }
     Routing routing() const { return routing_; }
     void routingIs(const Routing _routing) { routing_ = _routing; }
-    Ptr<Shipment> shipmentNew(const string name);
+    Ptr<Shipment> shipmentNew();
     Ptr<Path> nextHop(const WeakPtr<Shipment> shipment);
 
     ShippingNetwork() : customers_(0), ports_(0), truckTerminals_(0), planeTerminals_(0), boatTerminals_(0),

@@ -121,12 +121,17 @@ void ShippingNetwork::explore(const Ptr<Location> curLocation, set<string> visit
     visitedNodes.erase(curLocation->name());
 }
 
-Ptr<Shipment> ShippingNetwork::shipmentNew(const string name) {
-    Ptr<Shipment> m = new Shipment(name);
+Ptr<Shipment> ShippingNetwork::shipmentNew() {
+    static long shipmentID = 0;
+    stringstream name;
+    name << "shipment_" << shipmentID;
+    shipmentID++;
+    Ptr<Shipment> m = new Shipment(name.str());
     m->shippingNetworkIs(this);
     Fwk::Ptr<ShipmentReactor> r = ShipmentReactor::shipmentReactorNew();
     r->notifierIs(m);
     shipment_.push_back(m);
+    cerr << "shipment " << m->name() << "created" << endl;
     return m;
 }
 
@@ -137,8 +142,7 @@ Ptr<Path> ShippingNetwork::nextHop(const WeakPtr<Shipment> shipment) {
     Ptr<Bfs> bfs = Bfs::instance(this);
     bfs->nextHop(shipment);
     Ptr<RandomWalk> rw = RandomWalk::instance(this);
-    rw->nextHop(shipment);
-    return Path::pathNew();
+    return rw->nextHop(shipment);
 }
 
 class EngineReactor : public EngineManager::Notifiee {
