@@ -386,32 +386,32 @@ int LocationRep::segmentNumber(const string& name) {
 string StatsRep::attribute(const string& name) {
     ostringstream os;
     if (name == "Customer") {
-        os << manager_->shippingNetwork()->customers();
+        os << manager_->shippingNetwork()->statistics()->customers();
     } else if (name == "Truck terminal") {
-        os << manager_->shippingNetwork()->truckTerminals();
+        os << manager_->shippingNetwork()->statistics()->truckTerminals();
     } else if (name == "Plane terminal") {
-        os << manager_->shippingNetwork()->planeTerminals();
+        os << manager_->shippingNetwork()->statistics()->planeTerminals();
     } else if (name == "Boat terminal") {
-        os << manager_->shippingNetwork()->boatTerminals();
+        os << manager_->shippingNetwork()->statistics()->boatTerminals();
     } else if (name == "Port") {
-        os << manager_->shippingNetwork()->ports();
+        os << manager_->shippingNetwork()->statistics()->ports();
     } else if (name == "Truck segment") {
-        os << manager_->shippingNetwork()->truckSegments();
+        os << manager_->shippingNetwork()->statistics()->truckSegments();
     } else if (name == "Plane segment") {
-        os << manager_->shippingNetwork()->planeSegments();
+        os << manager_->shippingNetwork()->statistics()->planeSegments();
     } else if (name == "Boat segment") {
-        os << manager_->shippingNetwork()->boatSegments();
+        os << manager_->shippingNetwork()->statistics()->boatSegments();
     } else if (name == "expedite percentage") {
         int expediteAvailable = 0;
-        manager_->shippingNetwork()->expediteIs(Segment::available());
-        expediteAvailable += manager_->shippingNetwork()->truckSegments();
-        expediteAvailable += manager_->shippingNetwork()->planeSegments();
-        expediteAvailable += manager_->shippingNetwork()->boatSegments();
+        manager_->shippingNetwork()->statistics()->expediteIs(Segment::available());
+        expediteAvailable += manager_->shippingNetwork()->statistics()->truckSegments();
+        expediteAvailable += manager_->shippingNetwork()->statistics()->planeSegments();
+        expediteAvailable += manager_->shippingNetwork()->statistics()->boatSegments();
         int totalSegments = 0;
-        manager_->shippingNetwork()->expediteIs(Segment::allAvailabilities());
-        totalSegments += manager_->shippingNetwork()->truckSegments();
-        totalSegments += manager_->shippingNetwork()->planeSegments();
-        totalSegments += manager_->shippingNetwork()->boatSegments();
+        manager_->shippingNetwork()->statistics()->expediteIs(Segment::allAvailabilities());
+        totalSegments += manager_->shippingNetwork()->statistics()->truckSegments();
+        totalSegments += manager_->shippingNetwork()->statistics()->planeSegments();
+        totalSegments += manager_->shippingNetwork()->statistics()->boatSegments();
         os.setf(ios::fixed,ios::floatfield);
         os.precision(2);
         os << ((float) expediteAvailable / (float) totalSegments) * 100.0;

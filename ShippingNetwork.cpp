@@ -158,28 +158,28 @@ Ptr<Path> ShippingNetwork::nextHop(const WeakPtr<Shipment> shipment) {
 class ShippingNetworkReactor : public ShippingNetwork::Notifiee {
   public:
     virtual void onCustomerNew(Fwk::Ptr<Customer> p) {
-        notifier_->customersInc();
+        notifier_->statistics()->customersInc();
     }
     virtual void onTerminalNew(Fwk::Ptr<Terminal> p) {
         if (p->transportationMode() == Segment::truck()) {
-            notifier_->truckTerminals_++;
+            notifier_->statistics()->truckTerminals_++;
         } else if (p->transportationMode() == Segment::plane()) {
-            notifier_->planeTerminals_++;
+            notifier_->statistics()->planeTerminals_++;
         } else if (p->transportationMode() == Segment::boat()) {
-            notifier_->boatTerminals_++;
+            notifier_->statistics()->boatTerminals_++;
         }
     }
     virtual void onSegmentNew(Fwk::Ptr<Segment> p) {
         if (p->transportationMode() == Segment::truck()) {
-            notifier_->truckSegments_++;
+            notifier_->statistics()->truckSegments_++;
         } else if (p->transportationMode() == Segment::plane()) {
-            notifier_->planeSegments_++;
+            notifier_->statistics()->planeSegments_++;
         } else if (p->transportationMode() == Segment::boat()) {
-            notifier_->boatSegments_++;
+            notifier_->statistics()->boatSegments_++;
         }
     }
     virtual void onPortNew(Fwk::Ptr<Port> p) {
-        notifier_->ports_++;
+        notifier_->statistics()->ports_++;
     }
     virtual void onPlaneFleetNew(Fwk::Ptr<PlaneFleet> p) {
         notifier_->planeFleetIs(p);
@@ -196,12 +196,15 @@ class ShippingNetworkReactor : public ShippingNetwork::Notifiee {
     }
 };
 
-ShippingNetwork::ShippingNetwork() : customers_(0), ports_(0), truckTerminals_(0), planeTerminals_(0), boatTerminals_(0),
+Statistics::Statistics(Fwk::String name) : NamedInterface(name), customers_(0), ports_(0), truckTerminals_(0), planeTerminals_(0), boatTerminals_(0),
                         truckSegments_(0), planeSegments_(0), boatSegments_(0),
-                        truckSegmentsExpediteAvailable_(0), planeSegmentsExpediteAvailable_(0), boatSegmentsExpediteAvailable_(0),
-                        isConnAttributeChange(false), expedite_(Segment::allAvailabilities()), routing_(bfs__) {
+                        truckSegmentsExpediteAvailable_(0), planeSegmentsExpediteAvailable_(0), boatSegmentsExpediteAvailable_(0), expedite_(Segment::allAvailabilities()) {}
+ShippingNetwork::ShippingNetwork() : isConnAttributeChange(false), expedite_(Segment::allAvailabilities()), routing_(bfs__) {
     Fwk::Ptr<ShippingNetworkReactor> r = ShippingNetworkReactor::ShippingNetworkReactorNew();
     r->notifierIs(this);
+    stringstream name;
+    name << "shippingNetwork" << " " << "Statistics" << endl;
+    statistics_ = new Statistics(name.str());
 }
 
 Ptr<Customer> ShippingNetwork::customerNew(const string name) {
