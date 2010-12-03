@@ -136,6 +136,16 @@ Ptr<Shipment> ShippingNetwork::shipmentNew() {
 }
 
 void ShippingNetwork::deliverShipment(WeakPtr<Shipment> shipment) {
+    cerr << "shipment " << shipment->name() << "received at destination" << endl;
+    shipment->destination()->shipmentsReceivedInc();
+    shipment->destination()->totalLatencyInc(shipment->transitTime());
+    shipment->destination()->totalCostInc(shipment->cost());
+    for (unsigned int i = 0; i < shipment_.size(); i++) {
+        if (shipment_[i].ptr() == shipment.ptr()) {
+            shipment_.erase(shipment_.begin() + i);
+            break;
+        }
+    }
 }
 
 Ptr<Path> ShippingNetwork::nextHop(const WeakPtr<Shipment> shipment) {

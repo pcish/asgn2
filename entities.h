@@ -259,8 +259,11 @@ class Customer : public Location {
     void shipmentSizeIs(const PackageUnit shipmentSize) { if (shipmentSize_ == shipmentSize) return; shipmentSize_ = shipmentSize; if (notifiee_) notifiee_->onShipmentSize(); }
     void transferRateIs(const ShipmentCount transferRate) { if (transferRate_ == transferRate) return; transferRate_ = transferRate; if (notifiee_) notifiee_->onTransferRate(); }
     ShipmentCount shipmentsReceived() const { return shipmentsReceived_; }
-    Hour averageLatency() const { return averageLatency_; }
+    void shipmentsReceivedInc() { shipmentsReceived_ = shipmentsReceived_.value() + 1; }
+    Hour averageLatency() const { return totalLatency_.value() / shipmentsReceived_.value(); }
+    void totalLatencyInc(Hour increment) { totalLatency_ = totalLatency_.value() + increment.value(); }
     USD totalCost() const { return totalCost_; }
+    void totalCostInc(USD increment) { totalCost_ = totalCost_.value() + increment.value(); }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<Customer> notifier) {
@@ -297,7 +300,7 @@ class Customer : public Location {
     PackageUnit shipmentSize_;
     ShipmentCount transferRate_;
     ShipmentCount shipmentsReceived_;
-    Hour averageLatency_;
+    Hour totalLatency_;
     USD totalCost_;
     Customer(const Customer& o);
 };

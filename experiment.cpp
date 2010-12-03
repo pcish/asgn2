@@ -86,7 +86,7 @@ int main(int argc, char* argv[]) {
     //cout << network->explore();
     network->startShipments();
     Activity::Manager::Ptr activityManager = activityManagerInstance();
-    activityManager->nowIs(24.0);
+    activityManager->nowIs(23.0);
     delete network;
     return 0;
 }
