@@ -4,6 +4,7 @@
 #include "time.h"
 #include "Instance.h"
 #include "fwk/Exception.h"
+#include "ActivityImpl.h"
 
 using namespace std;
 
@@ -56,7 +57,7 @@ class ExperimentNetwork {
                 stringstream size_str;
                 size_str << random_shipment_size ? rand() % 1000 + 1 : 100;
                 source[s]->attributeIs("shipment size", size_str.str());
-                source[s]->attributeIs("transfer Rate", "1");
+                source[s]->attributeIs("transfer rate", "1");
             }
         } catch (Fwk::Exception e) {
             cout << e.what() << endl;
@@ -83,6 +84,8 @@ int main(int argc, char* argv[]) {
     network->setup();
     //cout << network->explore();
     network->startShipments();
+    Activity::Manager::Ptr activityManager = activityManagerInstance();
+    activityManager->nowIs(24.0);
     delete network;
     return 0;
 }
