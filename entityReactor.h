@@ -72,6 +72,7 @@ class ShipmentReactor : public Shipment::Notifiee {
             activityNotifiee_ = new ActivityNotifiee(
                 activity_.ptr(), this, nextHop->location(1));
             activity_->nextTimeIs(manager->now().value() + transitTime.value());
+            cerr << "ETA: " << manager->now().value() + transitTime.value() << endl;
             activity_->lastNotifieeIs(activityNotifiee_.ptr());
             manager->lastActivityIs(activity_.ptr());
 
@@ -82,6 +83,7 @@ class ShipmentReactor : public Shipment::Notifiee {
             notifier_->transitTimeInc(transitTime);
         } else {
             nextSegment->shipmentsRefusedInc();
+            notifier_->transitTimeInc(retryTime);
             Activity::Manager::Ptr manager = activityManagerInstance();
             if(activity_ == NULL) activity_ = manager->activityNew(notifier_->name());
             activityNotifiee_ = new ActivityNotifiee(

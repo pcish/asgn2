@@ -136,7 +136,7 @@ Ptr<Shipment> ShippingNetwork::shipmentNew() {
 }
 
 void ShippingNetwork::deliverShipment(WeakPtr<Shipment> shipment) {
-    cerr << "shipment " << shipment->name() << "received at destination" << endl;
+    cerr << "shipment " << shipment->name() << " received at destination" << endl;
     shipment->destination()->shipmentsReceivedInc();
     shipment->destination()->totalLatencyInc(shipment->transitTime());
     shipment->destination()->totalCostInc(shipment->cost());
@@ -152,7 +152,7 @@ Ptr<Path> ShippingNetwork::nextHop(const WeakPtr<Shipment> shipment) {
     Ptr<Bfs> bfs = Bfs::instance(this);
     bfs->nextHop(shipment);
     Ptr<RandomWalk> rw = RandomWalk::instance(this);
-    return rw->nextHop(shipment);
+    return bfs->nextHop(shipment);
 }
 
 class EngineReactor : public EngineManager::Notifiee {
