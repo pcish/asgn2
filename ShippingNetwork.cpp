@@ -4,8 +4,7 @@
 
 #include "ShippingNetwork.h"
 #include "entityReactor.h"
-#include "routing/bfs.h"
-#include "routing/random_walk.h"
+#include "routing/routing.h"
 
 namespace Shipping {
 
