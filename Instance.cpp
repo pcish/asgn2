@@ -351,6 +351,7 @@ string SegmentRep::attribute(const string& name) {
     } else if (name == "capacity") {
         os << engineObject_->capacity().value();
     } else {
+        LOG_CRITICAL("attribute", "Unsupported attribute: " + name);
         throw Fwk::UnknownArgException("Unsupported attribute: " + name);
     }
     return os.str();
