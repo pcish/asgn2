@@ -90,7 +90,7 @@ class Shipment : public Fwk::NamedInterface {
     Shipment(const Shipment& o);
 };
 
-class Segment : public Fwk::PtrInterface<Segment> {
+class Segment : public Fwk::NamedInterface {
     friend class ShippingNetwork;
   public:
     ~Segment() { if (notifiee_) notifiee_->onDel(this); }
@@ -114,9 +114,7 @@ class Segment : public Fwk::PtrInterface<Segment> {
 
     ExpediteSupport expediteSupport() const { return expediteSupport_; }
     void expediteSupportIs(const ExpediteSupport expediteSupport) { if (expediteSupport_ == expediteSupport) return; expediteSupport_ = expediteSupport; if (notifiee_) notifiee_->onExpediteSupport(); }
-    string name() const { return name_; }
     Ptr<Location> source() const { return source_; }
-//    void sourceIs(const Ptr<Location> source) { if (source_ == source) return; source_ = source; if (notifiee_) notifiee_->onSource(); }
     void sourceIs(const Ptr<Location> source);
     WeakPtr<Segment> returnSegment() const { return returnSegment_; }
     void returnSegmentIs(const Ptr<Segment> returnSegment);
@@ -162,7 +160,7 @@ class Segment : public Fwk::PtrInterface<Segment> {
     };
     Ptr<Segment::Notifiee> notifiee() const { return notifiee_; }
   protected:
-    Segment(const string name, const TransportationMode transportationMode) : name_(name), transportationMode_(transportationMode) {
+    Segment(const string name, const TransportationMode transportationMode) : NamedInterface(name), transportationMode_(transportationMode) {
         expediteSupport_ = unavailable_;
         capacity_ = ShipmentCount(10);
         length_ = Mile(1);
@@ -175,7 +173,6 @@ class Segment : public Fwk::PtrInterface<Segment> {
 
   private:
     ExpediteSupport expediteSupport_;
-    string name_;
     Ptr<Location> source_;
     WeakPtr<Segment> returnSegment_;
     TransportationMode transportationMode_;
@@ -189,7 +186,7 @@ class Segment : public Fwk::PtrInterface<Segment> {
     Segment(const Segment& o);
 };
 
-class Location : public Fwk::PtrInterface<Location> {
+class Location : public Fwk::NamedInterface {
     friend class ShippingNetwork;
   public:
     enum LocationType {
@@ -208,7 +205,6 @@ class Location : public Fwk::PtrInterface<Location> {
     virtual unsigned int segments() const { return segments_.size(); }
     virtual void segmentIs(const WeakPtr<Segment> segment);
     virtual void segmentIs(const unsigned int index, WeakPtr<Segment> segment);
-    string name() const { return name_; }
     ShippingNetwork* shippingNetwork() const { return shippingNetwork_; }
     void shippingNetworkIs(ShippingNetwork* shippingNetwork) { if (shippingNetwork_ == shippingNetwork) return; shippingNetwork_ = shippingNetwork; if (notifiee_) notifiee_->onShippingNetwork(); }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
@@ -233,7 +229,7 @@ class Location : public Fwk::PtrInterface<Location> {
     Ptr<Location::Notifiee> notifiee() const { return notifiee_; }
   protected:
     LocationType locationType_;
-    Location(const string name) : name_(name) {
+    Location(const string name) : NamedInterface(name) {
         locationType_ = undefined_;
     }
     Ptr<Location::Notifiee> notifiee_;
@@ -244,7 +240,6 @@ class Location : public Fwk::PtrInterface<Location> {
 
   private:
     std::vector<WeakPtr<Segment> > segments_;
-    string name_;
     ShippingNetwork* shippingNetwork_;
     Location(const Location& o);
 };
@@ -381,7 +376,7 @@ class Terminal : public Location {
     Terminal(const Terminal& o);
 };
 
-class Fleet : public Fwk::PtrInterface<Fleet> {
+class Fleet : public Fwk::NamedInterface {
     friend class ShippingNetwork;
   public:
     ~Fleet() { if (notifiee_) notifiee_->onDel(this); }
@@ -416,7 +411,7 @@ class Fleet : public Fwk::PtrInterface<Fleet> {
     };
     Ptr<Fleet::Notifiee> notifiee() const { return notifiee_; }
   protected:
-    Fleet() {}
+    Fleet(Fwk::String name) : NamedInterface(name) {}
     Ptr<Fleet::Notifiee> notifiee_;
     void notifieeIs(Fleet::Notifiee* n) const {
         Fleet* me = const_cast<Fleet*>(this);
@@ -454,7 +449,7 @@ class TruckFleet : public Fleet {
     };
     Ptr<TruckFleet::Notifiee> notifiee() const { return notifiee_; }
   protected:
-    TruckFleet() : Fleet() {}
+    TruckFleet(Fwk::String name) : Fleet(name) {}
     Ptr<TruckFleet::Notifiee> notifiee_;
     void notifieeIs(TruckFleet::Notifiee* n) const {
         TruckFleet* me = const_cast<TruckFleet*>(this);
@@ -488,7 +483,7 @@ class BoatFleet : public Fleet {
     };
     Ptr<BoatFleet::Notifiee> notifiee() const { return notifiee_; }
   protected:
-    BoatFleet() : Fleet() {}
+    BoatFleet(Fwk::String name) : Fleet(name) {}
     Ptr<BoatFleet::Notifiee> notifiee_;
     void notifieeIs(BoatFleet::Notifiee* n) const {
         BoatFleet* me = const_cast<BoatFleet*>(this);
@@ -522,7 +517,7 @@ class PlaneFleet : public Fleet {
     };
     Ptr<PlaneFleet::Notifiee> notifiee() const { return notifiee_; }
   protected:
-    PlaneFleet() : Fleet() {}
+    PlaneFleet(Fwk::String name) : Fleet(name) {}
     Ptr<PlaneFleet::Notifiee> notifiee_;
     void notifieeIs(PlaneFleet::Notifiee* n) const {
         PlaneFleet* me = const_cast<PlaneFleet*>(this);

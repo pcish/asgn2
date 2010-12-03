@@ -114,27 +114,25 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     friend class ShipmentReactor;
   public:
     ~ShippingNetwork() {}
-
-
+    Ptr<Segment> segmentNew(const Segment::TransportationMode transportationMode, const string name);
     Ptr<Customer> customerNew(const string name);
-    Ptr<PlaneFleet> planeFleetNew() {
-        Ptr<PlaneFleet> m = new PlaneFleet();
+    Ptr<Port> portNew(const string name);
+    Ptr<Terminal> terminalNew(const string name, const Segment::TransportationMode transportationMode);
+    Ptr<PlaneFleet> planeFleetNew(const string name) {
+        Ptr<PlaneFleet> m = new PlaneFleet(name);
         if (notifiee_) notifiee_->onPlaneFleetNew(m);
         return m;
     }
-    Ptr<TruckFleet> truckFleetNew() {
-        Ptr<TruckFleet> m = new TruckFleet();
+    Ptr<TruckFleet> truckFleetNew(const string name) {
+        Ptr<TruckFleet> m = new TruckFleet(name);
         if (notifiee_) notifiee_->onTruckFleetNew(m);
         return m;
     }
-    Ptr<Terminal> terminalNew(const string name, const Segment::TransportationMode transportationMode);
-    Ptr<BoatFleet> boatFleetNew() {
-        Ptr<BoatFleet> m = new BoatFleet();
+    Ptr<BoatFleet> boatFleetNew(const string name) {
+        Ptr<BoatFleet> m = new BoatFleet(name);
         if (notifiee_) notifiee_->onBoatFleetNew(m);
         return m;
     }
-    Ptr<Segment> segmentNew(const Segment::TransportationMode transportationMode, const string name);
-    Ptr<Port> portNew(const string name);
     void customerDel(Ptr<Customer> o);
     void terminalDel(Ptr<Terminal> o);
     void portDel(Ptr<Port> o);

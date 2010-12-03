@@ -180,9 +180,9 @@ class FleetRep : public Instance {
   protected:
     FleetRep(const string& name, ManagerImpl* manager) :
         Instance(name), manager_(manager) {
-        truckfleet_ = manager->shippingNetwork()->truckFleetNew();
-        planefleet_ = manager->shippingNetwork()->planeFleetNew();
-        boatfleet_ = manager->shippingNetwork()->boatFleetNew();
+        truckfleet_ = manager->shippingNetwork()->truckFleetNew(name+"_truck");
+        planefleet_ = manager->shippingNetwork()->planeFleetNew(name+"_plane");
+        boatfleet_ = manager->shippingNetwork()->boatFleetNew(name+"_boat");
         truckfleet_->costIs(1);
         truckfleet_->speedIs(1);
         truckfleet_->capacityIs(100);
