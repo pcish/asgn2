@@ -64,76 +64,65 @@ private:
     bool reversed_;
 };
 
-class Statistics : public Fwk::NamedInterface {
-    friend class ShippingNetworkReactor;
-    friend class SegmentReactor;
-    friend class CustomerReactor;
-    friend class PortReactor;
-    friend class TerminalReactor;
-
-  public:
-    int customers() const { return customers_; }
-    int segments() const { return truckSegments_ + planeSegments_ + boatSegments_; }
-    int truckSegments() const {
-        if (expedite_ == Segment::available()) return truckSegmentsExpediteAvailable_;
-        else return truckSegments_;
-    }
-    int planeSegments() const {
-        if (expedite_ == Segment::available()) return planeSegmentsExpediteAvailable_;
-        else return planeSegments_;
-    }
-    int boatSegments() const {
-        if (expedite_ == Segment::available()) return boatSegmentsExpediteAvailable_;
-        else return boatSegments_;
-    }
-    int terminals() const { return truckTerminals_ + planeTerminals_ + boatTerminals_; }
-    int ports() const { return ports_; }
-    int truckTerminals() const { return truckTerminals_; }
-    int planeTerminals() const { return planeTerminals_; }
-    int boatTerminals() const { return boatTerminals_; }
-    Segment::ExpediteSupport expedite() const { return expedite_; }
-    void expediteIs(const Segment::ExpediteSupport expedite) { if (expedite_ == expedite) return; expedite_ = expedite; }
-    Statistics(Fwk::String name);
-  private:
-    void customersInc() { customers_++; }
-    int customers_;
-    int ports_;
-    int truckTerminals_;
-    int planeTerminals_;
-    int boatTerminals_;
-    int truckSegments_;
-    int planeSegments_;
-    int boatSegments_;
-    int truckSegmentsExpediteAvailable_;
-    int planeSegmentsExpediteAvailable_;
-    int boatSegmentsExpediteAvailable_;
-    Segment::ExpediteSupport expedite_;
-};
-
 class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     friend class ShippingNetworkReactor;
     friend class ShipmentReactor;
   public:
+    class Statistics : public Fwk::NamedInterface {
+        friend class ShippingNetworkReactor;
+        friend class SegmentReactor;
+        friend class CustomerReactor;
+        friend class PortReactor;
+        friend class TerminalReactor;
+      public:
+        int customers() const { return customers_; }
+        int segments() const { return truckSegments_ + planeSegments_ + boatSegments_; }
+        int truckSegments() const {
+            if (expedite_ == Segment::available()) return truckSegmentsExpediteAvailable_;
+            else return truckSegments_;
+        }
+        int planeSegments() const {
+            if (expedite_ == Segment::available()) return planeSegmentsExpediteAvailable_;
+            else return planeSegments_;
+        }
+        int boatSegments() const {
+            if (expedite_ == Segment::available()) return boatSegmentsExpediteAvailable_;
+            else return boatSegments_;
+        }
+        int terminals() const { return truckTerminals_ + planeTerminals_ + boatTerminals_; }
+        int ports() const { return ports_; }
+        int truckTerminals() const { return truckTerminals_; }
+        int planeTerminals() const { return planeTerminals_; }
+        int boatTerminals() const { return boatTerminals_; }
+        Segment::ExpediteSupport expedite() const { return expedite_; }
+        void expediteIs(const Segment::ExpediteSupport expedite) { if (expedite_ == expedite) return; expedite_ = expedite; }
+        Statistics(Fwk::String name);
+
+      private:
+        void customersInc() { customers_++; }
+        int customers_;
+        int ports_;
+        int truckTerminals_;
+        int planeTerminals_;
+        int boatTerminals_;
+        int truckSegments_;
+        int planeSegments_;
+        int boatSegments_;
+        int truckSegmentsExpediteAvailable_;
+        int planeSegmentsExpediteAvailable_;
+        int boatSegmentsExpediteAvailable_;
+        Segment::ExpediteSupport expedite_;
+    };
+    Ptr<ShippingNetwork::Statistics> statistics() const { return statistics_; }
+
     ~ShippingNetwork() {}
     Ptr<Segment> segmentNew(const Segment::TransportationMode transportationMode, const string name);
     Ptr<Customer> customerNew(const string name);
     Ptr<Port> portNew(const string name);
     Ptr<Terminal> terminalNew(const string name, const Segment::TransportationMode transportationMode);
-    Ptr<PlaneFleet> planeFleetNew(const string name) {
-        Ptr<PlaneFleet> m = new PlaneFleet(name);
-        if (notifiee_) notifiee_->onPlaneFleetNew(m);
-        return m;
-    }
-    Ptr<TruckFleet> truckFleetNew(const string name) {
-        Ptr<TruckFleet> m = new TruckFleet(name);
-        if (notifiee_) notifiee_->onTruckFleetNew(m);
-        return m;
-    }
-    Ptr<BoatFleet> boatFleetNew(const string name) {
-        Ptr<BoatFleet> m = new BoatFleet(name);
-        if (notifiee_) notifiee_->onBoatFleetNew(m);
-        return m;
-    }
+    Ptr<PlaneFleet> planeFleetNew(const string name);
+    Ptr<TruckFleet> truckFleetNew(const string name);
+    Ptr<BoatFleet> boatFleetNew(const string name);
     void customerDel(Ptr<Customer> o);
     void terminalDel(Ptr<Terminal> o);
     void portDel(Ptr<Port> o);
@@ -169,8 +158,6 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     Ptr<Shipment> shipmentNew();
     Ptr<Path> nextHop(const WeakPtr<Shipment> shipment);
 
-    Ptr<Statistics> statistics() const { return statistics_; }
-
     ShippingNetwork();
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
@@ -198,14 +185,15 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
         Notifiee() : notifier_(0) {}
     };
     Ptr<ShippingNetwork::Notifiee> notifiee() const { return notifiee_; }
+
   protected:
     Ptr<ShippingNetwork::Notifiee> notifiee_;
     void notifieeIs(ShippingNetwork::Notifiee* n) {
         notifiee_ = n;
     }
     void locationDel(Ptr<Location> o);
-
     void deliverShipment(WeakPtr<Shipment> shipment);
+
   private:
     Ptr<Statistics> statistics_;
     map<string, Ptr<Location> > location_;
@@ -228,7 +216,6 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     ShippingNetwork(const ShippingNetwork& o);
     void computePath();
     void explore(Ptr<Location> curLocation, set<string> visitedNodes, Ptr<Path> curPath);
-
 };
 
 }

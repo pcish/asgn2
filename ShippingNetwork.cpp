@@ -195,9 +195,14 @@ class ShippingNetworkReactor : public ShippingNetwork::Notifiee {
     }
 };
 
-Statistics::Statistics(Fwk::String name) : NamedInterface(name), customers_(0), ports_(0), truckTerminals_(0), planeTerminals_(0), boatTerminals_(0),
-                        truckSegments_(0), planeSegments_(0), boatSegments_(0),
-                        truckSegmentsExpediteAvailable_(0), planeSegmentsExpediteAvailable_(0), boatSegmentsExpediteAvailable_(0), expedite_(Segment::allAvailabilities()) {}
+ShippingNetwork::Statistics::Statistics(Fwk::String name) :
+    NamedInterface(name), customers_(0), ports_(0),
+    truckTerminals_(0), planeTerminals_(0), boatTerminals_(0),
+    truckSegments_(0), planeSegments_(0), boatSegments_(0),
+    truckSegmentsExpediteAvailable_(0), planeSegmentsExpediteAvailable_(0),
+    boatSegmentsExpediteAvailable_(0), expedite_(Segment::allAvailabilities()) {
+}
+
 ShippingNetwork::ShippingNetwork() : isConnAttributeChange(false), expedite_(Segment::allAvailabilities()), routing_(bfs__) {
     Fwk::Ptr<ShippingNetworkReactor> r = ShippingNetworkReactor::ShippingNetworkReactorNew();
     r->notifierIs(this);
@@ -243,6 +248,24 @@ Ptr<Port> ShippingNetwork::portNew(const string name){
     r->notifierIs(m);
     if (notifiee_) notifiee_->onPortNew(m);
     location_[m->name()] = m;
+    return m;
+}
+
+Ptr<PlaneFleet> ShippingNetwork::planeFleetNew(const string name) {
+    Ptr<PlaneFleet> m = new PlaneFleet(name);
+    if (notifiee_) notifiee_->onPlaneFleetNew(m);
+    return m;
+}
+
+Ptr<TruckFleet> ShippingNetwork::truckFleetNew(const string name) {
+    Ptr<TruckFleet> m = new TruckFleet(name);
+    if (notifiee_) notifiee_->onTruckFleetNew(m);
+    return m;
+}
+
+Ptr<BoatFleet> ShippingNetwork::boatFleetNew(const string name) {
+    Ptr<BoatFleet> m = new BoatFleet(name);
+    if (notifiee_) notifiee_->onBoatFleetNew(m);
     return m;
 }
 
