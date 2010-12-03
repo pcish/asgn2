@@ -135,6 +135,7 @@ class StatsRep : public Instance {
         }
         return instance_;
     }
+    ~StatsRep() { instance_ = NULL; }
 
     string attribute(const string &name);
     void attributeIs(const string& name, const string& v) {} // do nothing: quietly ignore the write function
@@ -158,6 +159,7 @@ class ConnRep : public Instance {
             instance_ = new ConnRep(name, manager);
         return instance_;
     }
+    ~ConnRep() { instance_ = NULL; }
 
   protected:
     ConnRep (const string& name, ManagerImpl *manager) :
@@ -179,6 +181,7 @@ class FleetRep : public Instance {
 
     string attribute(const string& name);
     void attributeIs(const string& name, const string& v);
+    ~FleetRep() { instance_ = NULL; }
 
   protected:
     FleetRep(const string& name, ManagerImpl* manager) :
