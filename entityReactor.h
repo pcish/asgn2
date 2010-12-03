@@ -2,7 +2,7 @@
 #define ENTITY_REACTOR_H
 
 #include "entities.h"
-#include "Engine.h"
+#include "ShippingNetwork.h"
 #include "ActivityImpl.h"
 
 namespace Shipping {

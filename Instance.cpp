@@ -5,7 +5,7 @@
 
 #include "Instance.h"
 #include "entities.h"
-#include "Engine.h"
+#include "ShippingNetwork.h"
 #include "fwk/Exception.h"
 #include "ActivityImpl.h"
 
@@ -34,11 +34,11 @@ public:
 
     // Manager method
     void instanceDel(const string& name);
-    EngineManager* engineManager() { return engineManager_; }
+    ShippingNetwork* shippingNetwork() { return shippingNetwork_; }
 
 private:
     map<string,Ptr<Instance> > instance_;
-    EngineManager* engineManager_;
+    ShippingNetwork* shippingNetwork_;
 };
 
 class SegmentRep;
@@ -64,9 +64,9 @@ class PortRep : public LocationRep {
   public:
     PortRep(const string& name, ManagerImpl *manager) :
         LocationRep(name, manager) {
-        engineObject_ = manager->engineManager()->portNew(name);
+        engineObject_ = manager->shippingNetwork()->portNew(name);
     }
-    ~PortRep() { manager_->engineManager()->portDel(engineObject_); }
+    ~PortRep() { manager_->shippingNetwork()->portDel(engineObject_); }
     virtual Ptr<Location> engineObject() const { return engineObject_; }
 
   protected:
@@ -77,11 +77,11 @@ class CustomerRep : public LocationRep {
   public:
     CustomerRep(const string& name, ManagerImpl *manager) :
         LocationRep(name, manager) {
-        engineObject_ = manager->engineManager()->customerNew(name);
+        engineObject_ = manager->shippingNetwork()->customerNew(name);
     }
     virtual string attribute(const string& name);
     virtual void attributeIs(const string& name, const string& v);
-    ~CustomerRep() { manager_->engineManager()->customerDel(engineObject_); }
+    ~CustomerRep() { manager_->shippingNetwork()->customerDel(engineObject_); }
     virtual Ptr<Location> engineObject() const { return engineObject_; }
 
   protected:
@@ -92,9 +92,9 @@ class TerminalRep : public LocationRep {
   public:
     TerminalRep(const string& name, ManagerImpl *manager, Segment::TransportationMode _mode) :
         LocationRep(name, manager), mode_(_mode) {
-          engineObject_ = manager_->engineManager()->terminalNew(name, _mode);
+          engineObject_ = manager_->shippingNetwork()->terminalNew(name, _mode);
     }
-    ~TerminalRep() { manager_->engineManager()->terminalDel(engineObject_); }
+    ~TerminalRep() { manager_->shippingNetwork()->terminalDel(engineObject_); }
     virtual Ptr<Location> engineObject() const { return engineObject_; }
 
   protected:
@@ -106,9 +106,9 @@ class SegmentRep : public Instance {
   public:
     SegmentRep(const string& name, ManagerImpl* manager, Segment::TransportationMode _mode) :
         Instance(name), manager_(manager), mode_ (_mode) {
-        engineObject_ = manager_->engineManager()->segmentNew(_mode, name);
+        engineObject_ = manager_->shippingNetwork()->segmentNew(_mode, name);
     }
-    ~SegmentRep() { manager_->engineManager()->segmentDel(engineObject_); }
+    ~SegmentRep() { manager_->shippingNetwork()->segmentDel(engineObject_); }
 
     string attribute(const string& name);
     void attributeIs(const string& name, const string& v);
@@ -180,9 +180,9 @@ class FleetRep : public Instance {
   protected:
     FleetRep(const string& name, ManagerImpl* manager) :
         Instance(name), manager_(manager) {
-        truckfleet_ = manager->engineManager()->truckFleetNew();
-        planefleet_ = manager->engineManager()->planeFleetNew();
-        boatfleet_ = manager->engineManager()->boatFleetNew();
+        truckfleet_ = manager->shippingNetwork()->truckFleetNew();
+        planefleet_ = manager->shippingNetwork()->planeFleetNew();
+        boatfleet_ = manager->shippingNetwork()->boatFleetNew();
         truckfleet_->costIs(1);
         truckfleet_->speedIs(1);
         truckfleet_->capacityIs(100);
@@ -202,7 +202,7 @@ class FleetRep : public Instance {
 Ptr<FleetRep> FleetRep::instance_ = NULL;
 
 ManagerImpl::ManagerImpl() {
-    engineManager_ = new EngineManager();
+    shippingNetwork_ = new ShippingNetwork();
     instance_["defaultFleet"] = FleetRep::instance("defaultFleet", this);
     instance_["defaultStats"] = StatsRep::instance("defaultStats", this);
     instance_["defaultConn"] = ConnRep::instance("defaultConn", this);
@@ -346,35 +346,30 @@ string SegmentRep::attribute(const string& name) {
 }
 
 void SegmentRep::attributeIs(const string& name, const string& v) {
-//    try {
-        if (name == "source") {
-            if (v != "") {
-                Ptr<Location> location = manager_->cast_instance<Location, LocationRep>(v);
-                engineObject_->sourceIs(location);
-            }
-            else engineObject_->sourceIs(NULL);
-        } else if (name == "length") {
-            engineObject_->lengthIs(atof(v.c_str()));
-        } else if (name == "return segment") {
-            if (v != "") {
-                Ptr<Segment> segment = manager_->cast_instance<Segment, SegmentRep>(v);
-                engineObject_->returnSegmentIs(segment);
-            }
-            else engineObject_->returnSegmentIs(NULL);
-        } else if (name == "difficulty") {
-            engineObject_->difficultyIs(atof(v.c_str()));
-        } else if (name == "expedite support") {
-            if (v == "yes") engineObject_->expediteSupportIs(Segment::available());
-            else if (v == "no") engineObject_->expediteSupportIs(Segment::unavailable());
-        } else if (name == "capacity") {
-            engineObject_->capacityIs(ShipmentCount(atoi(v.c_str())));
-        } else {
-            throw Fwk::UnknownArgException("Unsupported attribute: " + name);
+    if (name == "source") {
+        if (v != "") {
+            Ptr<Location> location = manager_->cast_instance<Location, LocationRep>(v);
+            engineObject_->sourceIs(location);
         }
-//    } catch (ValueError e) {
-//        cerr << e.what() << endl;
-//    }
-//    } catch (Fwk::RangeExa}
+        else engineObject_->sourceIs(NULL);
+    } else if (name == "length") {
+        engineObject_->lengthIs(atof(v.c_str()));
+    } else if (name == "return segment") {
+        if (v != "") {
+            Ptr<Segment> segment = manager_->cast_instance<Segment, SegmentRep>(v);
+            engineObject_->returnSegmentIs(segment);
+        }
+        else engineObject_->returnSegmentIs(NULL);
+    } else if (name == "difficulty") {
+        engineObject_->difficultyIs(atof(v.c_str()));
+    } else if (name == "expedite support") {
+        if (v == "yes") engineObject_->expediteSupportIs(Segment::available());
+        else if (v == "no") engineObject_->expediteSupportIs(Segment::unavailable());
+    } else if (name == "capacity") {
+        engineObject_->capacityIs(ShipmentCount(atoi(v.c_str())));
+    } else {
+        throw Fwk::UnknownArgException("Unsupported attribute: " + name);
+    }
 }
 
 static const string segmentStr = "segment";
@@ -391,32 +386,32 @@ int LocationRep::segmentNumber(const string& name) {
 string StatsRep::attribute(const string& name) {
     ostringstream os;
     if (name == "Customer") {
-        os << manager_->engineManager()->shippingNetwork()->customers();
+        os << manager_->shippingNetwork()->customers();
     } else if (name == "Truck terminal") {
-        os << manager_->engineManager()->shippingNetwork()->truckTerminals();
+        os << manager_->shippingNetwork()->truckTerminals();
     } else if (name == "Plane terminal") {
-        os << manager_->engineManager()->shippingNetwork()->planeTerminals();
+        os << manager_->shippingNetwork()->planeTerminals();
     } else if (name == "Boat terminal") {
-        os << manager_->engineManager()->shippingNetwork()->boatTerminals();
+        os << manager_->shippingNetwork()->boatTerminals();
     } else if (name == "Port") {
-        os << manager_->engineManager()->shippingNetwork()->ports();
+        os << manager_->shippingNetwork()->ports();
     } else if (name == "Truck segment") {
-        os << manager_->engineManager()->shippingNetwork()->truckSegments();
+        os << manager_->shippingNetwork()->truckSegments();
     } else if (name == "Plane segment") {
-        os << manager_->engineManager()->shippingNetwork()->planeSegments();
+        os << manager_->shippingNetwork()->planeSegments();
     } else if (name == "Boat segment") {
-        os << manager_->engineManager()->shippingNetwork()->boatSegments();
+        os << manager_->shippingNetwork()->boatSegments();
     } else if (name == "expedite percentage") {
         int expediteAvailable = 0;
-        manager_->engineManager()->shippingNetwork()->expediteIs(Segment::available());
-        expediteAvailable += manager_->engineManager()->shippingNetwork()->truckSegments();
-        expediteAvailable += manager_->engineManager()->shippingNetwork()->planeSegments();
-        expediteAvailable += manager_->engineManager()->shippingNetwork()->boatSegments();
+        manager_->shippingNetwork()->expediteIs(Segment::available());
+        expediteAvailable += manager_->shippingNetwork()->truckSegments();
+        expediteAvailable += manager_->shippingNetwork()->planeSegments();
+        expediteAvailable += manager_->shippingNetwork()->boatSegments();
         int totalSegments = 0;
-        manager_->engineManager()->shippingNetwork()->expediteIs(Segment::allAvailabilities());
-        totalSegments += manager_->engineManager()->shippingNetwork()->truckSegments();
-        totalSegments += manager_->engineManager()->shippingNetwork()->planeSegments();
-        totalSegments += manager_->engineManager()->shippingNetwork()->boatSegments();
+        manager_->shippingNetwork()->expediteIs(Segment::allAvailabilities());
+        totalSegments += manager_->shippingNetwork()->truckSegments();
+        totalSegments += manager_->shippingNetwork()->planeSegments();
+        totalSegments += manager_->shippingNetwork()->boatSegments();
         os.setf(ios::fixed,ios::floatfield);
         os.precision(2);
         os << ((float) expediteAvailable / (float) totalSegments) * 100.0;
@@ -426,9 +421,10 @@ string StatsRep::attribute(const string& name) {
     }
     return os.str();
 }
+
 void ConnRep::attributeIs(const string& name, const string& v) {
     if (name.compare("routing") == 0) {
-        Ptr<ShippingNetwork> network = manager_->engineManager()->shippingNetwork();
+        Ptr<ShippingNetwork> network = manager_->shippingNetwork();
         if (v.compare("dijkstra") == 0) {
             network->routingIs(ShippingNetwork::dijkstra());
         }
@@ -446,7 +442,7 @@ string ConnRep::attribute(const string& name) {
     USD maxCost;
     Hour maxTime;
 
-    Ptr<ShippingNetwork> network = manager_->engineManager()->shippingNetwork();
+    Ptr<ShippingNetwork> network = manager_->shippingNetwork();
 
     is >> cmd;
     if (cmd.compare("explore") == 0) {
@@ -485,7 +481,7 @@ string ConnRep::attribute(const string& name) {
         network->maxTimeIs(maxTime);
     }
     else if (cmd.compare("connect") == 0) {
-        Ptr<ShippingNetwork> network = manager_->engineManager()->shippingNetwork();
+        Ptr<ShippingNetwork> network = manager_->shippingNetwork();
         is >> source >> dummy >> dest;
         network->sourceIs(Ptr<LocationRep>((LocationRep*)manager_->
                           instance(source).ptr() )->engineObject()

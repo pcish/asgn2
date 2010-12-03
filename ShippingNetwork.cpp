@@ -2,7 +2,7 @@
 #include <set>
 #include <algorithm>
 
-#include "Engine.h"
+#include "ShippingNetwork.h"
 #include "entityReactor.h"
 #include "routing/bfs.h"
 #include "routing/random_walk.h"
@@ -155,108 +155,110 @@ Ptr<Path> ShippingNetwork::nextHop(const WeakPtr<Shipment> shipment) {
     return bfs->nextHop(shipment);
 }
 
-class EngineReactor : public EngineManager::Notifiee {
+class ShippingNetworkReactor : public ShippingNetwork::Notifiee {
   public:
     virtual void onCustomerNew(Fwk::Ptr<Customer> p) {
-        notifier_->shippingNetwork()->customersInc();
+        notifier_->customersInc();
     }
     virtual void onTerminalNew(Fwk::Ptr<Terminal> p) {
         if (p->transportationMode() == Segment::truck()) {
-            notifier_->shippingNetwork()->truckTerminals_++;
+            notifier_->truckTerminals_++;
         } else if (p->transportationMode() == Segment::plane()) {
-            notifier_->shippingNetwork()->planeTerminals_++;
+            notifier_->planeTerminals_++;
         } else if (p->transportationMode() == Segment::boat()) {
-            notifier_->shippingNetwork()->boatTerminals_++;
+            notifier_->boatTerminals_++;
         }
     }
     virtual void onSegmentNew(Fwk::Ptr<Segment> p) {
         if (p->transportationMode() == Segment::truck()) {
-            notifier_->shippingNetwork()->truckSegments_++;
+            notifier_->truckSegments_++;
         } else if (p->transportationMode() == Segment::plane()) {
-            notifier_->shippingNetwork()->planeSegments_++;
+            notifier_->planeSegments_++;
         } else if (p->transportationMode() == Segment::boat()) {
-            notifier_->shippingNetwork()->boatSegments_++;
+            notifier_->boatSegments_++;
         }
     }
     virtual void onPortNew(Fwk::Ptr<Port> p) {
-        notifier_->shippingNetwork()->ports_++;
+        notifier_->ports_++;
     }
     virtual void onPlaneFleetNew(Fwk::Ptr<PlaneFleet> p) {
-        notifier_->shippingNetwork()->planeFleetIs(p);
+        notifier_->planeFleetIs(p);
     }
     virtual void onTruckFleetNew(Fwk::Ptr<TruckFleet> p) {
-        notifier_->shippingNetwork()->truckFleetIs(p);
+        notifier_->truckFleetIs(p);
     }
     virtual void onBoatFleetNew(Fwk::Ptr<BoatFleet> p) {
-        notifier_->shippingNetwork()->boatFleetIs(p);
+        notifier_->boatFleetIs(p);
     }
-    static Fwk::Ptr<EngineReactor> engineReactorNew() {
-        Fwk::Ptr<EngineReactor> n = new EngineReactor();
+    static Fwk::Ptr<ShippingNetworkReactor> ShippingNetworkReactorNew() {
+        Fwk::Ptr<ShippingNetworkReactor> n = new ShippingNetworkReactor();
         return n;
     }
 };
 
-EngineManager::EngineManager() {
-    network_ = new ShippingNetwork();
-    Fwk::Ptr<EngineReactor> r = EngineReactor::engineReactorNew();
+ShippingNetwork::ShippingNetwork() : customers_(0), ports_(0), truckTerminals_(0), planeTerminals_(0), boatTerminals_(0),
+                        truckSegments_(0), planeSegments_(0), boatSegments_(0),
+                        truckSegmentsExpediteAvailable_(0), planeSegmentsExpediteAvailable_(0), boatSegmentsExpediteAvailable_(0),
+                        isConnAttributeChange(false), expedite_(Segment::allAvailabilities()), routing_(bfs__) {
+    Fwk::Ptr<ShippingNetworkReactor> r = ShippingNetworkReactor::ShippingNetworkReactorNew();
     r->notifierIs(this);
 }
 
-Ptr<Customer> EngineManager::customerNew(const string name) {
+Ptr<Customer> ShippingNetwork::customerNew(const string name) {
     Ptr<Customer> m = new Customer(name);
-    m->shippingNetworkIs(network_.ptr());
+    m->shippingNetworkIs(this);
     Fwk::Ptr<CustomerReactor> r = CustomerReactor::customerReactorNew();
     r->notifierIs(m);
     if (notifiee_) notifiee_->onCustomerNew(m);
     return m;
 }
 
-Ptr<Terminal> EngineManager::terminalNew(const string name, const Segment::TransportationMode transportationMode){
+Ptr<Terminal> ShippingNetwork::terminalNew(const string name, const Segment::TransportationMode transportationMode){
     Ptr<Terminal> m = new Terminal(name, transportationMode);
-    m->shippingNetworkIs(network_.ptr());
+    m->shippingNetworkIs(this);
     Fwk::Ptr<TerminalReactor> r = TerminalReactor::terminalReactorNew();
     r->notifierIs(m);
     if (notifiee_) notifiee_->onTerminalNew(m);
     return m;
 }
 
-Ptr<Segment> EngineManager::segmentNew(const Segment::TransportationMode transportationMode, const string name){
+Ptr<Segment> ShippingNetwork::segmentNew(const Segment::TransportationMode transportationMode, const string name){
     Ptr<Segment> m = new Segment(name, transportationMode);
-    m->shippingNetworkIs(network_.ptr());
+    m->shippingNetworkIs(this);
     Fwk::Ptr<SegmentReactor> r = SegmentReactor::segmentReactorNew();
     r->notifierIs(m);
     if (notifiee_) notifiee_->onSegmentNew(m);
     return m;
 }
 
-Ptr<Port> EngineManager::portNew(const string name){
+Ptr<Port> ShippingNetwork::portNew(const string name){
     Ptr<Port> m = new Port(name);
-    m->shippingNetworkIs(network_.ptr());
+    m->shippingNetworkIs(this);
     Fwk::Ptr<PortReactor> r = PortReactor::portReactorNew();
     r->notifierIs(m);
     if (notifiee_) notifiee_->onPortNew(m);
     return m;
 }
 
-void EngineManager::locationDel(Ptr<Location> o) {
+void ShippingNetwork::locationDel(Ptr<Location> o) {
     for (unsigned int i = 0; i < o->segments(); i++) {
         o->segment(i)->sourceIs(NULL);
     }
 }
 
-void EngineManager::customerDel(Ptr<Customer> o) {
+void ShippingNetwork::customerDel(Ptr<Customer> o) {
     locationDel(o);
 }
 
-void EngineManager::terminalDel(Ptr<Terminal> o) {
+void ShippingNetwork::terminalDel(Ptr<Terminal> o) {
     locationDel(o);
 }
 
-void EngineManager::portDel(Ptr<Port> o) {
+void ShippingNetwork::portDel(Ptr<Port> o) {
     locationDel(o);
 }
 
-void EngineManager::segmentDel(Ptr<Segment> o) {
+void ShippingNetwork::segmentDel(Ptr<Segment> o) {
     if (o->returnSegment()) o->returnSegment()->returnSegmentIs(NULL);
     if (o->source()) {
         for (unsigned int i = 0; i < o->source()->segments(); i++) {

@@ -1,5 +1,5 @@
-#ifndef ENGINE_MNG_H
-#define ENGINE_MNG_H
+#ifndef SHIPPING_NETWORK_H
+#define SHIPPING_NETWORK_H
 #include "entities.h"
 #include "Ptr.h"
 #include "PtrInterface.h"
@@ -64,7 +64,7 @@ private:
 };
 
 class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
-    friend class EngineReactor;
+    friend class ShippingNetworkReactor;
     friend class SegmentReactor;
     friend class CustomerReactor;
     friend class PortReactor;
@@ -90,6 +90,29 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     int truckTerminals() const { return truckTerminals_; }
     int planeTerminals() const { return planeTerminals_; }
     int boatTerminals() const { return boatTerminals_; }
+    Ptr<Customer> customerNew(const string name);
+    Ptr<PlaneFleet> planeFleetNew() {
+        Ptr<PlaneFleet> m = new PlaneFleet();
+        if (notifiee_) notifiee_->onPlaneFleetNew(m);
+        return m;
+    }
+    Ptr<TruckFleet> truckFleetNew() {
+        Ptr<TruckFleet> m = new TruckFleet();
+        if (notifiee_) notifiee_->onTruckFleetNew(m);
+        return m;
+    }
+    Ptr<Terminal> terminalNew(const string name, const Segment::TransportationMode transportationMode);
+    Ptr<BoatFleet> boatFleetNew() {
+        Ptr<BoatFleet> m = new BoatFleet();
+        if (notifiee_) notifiee_->onBoatFleetNew(m);
+        return m;
+    }
+    Ptr<Segment> segmentNew(const Segment::TransportationMode transportationMode, const string name);
+    Ptr<Port> portNew(const string name);
+    void customerDel(Ptr<Customer> o);
+    void terminalDel(Ptr<Terminal> o);
+    void portDel(Ptr<Port> o);
+    void segmentDel(Ptr<Segment> o);
 
     void truckFleetIs(const Ptr<TruckFleet> _truckFleet) { truckFleet_ = _truckFleet; }
     void planeFleetIs(const Ptr<PlaneFleet> _planeFleet) { planeFleet_ = _planeFleet; }
@@ -121,12 +144,39 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     Ptr<Shipment> shipmentNew();
     Ptr<Path> nextHop(const WeakPtr<Shipment> shipment);
 
-    ShippingNetwork() : customers_(0), ports_(0), truckTerminals_(0), planeTerminals_(0), boatTerminals_(0),
-                        truckSegments_(0), planeSegments_(0), boatSegments_(0),
-                        truckSegmentsExpediteAvailable_(0), planeSegmentsExpediteAvailable_(0), boatSegmentsExpediteAvailable_(0),
-                        isConnAttributeChange(false), expedite_(Segment::allAvailabilities()), routing_(bfs__){}
-
+    ShippingNetwork();
+    class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
+      public:
+        virtual void notifierIs(Fwk::Ptr<ShippingNetwork> notifier) {
+            if (notifier_ == notifier) return;
+            if (notifier_) notifier->notifieeIs(0);
+            notifier_ = notifier;
+            notifier_->notifieeIs(this);
+        }
+        static Fwk::Ptr<ShippingNetwork::Notifiee> notifieeNew() {
+            Fwk::Ptr<ShippingNetwork::Notifiee> n = new Notifiee();
+            return n;
+        }
+        virtual void onCustomerNew(Fwk::Ptr<Customer> p) {}
+        virtual void onPlaneFleetNew(Fwk::Ptr<PlaneFleet> p) {}
+        virtual void onTruckFleetNew(Fwk::Ptr<TruckFleet> p) {}
+        virtual void onTerminalNew(Fwk::Ptr<Terminal> p) {}
+        virtual void onLocationNew(Fwk::Ptr<Location> p) {}
+        virtual void onBoatFleetNew(Fwk::Ptr<BoatFleet> p) {}
+        virtual void onFleetNew(Fwk::Ptr<Fleet> p) {}
+        virtual void onSegmentNew(Fwk::Ptr<Segment> p) {}
+        virtual void onPortNew(Fwk::Ptr<Port> p) {}
+      protected:
+        Fwk::Ptr<ShippingNetwork> notifier_;
+        Notifiee() : notifier_(0) {}
+    };
+    Ptr<ShippingNetwork::Notifiee> notifiee() const { return notifiee_; }
   protected:
+    Ptr<ShippingNetwork::Notifiee> notifiee_;
+    void notifieeIs(ShippingNetwork::Notifiee* n) {
+        notifiee_ = n;
+    }
+    void locationDel(Ptr<Location> o);
     void customersInc() { customers_++; }
     void deliverShipment(WeakPtr<Shipment> shipment);
   private:
@@ -161,73 +211,6 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     void explore(Ptr<Location> curLocation, set<string> visitedNodes, Ptr<Path> curPath);
 
 };
-
-class EngineManager : public Fwk::PtrInterface<EngineManager> {
-  public:
-    EngineManager();
-    Ptr<ShippingNetwork> shippingNetwork() const { return network_; }
-    Ptr<Customer> customerNew(const string name);
-    Ptr<PlaneFleet> planeFleetNew() {
-        Ptr<PlaneFleet> m = new PlaneFleet();
-        if (notifiee_) notifiee_->onPlaneFleetNew(m);
-        return m;
-    }
-    Ptr<TruckFleet> truckFleetNew() {
-        Ptr<TruckFleet> m = new TruckFleet();
-        if (notifiee_) notifiee_->onTruckFleetNew(m);
-        return m;
-    }
-    Ptr<Terminal> terminalNew(const string name, const Segment::TransportationMode transportationMode);
-    Ptr<BoatFleet> boatFleetNew() {
-        Ptr<BoatFleet> m = new BoatFleet();
-        if (notifiee_) notifiee_->onBoatFleetNew(m);
-        return m;
-    }
-    Ptr<Segment> segmentNew(const Segment::TransportationMode transportationMode, const string name);
-    Ptr<Port> portNew(const string name);
-    void customerDel(Ptr<Customer> o);
-    void terminalDel(Ptr<Terminal> o);
-    void portDel(Ptr<Port> o);
-    void segmentDel(Ptr<Segment> o);
-    class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
-      public:
-        virtual void notifierIs(Fwk::Ptr<EngineManager> notifier) {
-            if (notifier_ == notifier) return;
-            if (notifier_) notifier->notifieeIs(0);
-            notifier_ = notifier;
-            notifier_->notifieeIs(this);
-        }
-        static Fwk::Ptr<EngineManager::Notifiee> notifieeNew() {
-            Fwk::Ptr<EngineManager::Notifiee> n = new Notifiee();
-            return n;
-        }
-        virtual void onCustomerNew(Fwk::Ptr<Customer> p) {}
-        virtual void onPlaneFleetNew(Fwk::Ptr<PlaneFleet> p) {}
-        virtual void onTruckFleetNew(Fwk::Ptr<TruckFleet> p) {}
-        virtual void onTerminalNew(Fwk::Ptr<Terminal> p) {}
-        virtual void onLocationNew(Fwk::Ptr<Location> p) {}
-        virtual void onBoatFleetNew(Fwk::Ptr<BoatFleet> p) {}
-        virtual void onFleetNew(Fwk::Ptr<Fleet> p) {}
-        virtual void onSegmentNew(Fwk::Ptr<Segment> p) {}
-        virtual void onPortNew(Fwk::Ptr<Port> p) {}
-      protected:
-        Fwk::Ptr<EngineManager> notifier_;
-        Notifiee() : notifier_(0) {}
-    };
-    Ptr<EngineManager::Notifiee> notifiee() const { return notifiee_; }
-
-  protected:
-    Ptr<ShippingNetwork> network_;
-    Ptr<EngineManager::Notifiee> notifiee_;
-    void notifieeIs(EngineManager::Notifiee* n) {
-        //EngineManager* me = const_cast<EngineManager*>(this);
-        //me->notifiee_ = n;
-        notifiee_ = n;
-    }
-    void locationDel(Ptr<Location> o);
-};
-
-
 
 }
 #endif

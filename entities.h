@@ -19,7 +19,7 @@ using namespace std;
 using Fwk::WeakPtr;
 namespace Shipping {
 
-class EngineManager;
+class ShippingNetwork;
 class ShippingNetwork;
 class Customer;
 class PlaneFleet;
@@ -91,7 +91,7 @@ class Shipment : public Fwk::NamedInterface {
 };
 
 class Segment : public Fwk::PtrInterface<Segment> {
-    friend class EngineManager;
+    friend class ShippingNetwork;
   public:
     ~Segment() { if (notifiee_) notifiee_->onDel(this); }
     enum TransportationMode {
@@ -190,7 +190,7 @@ class Segment : public Fwk::PtrInterface<Segment> {
 };
 
 class Location : public Fwk::PtrInterface<Location> {
-    friend class EngineManager;
+    friend class ShippingNetwork;
   public:
     enum LocationType {
         undefined_,
@@ -250,7 +250,7 @@ class Location : public Fwk::PtrInterface<Location> {
 };
 
 class Customer : public Location {
-    friend class EngineManager;
+    friend class ShippingNetwork;
   public:
     ~Customer() { if (notifiee_) notifiee_->onDel(this); }
     WeakPtr<Location> destination() const { return destination_; }
@@ -306,7 +306,7 @@ class Customer : public Location {
 };
 
 class Port : public Location {
-    friend class EngineManager;
+    friend class ShippingNetwork;
   public:
     ~Port() { if (notifiee_) notifiee_->onDel(this); }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
@@ -342,7 +342,7 @@ class Port : public Location {
 };
 
 class Terminal : public Location {
-    friend class EngineManager;
+    friend class ShippingNetwork;
   public:
     ~Terminal() { if (notifiee_) notifiee_->onDel(this); }
     Segment::TransportationMode transportationMode() const { return transportationMode_; }
@@ -382,7 +382,7 @@ class Terminal : public Location {
 };
 
 class Fleet : public Fwk::PtrInterface<Fleet> {
-    friend class EngineManager;
+    friend class ShippingNetwork;
   public:
     ~Fleet() { if (notifiee_) notifiee_->onDel(this); }
     USD cost() const { return cost_; }
@@ -432,7 +432,7 @@ class Fleet : public Fwk::PtrInterface<Fleet> {
 };
 
 class TruckFleet : public Fleet {
-    friend class EngineManager;
+    friend class ShippingNetwork;
   public:
     ~TruckFleet() { if (notifiee_) notifiee_->onDel(this); }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
@@ -466,7 +466,7 @@ class TruckFleet : public Fleet {
 };
 
 class BoatFleet : public Fleet {
-    friend class EngineManager;
+    friend class ShippingNetwork;
   public:
     ~BoatFleet() { if (notifiee_) notifiee_->onDel(this); }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
@@ -500,7 +500,7 @@ class BoatFleet : public Fleet {
 };
 
 class PlaneFleet : public Fleet {
-    friend class EngineManager;
+    friend class ShippingNetwork;
   public:
     ~PlaneFleet() { if (notifiee_) notifiee_->onDel(this); }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
