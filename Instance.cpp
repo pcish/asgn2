@@ -39,6 +39,9 @@ public:
 private:
     map<string,Ptr<Instance> > instance_;
     ShippingNetwork* shippingNetwork_;
+    bool userCreatedStats;
+    bool userCreatedConn;
+    bool userCreatedFleet;
 };
 
 class SegmentRep;
@@ -204,17 +207,32 @@ Ptr<FleetRep> FleetRep::instance_ = NULL;
 ManagerImpl::ManagerImpl() {
     shippingNetwork_ = new ShippingNetwork();
     instance_["defaultFleet"] = FleetRep::instance("defaultFleet", this);
+    userCreatedFleet = false;
     instance_["defaultStats"] = StatsRep::instance("defaultStats", this);
+    userCreatedStats = false;
     instance_["defaultConn"] = ConnRep::instance("defaultConn", this);
+    userCreatedConn = false;
 }
 
 Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
     Ptr<Instance> t;
     if (type == "Stats") {
+        if (!userCreatedStats) {
+            instanceDel("defaultStats");
+            userCreatedStats = true;
+        }
         t = StatsRep::instance(name, this);
     } else if (type == "Fleet") {
+        if (!userCreatedFleet) {
+            instanceDel("defaultFleet");
+            userCreatedStats = true;
+        }
         t = FleetRep::instance(name, this);
     } else if (type == "Conn") {
+        if (!userCreatedConn) {
+            instanceDel("defaultConn");
+            userCreatedConn = true;
+        }
         t = ConnRep::instance(name, this);
     }
     if (t != NULL) {
@@ -262,7 +280,6 @@ void ManagerImpl::instanceDel(const string& name) {
         while (instance_[name]->references() > 1) instance_[name]->referencesDec();
         instance_.erase(t);
     } else {
-        throw Fwk::EntityNotFoundException("Attempt to delete non-existant instance " + name);
 //        cerr << "attempting to delete non-existant instance " << name << endl;
     }
 }
