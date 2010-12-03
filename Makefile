@@ -11,9 +11,6 @@ test:	test.o $(OBJECTS)
 test1:	test1.o $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIB)
 
-example: example.o $(OBJECTS)
-	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIB)
-
 experiment: experiment.o $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIB)
 	
@@ -25,5 +22,4 @@ ShippingNetwork.o: ShippingNetwork.cpp ShippingNetwork.h entityReactor.h entitie
 Instance.o: Instance.cpp Instance.h ShippingNetwork.o entities.o
 test.o: test1.cpp Instance.o ShippingNetwork.o entities.o
 test1.o: test1.cpp Instance.o ShippingNetwork.o entities.o
-example.o: example.cpp Instance.o ShippingNetwork.o entities.o
 experiment.o: experiment.cpp Instance.o ShippingNetwork.o entities.o
