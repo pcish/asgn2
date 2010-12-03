@@ -84,7 +84,7 @@ namespace ActivityImpl {
             //specific to this example
             Queue::Ptr queue() const { return queue_; }
         protected:
-            ManagerImpl() : now_(0) {
+            ManagerImpl() : now_(0), timeStepping_(virtualtime__) {
                 queue_ = new Queue();
             }
 
