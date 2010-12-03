@@ -212,6 +212,7 @@ Ptr<Customer> ShippingNetwork::customerNew(const string name) {
     Fwk::Ptr<CustomerReactor> r = CustomerReactor::customerReactorNew();
     r->notifierIs(m);
     if (notifiee_) notifiee_->onCustomerNew(m);
+    location_[m->name()] = m;
     return m;
 }
 
@@ -221,6 +222,7 @@ Ptr<Terminal> ShippingNetwork::terminalNew(const string name, const Segment::Tra
     Fwk::Ptr<TerminalReactor> r = TerminalReactor::terminalReactorNew();
     r->notifierIs(m);
     if (notifiee_) notifiee_->onTerminalNew(m);
+    location_[m->name()] = m;
     return m;
 }
 
@@ -230,6 +232,7 @@ Ptr<Segment> ShippingNetwork::segmentNew(const Segment::TransportationMode trans
     Fwk::Ptr<SegmentReactor> r = SegmentReactor::segmentReactorNew();
     r->notifierIs(m);
     if (notifiee_) notifiee_->onSegmentNew(m);
+    segment_[m->name()] = m;
     return m;
 }
 
@@ -239,12 +242,17 @@ Ptr<Port> ShippingNetwork::portNew(const string name){
     Fwk::Ptr<PortReactor> r = PortReactor::portReactorNew();
     r->notifierIs(m);
     if (notifiee_) notifiee_->onPortNew(m);
+    location_[m->name()] = m;
     return m;
 }
 
 void ShippingNetwork::locationDel(Ptr<Location> o) {
     for (unsigned int i = 0; i < o->segments(); i++) {
         o->segment(i)->sourceIs(NULL);
+    }
+    map<string,Ptr<Location> >::iterator t = location_.find(o->name());
+    if (t != location_.end()) {
+        location_.erase(t);
     }
 }
 
@@ -269,6 +277,10 @@ void ShippingNetwork::segmentDel(Ptr<Segment> o) {
                 break;
             }
         }
+    }
+    map<string,Ptr<Segment> >::iterator t = segment_.find(o->name());
+    if (t != segment_.end()) {
+        segment_.erase(t);
     }
 }
 

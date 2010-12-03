@@ -6,6 +6,7 @@
 #include <vector>
 #include <set>
 #include <algorithm>
+#include <map>
 
 namespace Shipping {
 class EngineReactor;
@@ -207,6 +208,8 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     void deliverShipment(WeakPtr<Shipment> shipment);
   private:
     Ptr<Statistics> statistics_;
+    map<string, Ptr<Location> > location_;
+    map<string, Ptr<Segment> > segment_;
     bool isConnAttributeChange;
 
     Ptr<TruckFleet> truckFleet_;
