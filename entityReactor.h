@@ -35,6 +35,10 @@ class ShipmentReactor : public Shipment::Notifiee {
     ShipmentReactor() { previousSegment_ = NULL; }
     void forwardShipment() {
         Fwk::Ptr<Path> nextHop = notifier_->shippingNetwork()->nextHop(notifier_);
+        if (nextHop == NULL) {
+            notifier_->shippingNetwork()->dropShipment(notifier_);
+            return;
+        }
         WeakPtr<Segment> nextSegment = nextHop->segment(0);
         LOG_DEBUG("forwardShipment", nextSegment->name());
         if (nextSegment == NULL || nextHop->location(1) == NULL) {

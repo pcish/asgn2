@@ -148,6 +148,16 @@ void ShippingNetwork::deliverShipment(WeakPtr<Shipment> shipment) {
     }
 }
 
+void ShippingNetwork::dropShipment(WeakPtr<Shipment> shipment) {
+    LOG_INFO("dropShipment", "dropping shipment " + shipment->name());
+    for (unsigned int i = 0; i < shipment_.size(); i++) {
+        if (shipment_[i].ptr() == shipment.ptr()) {
+            shipment_.erase(shipment_.begin() + i);
+            break;
+        }
+    }
+}
+
 Ptr<Path> ShippingNetwork::nextHop(const WeakPtr<Shipment> shipment) {
     switch (routing_) {
         case bfs__:
