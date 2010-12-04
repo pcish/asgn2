@@ -13,8 +13,8 @@
 #define LOG_INFO(f, x)     CerrLog::instance()->entryNew(Log::Info,     this->name(), (f), string("")+x, 0)
 #define LOG_DEBUG(f, x)    CerrLog::instance()->entryNew(Log::Debug,    this->name(), (f), string("")+x, 0)
 
-#define __STR(x) # x
-#define STR(x) __STR(x)
+#define STR(x) Log::toString((x))
+
 using namespace std;
 
 class Log : public Fwk::NamedInterface {
@@ -34,6 +34,8 @@ class Log : public Fwk::NamedInterface {
     virtual void entryNew(Priority, const string &name, const string &funcName,
         const string &cond, int arg) throw() = 0;
     void logLevelIs(Priority logLevel) { logLevel_ = logLevel; }
+    template <class T>
+    static string toString(T n) { stringstream ss; ss << n; return ss.str(); }
 
   protected:
     Log(string name) : Fwk::NamedInterface(name) {}
@@ -48,7 +50,7 @@ class CerrLog : public Log {
         return logger;
     }
     virtual void entryNew(Priority p, const string &name, const string &funcName, const string &cond, int arg) throw() {
-        if (p > logLevel_) return; 
+        if (p > logLevel_) return;
         cerr << "[";
         switch (p) {
           case Critical:
@@ -64,7 +66,7 @@ class CerrLog : public Log {
           default:
             cerr << "UNDEFINED"; break;
         }
-        cerr << "] " << name << "." << funcName << "(): " << cond << endl;
+        cerr << "] " << name << "::" << funcName << "(): " << cond << endl;
     }
   protected:
     CerrLog(string name) : Log(name){}

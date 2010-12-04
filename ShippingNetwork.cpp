@@ -131,7 +131,7 @@ Ptr<Shipment> ShippingNetwork::shipmentNew() {
     Fwk::Ptr<ShipmentReactor> r = ShipmentReactor::shipmentReactorNew();
     r->notifierIs(m);
     shipment_.push_back(m);
-    LOG_INFO("shipmentNew", "shipment " + m->name() + "created");
+    LOG_INFO("shipmentNew", "shipment " + m->name() + " created");
     return m;
 }
 
@@ -140,6 +140,16 @@ void ShippingNetwork::deliverShipment(WeakPtr<Shipment> shipment) {
     shipment->destination()->shipmentsReceivedInc();
     shipment->destination()->totalLatencyInc(shipment->transitTime());
     shipment->destination()->totalCostInc(shipment->cost());
+    for (unsigned int i = 0; i < shipment_.size(); i++) {
+        if (shipment_[i].ptr() == shipment.ptr()) {
+            shipment_.erase(shipment_.begin() + i);
+            break;
+        }
+    }
+}
+
+void ShippingNetwork::dropShipment(WeakPtr<Shipment> shipment) {
+    LOG_INFO("dropShipment", "dropping shipment " + shipment->name());
     for (unsigned int i = 0; i < shipment_.size(); i++) {
         if (shipment_[i].ptr() == shipment.ptr()) {
             shipment_.erase(shipment_.begin() + i);

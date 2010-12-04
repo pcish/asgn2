@@ -195,6 +195,7 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     }
     void locationDel(Ptr<Location> o);
     void deliverShipment(WeakPtr<Shipment> shipment);
+    void dropShipment(WeakPtr<Shipment> shipment);
 
   private:
     Ptr<Statistics> statistics_;

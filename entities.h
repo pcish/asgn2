@@ -252,6 +252,7 @@ class Customer : public Location {
     void destinationIs(const Ptr<Location> destination) { if (destination_ == destination) return; destination_ = destination; if (notifiee_) notifiee_->onDestination(); }
     PackageUnit shipmentSize() const { return shipmentSize_; }
     void shipmentSizeIs(const PackageUnit shipmentSize) { if (shipmentSize_ == shipmentSize) return; shipmentSize_ = shipmentSize; if (notifiee_) notifiee_->onShipmentSize(); }
+    ShipmentCount transferRate() const { return transferRate_; }
     void transferRateIs(const ShipmentCount transferRate) { if (transferRate_ == transferRate) return; transferRate_ = transferRate; if (notifiee_) notifiee_->onTransferRate(); }
     ShipmentCount shipmentsReceived() const { return shipmentsReceived_; }
     void shipmentsReceivedInc() { shipmentsReceived_ = shipmentsReceived_.value() + 1; }
