@@ -1,6 +1,29 @@
 user: luyota
 user: pcish
 
+Table of Contents
+----
+I. New in Assignment 3
+  1. New Features
+    A. Exceptions and Logging
+    B. ActivityManager
+      a. Virtual Time
+      b. Real Time
+    C. Shipment Transfers
+      a. Mechanics
+      b. Statistics Collected
+      c. Routing Algorithms
+    D. Scheduled Changes to Fleet Attributes 
+  2. Simulations
+    A. verification.cpp
+    B. experiment.cpp
+II. Original Assignment 2 README
+----
+I. New in Assignment 3
+
+
+II. Original Assignment 2 README
+
 Submission Notes for TA:
 All our test cases are under the directory: 
 testcases/simple
