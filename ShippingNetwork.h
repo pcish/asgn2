@@ -160,6 +160,7 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     Ptr<Path> nextHop(const WeakPtr<Shipment> shipment);
 
     ShippingNetwork();
+    string name() { return "shippingNetwork"; }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<ShippingNetwork> notifier) {

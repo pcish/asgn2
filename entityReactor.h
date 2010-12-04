@@ -4,6 +4,7 @@
 #include "entities.h"
 #include "ShippingNetwork.h"
 #include "ActivityImpl.h"
+#include "Log.h"
 
 namespace Shipping {
 class ShippingNetwork;
@@ -12,13 +13,11 @@ class ShipmentReactor : public Shipment::Notifiee {
   public:
     static Hour retryTime;
     virtual void onCurrentLocation() {
-        cerr << "on current location called" << endl;
         if (notifier_->currentLocation() == notifier_->destination()) {
             notifier_->shippingNetwork()->deliverShipment(notifier_);
         } else {
             forwardShipment();
         }
-        cerr << "on current location end" << endl;
     }
     static Fwk::Ptr<ShipmentReactor> shipmentReactorNew() {
         Fwk::Ptr<ShipmentReactor> n = new ShipmentReactor();
@@ -35,15 +34,14 @@ class ShipmentReactor : public Shipment::Notifiee {
   private:
     ShipmentReactor() { previousSegment_ = NULL; }
     void forwardShipment() {
-        cerr << "forward shipment called" << endl;
         Fwk::Ptr<Path> nextHop = notifier_->shippingNetwork()->nextHop(notifier_);
         WeakPtr<Segment> nextSegment = nextHop->segment(0);
-        cerr << nextSegment->name() << endl;
+        LOG_DEBUG("forwardShipment", nextSegment->name());
         if (nextSegment == NULL || nextHop->location(1) == NULL) {
             throw Fwk::InternalException("nextHop return invalid path");
         }
-        cerr << "capacity = " << nextSegment->availableCapacity().value() << endl;
-        cerr << nextHop->location(1)->name() << endl;
+        LOG_DEBUG("forwardShipment", "nextLocation=" + nextHop->location(1)->name());
+        LOG_DEBUG("forwardShipment", "capacity = "+STR(nextSegment->availableCapacity().value()));
         if (nextSegment->availableCapacity() > 0) {
             Fwk::Ptr<Fleet> fleet;
             if (nextSegment->transportationMode() == Segment::truck()) {
@@ -58,21 +56,20 @@ class ShipmentReactor : public Shipment::Notifiee {
                 (nextSegment->length().value() / fleet->speed().value());
             //cerr << "ceil(" << notifier_->load().value() << " / " << fleet->capacity().value() << ")" << endl;
             //cerr << "* ("<< nextSegment->length().value() << " / " << fleet->speed().value() << ")" << endl;
-            cerr << "transit time = " << transitTime.value() << endl;
+            LOG_DEBUG("forwardShipment", "transit time = "+STR(transitTime.value()));
 
             Activity::Manager::Ptr manager = activityManagerInstance();
             if (activity_ == NULL) {
                 try {
                     activity_ = manager->activityNew(notifier_->name());
                 } catch(Fwk::Exception& e) {
-                    cerr << "attempting to new activity with name=" << notifier_->name() << "returned: ";
-                    cout << e.what() << endl;
+                    LOG_INFO("forwardShipment", "attempting to new activity with name="+notifier_->name()+"returned: "+e.what());
                 }
             }
             activityNotifiee_ = new ActivityNotifiee(
                 activity_.ptr(), this, nextHop->location(1));
             activity_->nextTimeIs(manager->now().value() + transitTime.value());
-            cerr << "ETA: " << manager->now().value() + transitTime.value() << endl;
+            LOG_DEBUG("forwardShipment", "ETA: "+STR(manager->now().value() + transitTime.value()));
             activity_->lastNotifieeIs(activityNotifiee_.ptr());
             manager->lastActivityIs(activity_.ptr());
 
@@ -92,7 +89,6 @@ class ShipmentReactor : public Shipment::Notifiee {
             activity_->lastNotifieeIs(activityNotifiee_.ptr());
             manager->lastActivityIs(activity_.ptr());
         }
-        cerr << "forward shipment return" << endl;
     }
     class ActivityNotifiee : public Activity::Activity::Notifiee {
       public:
@@ -248,7 +244,7 @@ class CustomerReactor : public Customer::Notifiee {
         Activity::Manager::Ptr manager = activityManagerInstance();
         activity_->nextTimeIs(manager->now().value() + 24);
         manager->lastActivityIs(activity_.ptr());
-        cerr << "shipment at " << notifier_->name() << " started" << endl;
+        LOG_INFO("shipmentNew", "shipment at " + notifier_->name() + " started");
     }
     CustomerReactor() : destSet(false), shipmentSizeSet(false), transferRateSet(false), started(false) {}
     Activity::Activity::Ptr activity_;

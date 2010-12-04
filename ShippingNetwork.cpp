@@ -5,6 +5,7 @@
 #include "ShippingNetwork.h"
 #include "entityReactor.h"
 #include "routing/routing.h"
+#include "Log.h"
 
 namespace Shipping {
 
@@ -130,12 +131,12 @@ Ptr<Shipment> ShippingNetwork::shipmentNew() {
     Fwk::Ptr<ShipmentReactor> r = ShipmentReactor::shipmentReactorNew();
     r->notifierIs(m);
     shipment_.push_back(m);
-    cerr << "shipment " << m->name() << "created" << endl;
+    LOG_INFO("shipmentNew", "shipment " + m->name() + "created");
     return m;
 }
 
 void ShippingNetwork::deliverShipment(WeakPtr<Shipment> shipment) {
-    cerr << "shipment " << shipment->name() << " received at destination" << endl;
+    LOG_INFO("deliverShipment", "shipment " + shipment->name() + " received at destination");
     shipment->destination()->shipmentsReceivedInc();
     shipment->destination()->totalLatencyInc(shipment->transitTime());
     shipment->destination()->totalCostInc(shipment->cost());

@@ -7,12 +7,14 @@
 #include "fwk/Ptr.h"
 #include "fwk/PtrInterface.h"
 
-#define LOG_CRITICAL(f, x) CerrLog::instance()->entryNew(Log::Critical, this->name(), (f), (x), 0)
-#define LOG_ERROR(f, x)    CerrLog::instance()->entryNew(Log::Error,    this->name(), (f), (x), 0)
-#define LOG_WARNING(f, x)  CerrLog::instance()->entryNew(Log::Warning,  this->name(), (f), (x), 0)
-#define LOG_INFO(f, x)     CerrLog::instance()->entryNew(Log::Info,     this->name(), (f), (x), 0)
-#define LOG_DEBUG(f, x)    CerrLog::instance()->entryNew(Log::Debug,    this->name(), (f), (x), 0)
+#define LOG_CRITICAL(f, x) CerrLog::instance()->entryNew(Log::Critical, this->name(), (f), string("")+x, 0)
+#define LOG_ERROR(f, x)    CerrLog::instance()->entryNew(Log::Error,    this->name(), (f), string("")+x, 0)
+#define LOG_WARNING(f, x)  CerrLog::instance()->entryNew(Log::Warning,  this->name(), (f), string("")+x, 0)
+#define LOG_INFO(f, x)     CerrLog::instance()->entryNew(Log::Info,     this->name(), (f), string("")+x, 0)
+#define LOG_DEBUG(f, x)    CerrLog::instance()->entryNew(Log::Debug,    this->name(), (f), string("")+x, 0)
 
+#define __STR(x) # x
+#define STR(x) __STR(x)
 using namespace std;
 
 class Log : public Fwk::NamedInterface {
