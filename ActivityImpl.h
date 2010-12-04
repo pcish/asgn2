@@ -58,7 +58,7 @@ namespace ActivityImpl {
             friend class ManagerImpl;
             Status status_;
             Hour nextTime_;
-            Notifiee* notifiee_;
+            Fwk::Ptr<Notifiee> notifiee_;
             Fwk::Ptr<class ManagerImpl> manager_;
     };
 

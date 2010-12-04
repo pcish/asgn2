@@ -227,9 +227,13 @@ class CustomerReactor : public Customer::Notifiee {
             if (destSet && shipmentSizeSet && transferRateSet && notifier_) {
                 started = true;
                 //lauch the shipment
-                Activity::Manager::Ptr manager = activityManagerInstance();
+                Activity::Manager::Ptr manager = activityManagerInstance();               
                 //name here
-                activity_ = manager->activityNew(notifier_->name()); //use what name?
+                try {
+                    activity_ = manager->activityNew(notifier_->name()); //use what name?
+                } catch(Fwk::Exception& e) {
+                    cerr << "attempting to new activity with name=" << notifier_->name() << "returned: ";
+                }
                 activity_->nextTimeIs(manager->now());
                 //here we need to set the time for activity
                 activityNotifiee_ = new ActivityNotifiee(activity_.ptr(), this);
