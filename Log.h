@@ -31,9 +31,11 @@ class Log : public Fwk::NamedInterface {
     }
     virtual void entryNew(Priority, const string &name, const string &funcName,
         const string &cond, int arg) throw() = 0;
+    void logLevelIs(Priority logLevel) { logLevel_ = logLevel; }
 
   protected:
     Log(string name) : Fwk::NamedInterface(name) {}
+    Priority logLevel_;
 };
 
 class CerrLog : public Log {
@@ -44,6 +46,7 @@ class CerrLog : public Log {
         return logger;
     }
     virtual void entryNew(Priority p, const string &name, const string &funcName, const string &cond, int arg) throw() {
+        if (p > logLevel_) return; 
         cerr << "[";
         switch (p) {
           case Critical:
