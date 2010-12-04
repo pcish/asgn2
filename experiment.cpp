@@ -5,6 +5,7 @@
 #include "Instance.h"
 #include "fwk/Exception.h"
 #include "ActivityImpl.h"
+#include "Log.h"
 
 using namespace std;
 
@@ -83,6 +84,7 @@ class ExperimentNetwork {
 int main(int argc, char* argv[]) {
     ExperimentNetwork * network = new ExperimentNetwork();
     network->setup();
+    CerrLog::instance()->logLevelIs(Log::Null);
     //cout << network->explore();
     network->startShipments();
     Activity::Manager::Ptr activityManager = activityManagerInstance();
