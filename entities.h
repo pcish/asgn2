@@ -255,7 +255,7 @@ class Customer : public Location {
     void transferRateIs(const ShipmentCount transferRate) { if (transferRate_ == transferRate) return; transferRate_ = transferRate; if (notifiee_) notifiee_->onTransferRate(); }
     ShipmentCount shipmentsReceived() const { return shipmentsReceived_; }
     void shipmentsReceivedInc() { shipmentsReceived_ = shipmentsReceived_.value() + 1; }
-    Hour averageLatency() const { return totalLatency_.value() / shipmentsReceived_.value(); }
+    Hour averageLatency() const { return ((shipmentsReceived_.value() != 0)? totalLatency_.value() / shipmentsReceived_.value() : 0); }
     void totalLatencyInc(Hour increment) { totalLatency_ = totalLatency_.value() + increment.value(); }
     USD totalCost() const { return totalCost_; }
     void totalCostInc(USD increment) { totalCost_ = totalCost_.value() + increment.value(); }

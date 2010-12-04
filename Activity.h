@@ -70,7 +70,7 @@ public:
 
     virtual Hour now() const = 0;
     virtual void nowIs(Hour) = 0;
-
+    virtual ~Manager() {}
 
 private:
     /* Up to you */

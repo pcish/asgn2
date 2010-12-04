@@ -52,6 +52,7 @@ namespace ActivityImpl {
                 ActivityImpl* me = const_cast<ActivityImpl*>(this);
                 me->notifiee_ = n;
             }
+            virtual ~ActivityImpl() { cout << "Activity Deleted" << endl; }
 
 
         private:
@@ -93,12 +94,14 @@ namespace ActivityImpl {
             map<string, Activity::Ptr> activities_; //pool of all activities
             Hour now_;
             TimeStepping timeStepping_;
+            ~ManagerImpl() { }
 
             //specific to this example
             //Queue::Ptr queue_;
 
             //singleton instance
-            static Fwk::Ptr<Activity::Manager> activityInstance_;
+            //static Fwk::Ptr<Activity::Manager> activityInstance_;
+            static Activity::Manager::Ptr activityInstance_;
 
     };
 

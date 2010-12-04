@@ -2,7 +2,7 @@
 #include <time.h>
 
 #include "ActivityImpl.h"
-
+#include "Log.h"
 
 Fwk::Ptr<Activity::Manager> activityManagerInstance() {
     return ActivityImpl::ManagerImpl::activityManagerInstance();
@@ -62,7 +62,14 @@ namespace ActivityImpl {
 
             //figure out the next activity to run
             Activity::Ptr nextToRun = scheduledActivities_.top();
-
+            
+            if (nextToRun->status() == Activity::deleted) {
+                //LOG_DEBUG("ManagerImpl::nowIs", "Remove activity because it's status is deleted: " + nextToRun->name());
+                //cout << "ManagerImpl::nowIs" <<  "Remove activity because it's status is deleted: " <<  nextToRun->name() << " ref count=" << nextToRun->references() << endl;
+                scheduledActivities_.pop();
+                activityDel(nextToRun->name());
+                continue;
+            }
             //if the next Hour is greater than the specified time, break
             //the loop
             if (nextToRun->nextTime() > t) {

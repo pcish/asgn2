@@ -30,7 +30,10 @@ class ShipmentReactor : public Shipment::Notifiee {
             notifier_->currentLocationIs(nextLocation);
         }
     }
-
+    virtual ~ShipmentReactor() {
+//        cout << "ShipmentReactor deleting..." << endl;
+        activity_->statusIs(Activity::Activity::deleted);
+    }
   private:
     ShipmentReactor() { previousSegment_ = NULL; }
     void forwardShipment() {
@@ -228,7 +231,10 @@ class CustomerReactor : public Customer::Notifiee {
                 try {
                     activity_ = manager->activityNew(notifier_->name()); //use what name?
                 } catch(Fwk::Exception& e) {
-                    cerr << "attempting to new activity with name=" << notifier_->name() << "returned: ";
+                    LOG_INFO("checkAndLaunch", "attempting to new activity with name="+notifier_->name()+"returned: "+e.what());
+                    //There is some problem with the logging system that it doesn't output on cerr
+                    //cerr << "attempting to new activity with name=" << notifier_->name() << "returned: ";
+                    return;
                 }
                 activity_->nextTimeIs(manager->now());
                 //here we need to set the time for activity
