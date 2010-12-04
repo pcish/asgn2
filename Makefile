@@ -13,7 +13,10 @@ test1:	test1.o $(OBJECTS)
 
 experiment: experiment.o $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIB)
-	
+
+verification: verification.o $(OBJECTS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIB)
+
 clean:
 	rm -f test1 *.o *.exe $(OBJECTS) *~
 
@@ -23,3 +26,4 @@ Instance.o: Instance.cpp Instance.h ShippingNetwork.o entities.o
 test.o: test1.cpp Instance.o ShippingNetwork.o entities.o
 test1.o: test1.cpp Instance.o ShippingNetwork.o entities.o
 experiment.o: experiment.cpp Instance.o ShippingNetwork.o entities.o
+verification.o: verification.cpp Instance.o ShippingNetwork.o entities.o
