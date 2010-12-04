@@ -82,13 +82,27 @@ class ExperimentNetwork {
 };
 
 int main(int argc, char* argv[]) {
+    CerrLog::instance()->logLevelIs(Log::Null);
+    Activity::Manager::Ptr activityManager = activityManagerInstance();
+
+    cout << "Simulation 1: all sources send 100 packages" << endl;
     ExperimentNetwork * network = new ExperimentNetwork();
     network->setup();
-    CerrLog::instance()->logLevelIs(Log::Null);
-    //cout << network->explore();
     network->startShipments();
-    Activity::Manager::Ptr activityManager = activityManagerInstance();
     activityManager->nowIs(23.0);
+    cout << "Shipments received at destination: " << network->destination->attribute("shipments received") << endl;
+    cout << "Average latency of received shipments: " << network->destination->attribute("average latency") << endl;
+    delete network;
+
+    activityManager = 0;
+    activityManager = activityManagerInstance();
+    cout << "Simulation 2: all sources send rand(1, 1000) packages" << endl;
+    network = new ExperimentNetwork();
+    network->setup();
+    network->startShipments(true);
+    activityManager->nowIs(23.0);
+    cout << "Shipments received at destination: " << network->destination->attribute("shipments received") << endl;
+    cout << "Average latency of received shipments: " << network->destination->attribute("average latency") << endl;
     delete network;
     return 0;
 }
