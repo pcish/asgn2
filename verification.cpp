@@ -72,7 +72,7 @@ class Network {
 };
 
 int main(int argc, char* argv[]) {
-    CerrLog::instance()->logLevelIs(Log::Info);
+    CerrLog::instance()->logLevelIs(Log::Debug);
     Activity::Manager::Ptr activityManager = activityManagerInstance();
 
     cout << "Simulation 1: all sources send 100 packages" << endl;

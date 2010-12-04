@@ -30,6 +30,7 @@ class ShipmentReactor : public Shipment::Notifiee {
             notifier_->currentLocationIs(nextLocation);
         }
     }
+    string name() const { return notifier_->name() + ".ShipmentReactor"; }
 
   private:
     ShipmentReactor() { previousSegment_ = NULL; }
@@ -44,8 +45,8 @@ class ShipmentReactor : public Shipment::Notifiee {
         if (nextSegment == NULL || nextHop->location(1) == NULL) {
             throw Fwk::InternalException("nextHop return invalid path");
         }
-        LOG_DEBUG("forwardShipment", "nextLocation=" + nextHop->location(1)->name());
-        LOG_DEBUG("forwardShipment", "capacity = "+STR(nextSegment->availableCapacity().value()));
+        LOG_DEBUG("forwardShipment", "nextLocation = " + nextHop->location(1)->name());
+        LOG_DEBUG("forwardShipment", "capacity = " + STR(nextSegment->availableCapacity().value()));
         if (nextSegment->availableCapacity() > 0) {
             Fwk::Ptr<Fleet> fleet;
             if (nextSegment->transportationMode() == Segment::truck()) {
@@ -60,20 +61,20 @@ class ShipmentReactor : public Shipment::Notifiee {
                 (nextSegment->length().value() / fleet->speed().value());
             //cerr << "ceil(" << notifier_->load().value() << " / " << fleet->capacity().value() << ")" << endl;
             //cerr << "* ("<< nextSegment->length().value() << " / " << fleet->speed().value() << ")" << endl;
-            LOG_DEBUG("forwardShipment", "transit time = "+STR(transitTime.value()));
+            LOG_DEBUG("forwardShipment", "transit time = " + STR(transitTime.value()));
 
             Activity::Manager::Ptr manager = activityManagerInstance();
             if (activity_ == NULL) {
                 try {
                     activity_ = manager->activityNew(notifier_->name());
                 } catch(Fwk::Exception& e) {
-                    LOG_INFO("forwardShipment", "attempting to new activity with name="+notifier_->name()+"returned: "+e.what());
+                    LOG_INFO("forwardShipment", "attempting to new activity with name = " + notifier_->name()+"returned: "+e.what());
                 }
             }
             activityNotifiee_ = new ActivityNotifiee(
                 activity_.ptr(), this, nextHop->location(1));
             activity_->nextTimeIs(manager->now().value() + transitTime.value());
-            LOG_DEBUG("forwardShipment", "ETA: "+STR(manager->now().value() + transitTime.value()));
+            LOG_DEBUG("forwardShipment", "ETA: " + STR(manager->now().value() + transitTime.value()));
             activity_->lastNotifieeIs(activityNotifiee_.ptr());
             manager->lastActivityIs(activity_.ptr());
 
@@ -174,6 +175,7 @@ class SegmentReactor : public Segment::Notifiee {
         Fwk::Ptr<SegmentReactor> n = new SegmentReactor();
         return n;
     }
+    string name() const { return notifier_->name() + ".SegmentReactor"; }
   protected:
     SegmentReactor() {
         previousSource_ = NULL;
@@ -206,6 +208,7 @@ class CustomerReactor : public Customer::Notifiee {
         Fwk::Ptr<CustomerReactor> n = new CustomerReactor();
         return n;
     }
+    string name() const { return notifier_->name() + ".CustomerReactor"; }
   private:
     class ActivityNotifiee : public Activity::Activity::Notifiee {
       public:
@@ -265,7 +268,9 @@ class PortReactor : public Port::Notifiee {
         Fwk::Ptr<PortReactor> n = new PortReactor();
         return n;
     }
+    string name() const { return notifier_->name() + ".PortReactor"; }
 };
+
 class TerminalReactor : public Terminal::Notifiee {
   public:
     virtual void onDel(Terminal *p) {
@@ -281,6 +286,7 @@ class TerminalReactor : public Terminal::Notifiee {
         Fwk::Ptr<TerminalReactor> n = new TerminalReactor();
         return n;
     }
+    string name() const { return notifier_->name() + ".TerminalReactor"; }
 };
 
 }

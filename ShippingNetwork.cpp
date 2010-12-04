@@ -131,7 +131,7 @@ Ptr<Shipment> ShippingNetwork::shipmentNew() {
     Fwk::Ptr<ShipmentReactor> r = ShipmentReactor::shipmentReactorNew();
     r->notifierIs(m);
     shipment_.push_back(m);
-    LOG_INFO("shipmentNew", "shipment " + m->name() + "created");
+    LOG_INFO("shipmentNew", "shipment " + m->name() + " created");
     return m;
 }
 
