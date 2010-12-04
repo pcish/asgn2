@@ -303,6 +303,21 @@ void LocationRep::attributeIs(const string& name, const string& v) {
 
 string CustomerRep::attribute(const string& name) {
     ostringstream os;
+    if (name == "destination") {
+        if (engineObject_->destination() != NULL) {
+            os << engineObject_->destination()->name();
+        }
+    } else if (name == "shipment size") {
+        os << engineObject_->shipmentSize().value();
+    } else if (name == "shipments received") {
+        os << engineObject_->shipmentsReceived().value();
+    } else if (name == "average latency") {
+        os << engineObject_->averageLatency().value();
+    } else if (name == "total cost") {
+        os << engineObject_->totalCost().value();
+    } else {
+        throw Fwk::UnknownArgException("Unsupported attribute: " + name);
+    }
     return os.str();
 }
 
