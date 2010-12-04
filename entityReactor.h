@@ -242,11 +242,13 @@ class CustomerReactor : public Customer::Notifiee {
         }
     }
     void shipmentNew() {
-        Fwk::Ptr<Shipment> shipment = notifier_->shippingNetwork()->shipmentNew();
-        shipment->sourceIs(notifier_.ptr());
-        shipment->destinationIs(dynamic_cast<Customer*>(notifier_->destination().ptr()));
-        shipment->loadIs(notifier_->shipmentSize());
-        shipment->currentLocationIs(notifier_.ptr());
+        for (unsigned int i = 0; i < notifier_->transferRate().value(); i++) {
+            Fwk::Ptr<Shipment> shipment = notifier_->shippingNetwork()->shipmentNew();
+            shipment->sourceIs(notifier_.ptr());
+            shipment->destinationIs(dynamic_cast<Customer*>(notifier_->destination().ptr()));
+            shipment->loadIs(notifier_->shipmentSize());
+            shipment->currentLocationIs(notifier_.ptr());
+        }
 
         Activity::Manager::Ptr manager = activityManagerInstance();
         activity_->nextTimeIs(manager->now().value() + 24);
