@@ -11,6 +11,7 @@
 using namespace std;
 
 Fwk::Ptr<Activity::Manager> activityManagerInstance();
+void activityManagerInstanceIs(Fwk::Ptr<Activity::Manager>);
 
 namespace ActivityImpl {
 
@@ -77,6 +78,7 @@ namespace ActivityImpl {
             virtual void nowIs(Hour time);
 
             static Fwk::Ptr<Activity::Manager> activityManagerInstance();
+            static void activityManagerInstanceIs(const Fwk::Ptr<Activity::Manager> _instance);
 
             virtual void lastActivityIs(Activity::Ptr activity);
             void timeSteppingIs(const TimeStepping _timeStepping) { timeStepping_ = _timeStepping; }

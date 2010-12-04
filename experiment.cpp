@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
     delete network;
 
     activityManager = NULL;
-    //delete activityManager.ptr();
+    activityManagerInstanceIs(NULL);
     activityManager = activityManagerInstance();
     cout << "Simulation 2: all sources send rand(1, 1000) packages" << endl;
     network = new ExperimentNetwork();

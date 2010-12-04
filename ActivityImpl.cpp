@@ -4,8 +4,11 @@
 #include "ActivityImpl.h"
 #include "Log.h"
 
-Fwk::Ptr<Activity::Manager> activityManagerInstance() {
+Fwk::Ptr<Activity::Manager> activityManagerInstance(){
     return ActivityImpl::ManagerImpl::activityManagerInstance();
+}
+void activityManagerInstanceIs(Fwk::Ptr<Activity::Manager> _instance){
+    ActivityImpl::ManagerImpl::activityManagerInstanceIs(_instance);
 }
 
 namespace ActivityImpl {
@@ -21,6 +24,7 @@ namespace ActivityImpl {
 
         return activityInstance_;
     }
+    void ManagerImpl::activityManagerInstanceIs(const Fwk::Ptr<Activity::Manager> _instance) { activityInstance_ = _instance; }
 
     Activity::Ptr ManagerImpl::activityNew(const string& name) {
         Activity::Ptr activity = activities_[name];
