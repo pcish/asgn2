@@ -82,10 +82,10 @@ namespace ActivityImpl {
             TimeStepping timeStepping() { return timeStepping_; }
 
             //specific to this example
-            Queue::Ptr queue() const { return queue_; }
+            //Queue::Ptr queue() const { return queue_; }
         protected:
             ManagerImpl() : now_(0), timeStepping_(virtualtime__) {
-                queue_ = new Queue();
+                //queue_ = new Queue();
             }
 
             //Data members
@@ -95,7 +95,7 @@ namespace ActivityImpl {
             TimeStepping timeStepping_;
 
             //specific to this example
-            Queue::Ptr queue_;
+            //Queue::Ptr queue_;
 
             //singleton instance
             static Fwk::Ptr<Activity::Manager> activityInstance_;

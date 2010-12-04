@@ -148,10 +148,19 @@ void ShippingNetwork::deliverShipment(WeakPtr<Shipment> shipment) {
 }
 
 Ptr<Path> ShippingNetwork::nextHop(const WeakPtr<Shipment> shipment) {
-    Ptr<Bfs> bfs = Bfs::instance(this);
-    bfs->nextHop(shipment);
-    Ptr<RandomWalk> rw = RandomWalk::instance(this);
-    return bfs->nextHop(shipment);
+    switch (routing_) {
+        case bfs__:
+            return Bfs::instance(this)->nextHop(shipment);
+        break;
+        case dijkstra__:
+            return Dijkstra::instance(this)->nextHop(shipment);
+        break;
+        case randomwalk__:
+            return RandomWalk::instance(this)->nextHop(shipment);
+        break;
+        default:
+            return NULL;
+    }
 }
 
 class ShippingNetworkReactor : public ShippingNetwork::Notifiee {

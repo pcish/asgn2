@@ -443,6 +443,9 @@ void ConnRep::attributeIs(const string& name, const string& v) {
         else if (v.compare("bfs") == 0) {
             network->routingIs(ShippingNetwork::bfs());
         }
+        else if (v.compare("randomwalk") == 0) {
+            network->routingIs(ShippingNetwork::randomwalk());
+        }
     }
 }
 string ConnRep::attribute(const string& name) {

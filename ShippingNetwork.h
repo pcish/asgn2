@@ -149,10 +149,11 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     Segment::ExpediteSupport expedite() const { return expedite_; }
     void expediteIs(const Segment::ExpediteSupport expedite) { if (expedite_ == expedite) return; expedite_ = expedite; isConnAttributeChange = true; }
     enum Routing {
-        dijkstra__, bfs__
+        dijkstra__, bfs__, randomwalk__
     };
     static inline Routing dijkstra() { return dijkstra__; }
     static inline Routing bfs(){ return bfs__; }
+    static inline Routing randomwalk() { return randomwalk__; }
     Routing routing() const { return routing_; }
     void routingIs(const Routing _routing) { routing_ = _routing; }
     Ptr<Shipment> shipmentNew();
