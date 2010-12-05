@@ -381,14 +381,17 @@ class Fleet : public Fwk::NamedInterface {
     friend class ShippingNetwork;
   public:
     ~Fleet() { if (notifiee_) notifiee_->onDel(this); }
-    USD cost() const { return cost_; }
-    void costIs(const USD cost) { if (cost_ == cost) return; cost_ = cost; if (notifiee_) notifiee_->onCost(); }
-    PackageUnit capacity() const { return capacity_; }
-    void capacityIs(const PackageUnit capacity) { if (capacity_ == capacity) return; capacity_ = capacity; if (notifiee_) notifiee_->onCapacity(); }
+    USD cost(const unsigned int index=0) const { return cost_[index]; }
+    void costIs(const USD cost) { for (unsigned int i = 0; i < 24; i++) cost_[i] = cost; }
+    void costIs(const unsigned int index, USD cost) { cost_[index] = cost; }
+    PackageUnit capacity(const unsigned int index=0) const { return capacity_[index]; }
+    void capacityIs(const PackageUnit capacity) { for (unsigned int i = 0; i < 24; i++) capacity_[i] = capacity; }
+    void capacityIs(const unsigned int index, PackageUnit capacity) { capacity_[index] = capacity; }
     Segment::TransportationMode transportationMode() const { return transportationMode_; }
     void transportationModeIs(const Segment::TransportationMode transportationMode) { if (transportationMode_ == transportationMode) return; transportationMode_ = transportationMode; if (notifiee_) notifiee_->onTransportationMode(); }
-    Mile speed() const { return speed_; }
-    void speedIs(const Mile speed) { if (speed_ == speed) return; speed_ = speed; if (notifiee_) notifiee_->onSpeed(); }
+    Mile speed(const unsigned int index=0) const { return speed_[index]; }
+    void speedIs(const Mile speed) { for (unsigned int i = 0; i < 24; i++) speed_[i] = speed; }
+    void speedIs(const unsigned int index, Mile speed) { speed_[index] = speed; }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<Fleet> notifier) {
@@ -412,7 +415,13 @@ class Fleet : public Fwk::NamedInterface {
     };
     Ptr<Fleet::Notifiee> notifiee() const { return notifiee_; }
   protected:
-    Fleet(Fwk::String name) : NamedInterface(name), cost_(1), speed_(1), capacity_(100) {}
+    Fleet(Fwk::String name) : NamedInterface(name) {
+        for (unsigned int i = 0; i < 24; i++) {
+            cost_[i] = 1;
+            speed_[i] = 1;
+            capacity_[i] = 100;
+        }
+    }
     Ptr<Fleet::Notifiee> notifiee_;
     void notifieeIs(Fleet::Notifiee* n) const {
         Fleet* me = const_cast<Fleet*>(this);
@@ -420,9 +429,9 @@ class Fleet : public Fwk::NamedInterface {
     }
 
   private:
-    USD cost_;
-    Mile speed_;
-    PackageUnit capacity_;
+    USD cost_[24];
+    Mile speed_[24];
+    PackageUnit capacity_[24];
     Segment::TransportationMode transportationMode_;
     Fleet(const Fleet& o);
 };
