@@ -611,25 +611,54 @@ void FleetRep::attributeIs(const string& name, const string& v) {
         if (mode == "Plane") fleet_ = manager_->shippingNetwork()->planeFleet();
         if (mode == "Boat") fleet_ = manager_->shippingNetwork()->boatFleet();
 
+        
         istringstream is(v);
-        if (property == "speed") {
+        istringstream issprop(property);
+        vector<string> propList;
+        string temp;
+        while(issprop >> temp) {
+            propList.push_back(temp);
+        }
+
+        if (propList.size() == 1) { 
             string propertyValue;
             is >> propertyValue;
-            fleet_->speedIs(Mile(atof(propertyValue.c_str())));
+            if (propList[0] == "speed") {
+                fleet_->speedIs(Mile(atof(propertyValue.c_str())));
+            }
+            if (propList[0] == "cost") {
+                fleet_->costIs(USD(atof(propertyValue.c_str())));
+            }
+            if (propList[0] == "capacity") {
+                fleet_->capacityIs(PackageUnit(atoi(propertyValue.c_str())));
+            }
         }
-        if (property == "cost") {
-            string propertyValue;
-            is >> propertyValue;
-            fleet_->costIs(USD(atof(propertyValue.c_str())));
+        else if (propList.size() == 5) {
+            if (propList[1] == "from" && propList[3] == "to") {
+                string propertyValue;
+                is >> propertyValue;
+                int from, to;
+                from = atoi(propList[2].c_str());
+                to = atoi(propList[4].c_str());
+                //cout << propList[0] << " from " << from << " to " << to << endl;
+                //LOG_DEBUG("FleetRep::attributeIs", "scheduled " + mode);
+                for (int i = from; i <= to; i ++) {
+                    if (propList[0] == "speed") {
+                        fleet_->scheduledSpeedIs(i, Mile(atof(propertyValue.c_str())));
+                    }
+                    if (propList[0] == "cost") {
+                        fleet_->scheduledCostIs(i, USD(atof(propertyValue.c_str())));
+                    }
+                    if (propList[0] == "capacity") {
+                        fleet_->scheduledCapacityIs(i, PackageUnit(atoi(propertyValue.c_str())));
+                    }
+                }
+            }
         }
-        if (property == "capacity") {
-            string propertyValue;
-            is >> propertyValue;
-            fleet_->capacityIs(PackageUnit(atoi(propertyValue.c_str())));
-        }
-    //} catch (ValueError e) {
-    //    cerr << e.what() << endl;
-    //}
+
+        //} catch (ValueError e) {
+        //    cerr << e.what() << endl;
+        //}
 }
 
 }
