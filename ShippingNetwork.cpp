@@ -200,15 +200,6 @@ class ShippingNetworkReactor : public ShippingNetwork::Notifiee {
     virtual void onPortNew(Fwk::Ptr<Port> p) {
         notifier_->statistics()->ports_++;
     }
-    virtual void onPlaneFleetNew(Fwk::Ptr<PlaneFleet> p) {
-        notifier_->planeFleetIs(p);
-    }
-    virtual void onTruckFleetNew(Fwk::Ptr<TruckFleet> p) {
-        notifier_->truckFleetIs(p);
-    }
-    virtual void onBoatFleetNew(Fwk::Ptr<BoatFleet> p) {
-        notifier_->boatFleetIs(p);
-    }
     static Fwk::Ptr<ShippingNetworkReactor> ShippingNetworkReactorNew() {
         Fwk::Ptr<ShippingNetworkReactor> n = new ShippingNetworkReactor();
         return n;
@@ -273,18 +264,21 @@ Ptr<Port> ShippingNetwork::portNew(const string name){
 
 Ptr<PlaneFleet> ShippingNetwork::planeFleetNew(const string name) {
     Ptr<PlaneFleet> m = new PlaneFleet(name);
+    planeFleet_ = m;
     if (notifiee_) notifiee_->onPlaneFleetNew(m);
     return m;
 }
 
 Ptr<TruckFleet> ShippingNetwork::truckFleetNew(const string name) {
     Ptr<TruckFleet> m = new TruckFleet(name);
+    truckFleet_ = m;
     if (notifiee_) notifiee_->onTruckFleetNew(m);
     return m;
 }
 
 Ptr<BoatFleet> ShippingNetwork::boatFleetNew(const string name) {
     Ptr<BoatFleet> m = new BoatFleet(name);
+    boatFleet_ = m;
     if (notifiee_) notifiee_->onBoatFleetNew(m);
     return m;
 }
