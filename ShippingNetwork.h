@@ -129,6 +129,7 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     void segmentDel(Ptr<Segment> o);
 
     void truckFleetIs(const Ptr<TruckFleet> _truckFleet) { truckFleet_ = _truckFleet; }
+    Ptr<TruckFleet> truckFleet() const { return truckFleet_; }
     void planeFleetIs(const Ptr<PlaneFleet> _planeFleet) { planeFleet_ = _planeFleet; }
     void boatFleetIs(const Ptr<BoatFleet> _boatFleet) { boatFleet_ = _boatFleet; }
     /*Connectivity*/

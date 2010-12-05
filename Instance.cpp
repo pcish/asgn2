@@ -3,6 +3,7 @@
 #include <map>
 #include <sstream>
 
+#include "assert.h"
 #include "Instance.h"
 #include "entities.h"
 #include "ShippingNetwork.h"
@@ -35,6 +36,7 @@ public:
     // Manager method
     void instanceDel(const string& name);
     ShippingNetwork* shippingNetwork() { return shippingNetwork_; }
+    ~ManagerImpl();
 
 private:
     map<string,Ptr<Instance> > instance_;
@@ -57,7 +59,7 @@ class LocationRep : public Instance {
     LocationRep(const string& name, ManagerImpl* manager) :
         Instance(name), manager_(manager) {
     }
-    Ptr<ManagerImpl> manager_;
+    ManagerImpl* manager_;
 
   private:
     int segmentNumber(const string& name);
@@ -119,7 +121,7 @@ class SegmentRep : public Instance {
     Ptr<Segment> engineObject() const { return engineObject_; }
 
   protected:
-    Ptr<ManagerImpl> manager_;
+    ManagerImpl* manager_;
 
   private:
     Ptr<Segment> engineObject_;
@@ -143,7 +145,7 @@ class StatsRep : public Instance {
   protected:
     StatsRep(const string& name, ManagerImpl *manager) :
         Instance(name), manager_(manager) {}
-    Ptr<ManagerImpl> manager_;
+    ManagerImpl* manager_;
 
   private:
     static Ptr<StatsRep> instance_;
@@ -164,7 +166,7 @@ class ConnRep : public Instance {
   protected:
     ConnRep (const string& name, ManagerImpl *manager) :
         Instance(name), manager_(manager) { }
-    Ptr<ManagerImpl> manager_;
+    ManagerImpl* manager_;
 
   private:
     static Ptr<ConnRep> instance_;
@@ -186,15 +188,14 @@ class FleetRep : public Instance {
   protected:
     FleetRep(const string& name, ManagerImpl* manager) :
         Instance(name), manager_(manager) {
-        truckfleet_ = manager->shippingNetwork()->truckFleetNew(name+"_truck");
-        planefleet_ = manager->shippingNetwork()->planeFleetNew(name+"_plane");
-        boatfleet_ = manager->shippingNetwork()->boatFleetNew(name+"_boat");
+        manager->shippingNetwork()->truckFleetNew(name+"_truck");
+        manager->shippingNetwork()->planeFleetNew(name+"_plane");
+        manager->shippingNetwork()->boatFleetNew(name+"_boat");
     }
-    Ptr<Fleet> truckfleet_, boatfleet_, planefleet_;
 
   private:
     static Ptr<FleetRep> instance_;
-    Ptr<ManagerImpl> manager_;
+    ManagerImpl* manager_;
 };
 Ptr<FleetRep> FleetRep::instance_ = NULL;
 
@@ -206,6 +207,13 @@ ManagerImpl::ManagerImpl() {
     userCreatedStats = false;
     instance_["defaultConn"] = ConnRep::instance("defaultConn", this);
     userCreatedConn = false;
+}
+
+ManagerImpl::~ManagerImpl() {
+    for (map<string, Ptr<Instance> >::iterator i = instance_.begin(); i != instance_.end(); i++) {
+        (*i).second->deleteRef();
+        instance_.erase(i);
+    }
 }
 
 Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
@@ -569,9 +577,9 @@ string FleetRep::attribute(const string& name) {
     property = property.substr(property.find_first_not_of(' ') );
     property = property.substr(0, property.find_last_not_of(' ') + 1);
     Ptr<Fleet> fleet_;
-    if (mode == "Truck") fleet_ = truckfleet_;
-    if (mode == "Boat") fleet_ = boatfleet_;
-    if (mode == "Plane") fleet_ = planefleet_;
+    if (mode == "Truck") fleet_ = manager_->shippingNetwork()->truckFleet();
+    if (mode == "Plane") fleet_ = manager_->shippingNetwork()->planeFleet();
+    if (mode == "Boat") fleet_ = manager_->shippingNetwork()->boatFleet();
 
     ostringstream os;
     os.setf(ios::fixed,ios::floatfield);
@@ -599,9 +607,9 @@ void FleetRep::attributeIs(const string& name, const string& v) {
         property = property.substr(property.find_first_not_of(' '));
         property = property.substr(0, property.find_last_not_of(' ') + 1);
         Ptr<Fleet> fleet_;
-        if (mode == "Truck") fleet_ = truckfleet_;
-        if (mode == "Boat") fleet_ = boatfleet_;
-        if (mode == "Plane") fleet_ = planefleet_;
+        if (mode == "Truck") fleet_ = manager_->shippingNetwork()->truckFleet();
+        if (mode == "Plane") fleet_ = manager_->shippingNetwork()->planeFleet();
+        if (mode == "Boat") fleet_ = manager_->shippingNetwork()->boatFleet();
 
         istringstream is(v);
         if (property == "speed") {

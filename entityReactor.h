@@ -31,8 +31,8 @@ class ShipmentReactor : public Shipment::Notifiee {
         }
     }
     virtual ~ShipmentReactor() {
-//        cout << "ShipmentReactor deleting..." << endl;
-        activity_->statusIs(Activity::Activity::deleted);
+        if (activity_)
+            activity_->statusIs(Activity::Activity::deleted);
     }
     string name() const { return notifier_->name() + ".ShipmentReactor"; }
 
@@ -59,6 +59,9 @@ class ShipmentReactor : public Shipment::Notifiee {
                 fleet = notifier_->shippingNetwork()->planeFleet_;
             } else if (nextSegment->transportationMode() == Segment::boat()) {
                 fleet = notifier_->shippingNetwork()->boatFleet_;
+            }
+            if (fleet == NULL) {
+                LOG_ERROR("forwardShipment", "cannot find fleet for seg "+nextSegment->name()+" tmode="+STR(nextSegment->transportationMode()));
             }
             Hour transitTime =
                 ceil((double) notifier_->load().value() / (double) fleet->capacity().value()) *
@@ -259,6 +262,7 @@ class CustomerReactor : public Customer::Notifiee {
             shipment->destinationIs(dynamic_cast<Customer*>(notifier_->destination().ptr()));
             shipment->loadIs(notifier_->shipmentSize());
             shipment->currentLocationIs(notifier_.ptr());
+            LOG_INFO("shipmentNew", "shipment " + shipment->name() + " created with " + STR(shipment->load().value()) + " packages for " + shipment->destination()->name());
         }
 
         Activity::Manager::Ptr manager = activityManagerInstance();
