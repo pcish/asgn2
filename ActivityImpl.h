@@ -96,7 +96,7 @@ namespace ActivityImpl {
             map<string, Activity::Ptr> activities_; //pool of all activities
             Hour now_;
             TimeStepping timeStepping_;
-            ~ManagerImpl() { }
+            ~ManagerImpl() { activityInstance_ = NULL; }
 
             //specific to this example
             //Queue::Ptr queue_;

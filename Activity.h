@@ -78,5 +78,4 @@ private:
 };
 
 extern Fwk::Ptr<Activity::Manager> activityManagerInstance();
-extern void activityManagerInstanceIs(Fwk::Ptr<Activity::Manager>);
 #endif

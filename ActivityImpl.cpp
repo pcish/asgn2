@@ -7,9 +7,6 @@
 Fwk::Ptr<Activity::Manager> activityManagerInstance(){
     return ActivityImpl::ManagerImpl::activityManagerInstance();
 }
-void activityManagerInstanceIs(Fwk::Ptr<Activity::Manager> _instance){
-    ActivityImpl::ManagerImpl::activityManagerInstanceIs(_instance);
-}
 
 namespace ActivityImpl {
     //Definition of static member
