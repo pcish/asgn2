@@ -383,14 +383,17 @@ class Fleet : public Fwk::NamedInterface {
     ~Fleet() { if (notifiee_) notifiee_->onDel(this); }
     USD cost() const { return cost_; }
     void costIs(const USD cost) { if (cost_ == cost) return; cost_ = cost; if (notifiee_) notifiee_->onCost(); }
+    USD scheduledCost(const unsigned int index) const { return scheduledCosts_[index]; }
     void scheduledCostIs(const unsigned int index, USD cost) { scheduledCosts_[index] = cost; }
     PackageUnit capacity() const { return capacity_; }
     void capacityIs(const PackageUnit capacity) { if (capacity_ == capacity) return; capacity_ = capacity; if (notifiee_) notifiee_->onCapacity(); }
+    PackageUnit scheduledCapacity(const unsigned int index) const { return scheduledCapacitys_[index]; }
     void scheduledCapacityIs(const unsigned int index, PackageUnit capacity) { scheduledCapacitys_[index] = capacity; }
     Segment::TransportationMode transportationMode() const { return transportationMode_; }
     void transportationModeIs(const Segment::TransportationMode transportationMode) { if (transportationMode_ == transportationMode) return; transportationMode_ = transportationMode; if (notifiee_) notifiee_->onTransportationMode(); }
     Mile speed() const { return speed_; }
     void speedIs(const Mile speed) { if (speed_ == speed) return; speed_ = speed; if (notifiee_) notifiee_->onSpeed(); }
+    Mile scheduledSpeed(const unsigned int index) const { return scheduledSpeeds_[index]; }
     void scheduledSpeedIs(const unsigned int index, Mile speed) { scheduledSpeeds_[index] = speed; }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
@@ -417,9 +420,9 @@ class Fleet : public Fwk::NamedInterface {
   protected:
     Fleet(Fwk::String name) : NamedInterface(name) {
         for (unsigned int i = 0; i < 24; i++) {
-            cost_[i] = 1;
-            speed_[i] = 1;
-            capacity_[i] = 100;
+            scheduledCosts_[i] = 1;
+            scheduledSpeeds_[i] = 1;
+            scheduledCapacitys_[i] = 100;
         }
     }
     Ptr<Fleet::Notifiee> notifiee_;

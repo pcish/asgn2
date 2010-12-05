@@ -7,6 +7,7 @@
 #include <set>
 #include <algorithm>
 #include <map>
+#include "ActivityImpl.h"
 
 namespace Shipping {
 class EngineReactor;
@@ -219,6 +220,24 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     ShippingNetwork(const ShippingNetwork& o);
     void computePath();
     void explore(Ptr<Location> curLocation, set<string> visitedNodes, Ptr<Path> curPath);
+    void onHeartbeat();
+    Activity::Activity::Ptr heartbeatActivity_;
+    class HeartbeatActivityNotifiee : public Activity::Activity::Notifiee {
+      public:
+        HeartbeatActivityNotifiee(Activity::Activity *activity, ShippingNetwork *_parent) :
+            Activity::Activity::Notifiee(activity), activity_(activity),
+            parent_(_parent) {}
+        virtual void onStatus() {
+            Activity::Activity::Status status = activity_->status();
+            if (status == Activity::Activity::executing) {
+                parent_->onHeartbeat();
+            }
+        }
+        virtual void onNextTime() {}
+      private:
+        Activity::Activity *activity_;
+        ShippingNetwork *parent_;
+    };
 };
 
 }

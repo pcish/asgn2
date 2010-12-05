@@ -6,6 +6,7 @@
 #include "entityReactor.h"
 #include "routing/routing.h"
 #include "Log.h"
+#include "ActivityImpl.h"
 
 namespace Shipping {
 
@@ -220,6 +221,29 @@ ShippingNetwork::ShippingNetwork() : isConnAttributeChange(false), expedite_(Seg
     stringstream name;
     name << "shippingNetwork" << " " << "Statistics" << endl;
     statistics_ = new Statistics(name.str());
+
+    Activity::Manager::Ptr manager = activityManagerInstance();
+    if(heartbeatActivity_ == NULL) heartbeatActivity_ = manager->activityNew("ShippingNetwork.onHeartbeatActivity");
+    heartbeatActivity_->nextTimeIs(manager->now().value() + 1);
+    heartbeatActivity_->lastNotifieeIs(new HeartbeatActivityNotifiee(heartbeatActivity_.ptr(), this));
+    manager->lastActivityIs(heartbeatActivity_.ptr());
+}
+
+void ShippingNetwork::onHeartbeat() {
+    Activity::Manager::Ptr manager = activityManagerInstance();
+    planeFleet_->costIs(planeFleet_->scheduledCost((int) manager->now().value()));
+    planeFleet_->speedIs(planeFleet_->scheduledSpeed((int) manager->now().value()));
+    planeFleet_->capacityIs(planeFleet_->scheduledCapacity((int) manager->now().value()));
+    truckFleet_->costIs(truckFleet_->scheduledCost((int) manager->now().value()));
+    truckFleet_->speedIs(truckFleet_->scheduledSpeed((int) manager->now().value()));
+    truckFleet_->capacityIs(truckFleet_->scheduledCapacity((int) manager->now().value()));
+    boatFleet_->costIs(boatFleet_->scheduledCost((int) manager->now().value()));
+    boatFleet_->speedIs(boatFleet_->scheduledSpeed((int) manager->now().value()));
+    boatFleet_->capacityIs(boatFleet_->scheduledCapacity((int) manager->now().value()));
+
+    heartbeatActivity_->nextTimeIs(manager->now().value() + 1);
+    heartbeatActivity_->lastNotifieeIs(new HeartbeatActivityNotifiee(heartbeatActivity_.ptr(), this));
+    manager->lastActivityIs(heartbeatActivity_.ptr());
 }
 
 Ptr<Customer> ShippingNetwork::customerNew(const string name) {
