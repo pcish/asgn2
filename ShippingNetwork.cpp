@@ -221,14 +221,17 @@ ShippingNetwork::ShippingNetwork() : isConnAttributeChange(false), expedite_(Seg
     stringstream name;
     name << "shippingNetwork" << " " << "Statistics" << endl;
     statistics_ = new Statistics(name.str());
+    clock_ = new Clock();
+}
 
+ShippingNetwork::Clock::Clock() : NamedInterface("clock") {
     Activity::Manager::Ptr manager = activityManagerInstance();
     if(heartbeatActivity_ == NULL) heartbeatActivity_ = manager->activityNew("ShippingNetwork.onHeartbeatActivity");
     heartbeatActivity_->nextTimeIs(manager->now().value() + 1);
     heartbeatActivity_->lastNotifieeIs(new HeartbeatActivityNotifiee(heartbeatActivity_.ptr(), this));
     manager->lastActivityIs(heartbeatActivity_.ptr());
 }
-
+/*
 void ShippingNetwork::onHeartbeat() {
     Activity::Manager::Ptr manager = activityManagerInstance();
     planeFleet_->costIs(planeFleet_->scheduledCost((int) manager->now().value()));
@@ -245,7 +248,7 @@ void ShippingNetwork::onHeartbeat() {
     heartbeatActivity_->lastNotifieeIs(new HeartbeatActivityNotifiee(heartbeatActivity_.ptr(), this));
     manager->lastActivityIs(heartbeatActivity_.ptr());
 }
-
+*/
 Ptr<Customer> ShippingNetwork::customerNew(const string name) {
     Ptr<Customer> m = new Customer(name);
     m->shippingNetworkIs(this);

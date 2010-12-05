@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <map>
 #include "ActivityImpl.h"
+#include "Log.h"
 
 namespace Shipping {
 class EngineReactor;
@@ -220,24 +221,65 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
     ShippingNetwork(const ShippingNetwork& o);
     void computePath();
     void explore(Ptr<Location> curLocation, set<string> visitedNodes, Ptr<Path> curPath);
-    void onHeartbeat();
-    Activity::Activity::Ptr heartbeatActivity_;
-    class HeartbeatActivityNotifiee : public Activity::Activity::Notifiee {
+
+    class Clock : public Fwk::NamedInterface {
       public:
-        HeartbeatActivityNotifiee(Activity::Activity *activity, ShippingNetwork *_parent) :
-            Activity::Activity::Notifiee(activity), activity_(activity),
-            parent_(_parent) {}
-        virtual void onStatus() {
-            Activity::Activity::Status status = activity_->status();
-            if (status == Activity::Activity::executing) {
-                parent_->onHeartbeat();
+        Clock();
+        Hour now() const { return now_; }
+        class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
+          public:
+            virtual void notifierIs(Fwk::Ptr<Clock> notifier) {
+                if (notifier_ == notifier) return;
+                if (notifier_) notifier->notifieeIs(0);
+                notifier_ = notifier;
+                notifier_->notifieeIs(this);
             }
+            static Fwk::Ptr<Clock::Notifiee> notifieeNew() {
+                Fwk::Ptr<Clock::Notifiee> n = new Notifiee();
+                return n;
+            }
+            virtual void onNow() {}
+          protected:
+            Fwk::WeakPtr<Clock> notifier_;
+            Notifiee() : notifier_(0) {}
+        };
+      protected:
+        vector<Ptr<Clock::Notifiee> > notifiee_;
+        void notifieeIs(Clock::Notifiee* n) {
+            notifiee_.push_back(n);
         }
-        virtual void onNextTime() {}
       private:
-        Activity::Activity *activity_;
-        ShippingNetwork *parent_;
+        Hour now_;
+        void nowInc() {
+            Activity::Manager::Ptr manager = activityManagerInstance();
+            now_ = now_.value() + 1;
+            LOG_INFO("nowInc", "now = " + STR(now_.value()));
+            for(vector<Ptr<Clock::Notifiee> >::iterator i = notifiee_.begin(); i != notifiee_.end(); i++) {
+                (*i)->onNow();
+            }
+            heartbeatActivity_->nextTimeIs(manager->now().value() + 1);
+            //heartbeatActivity_->lastNotifieeIs(new HeartbeatActivityNotifiee(heartbeatActivity_.ptr(), this));
+            manager->lastActivityIs(heartbeatActivity_.ptr());
+        }
+        Activity::Activity::Ptr heartbeatActivity_;
+        class HeartbeatActivityNotifiee : public Activity::Activity::Notifiee {
+          public:
+            HeartbeatActivityNotifiee(Activity::Activity *activity, Clock *_parent) :
+                Activity::Activity::Notifiee(activity), activity_(activity),
+                parent_(_parent) {}
+            virtual void onStatus() {
+                Activity::Activity::Status status = activity_->status();
+                if (status == Activity::Activity::executing) {
+                    parent_->nowInc();
+                }
+            }
+            virtual void onNextTime() {}
+          private:
+            Activity::Activity *activity_;
+            Clock *parent_;
+        };
     };
+    Ptr<Clock> clock_;
 };
 
 }
