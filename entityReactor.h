@@ -66,9 +66,12 @@ class ShipmentReactor : public Shipment::Notifiee {
             Hour transitTime =
                 ceil((double) notifier_->load().value() / (double) fleet->capacity().value()) *
                 (nextSegment->length().value() / fleet->speed().value());
-            //cerr << "ceil(" << notifier_->load().value() << " / " << fleet->capacity().value() << ")" << endl;
-            //cerr << "* ("<< nextSegment->length().value() << " / " << fleet->speed().value() << ")" << endl;
-            LOG_DEBUG("forwardShipment", "transit time = " + STR(transitTime.value()));
+            LOG_DEBUG("forwardShipment", "transit time = ceil(" +
+                      STR(notifier_->load().value()) + " / " +
+                      STR(fleet->capacity().value()) + ") * (" +
+                      STR(nextSegment->length().value()) + " / " +
+                      STR(fleet->speed().value()) + ") = " +
+                      STR(transitTime.value()));
 
             Activity::Manager::Ptr manager = activityManagerInstance();
             if (activity_ == NULL) {
@@ -237,7 +240,7 @@ class CustomerReactor : public Customer::Notifiee {
             if (destSet && shipmentSizeSet && transferRateSet && notifier_) {
                 started = true;
                 //lauch the shipment
-                Activity::Manager::Ptr manager = activityManagerInstance();               
+                Activity::Manager::Ptr manager = activityManagerInstance();
                 //name here
                 try {
                     activity_ = manager->activityNew(notifier_->name()); //use what name?

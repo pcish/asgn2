@@ -418,7 +418,7 @@ class Fleet : public Fwk::NamedInterface {
     };
     Ptr<Fleet::Notifiee> notifiee() const { return notifiee_; }
   protected:
-    Fleet(Fwk::String name) : NamedInterface(name) {
+    Fleet(Fwk::String name) : NamedInterface(name), cost_(1), speed_(1), capacity_(100) {
         for (unsigned int i = 0; i < 24; i++) {
             scheduledCosts_[i] = 1;
             scheduledSpeeds_[i] = 1;

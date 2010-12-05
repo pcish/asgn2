@@ -30,6 +30,7 @@ class Network {
             location.push_back(manager->instanceNew("location9", "Customer"));
 
             createSegmentPair(0, "location0", "location1", "Plane segment");
+            manager->instance("segment0")->attributeIs("capacity", "1");
             createSegmentPair(1, "location0", "location8", "Boat segment");
             createSegmentPair(2, "location1", "location8", "Boat segment");
             createSegmentPair(3, "location1", "location2", "Truck segment");
@@ -40,7 +41,7 @@ class Network {
             createSegmentPair(8, "location6", "location7", "Truck segment");
             createSegmentPair(9, "location7", "location0", "Truck segment");
             Ptr<Instance> fleet = manager->instanceNew("fleet", "Fleet");
-          //  fleet->attributeIs("Truck, cost from 10 to 12", "100");
+            fleet->attributeIs("Truck cost from 3 to 4", "100");
         } catch (Fwk::Exception e) {
             cout << e.what() << endl;
         } catch (...) {}
