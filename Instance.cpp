@@ -210,10 +210,13 @@ ManagerImpl::ManagerImpl() {
 }
 
 ManagerImpl::~ManagerImpl() {
+    instance_.clear();
+    /*
     for (map<string, Ptr<Instance> >::iterator i = instance_.begin(); i != instance_.end(); i++) {
         (*i).second->deleteRef();
         instance_.erase(i);
     }
+    */
 }
 
 Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
@@ -611,7 +614,7 @@ void FleetRep::attributeIs(const string& name, const string& v) {
         if (mode == "Plane") fleet_ = manager_->shippingNetwork()->planeFleet();
         if (mode == "Boat") fleet_ = manager_->shippingNetwork()->boatFleet();
 
-        
+
         istringstream is(v);
         istringstream issprop(property);
         vector<string> propList;
@@ -620,7 +623,7 @@ void FleetRep::attributeIs(const string& name, const string& v) {
             propList.push_back(temp);
         }
 
-        if (propList.size() == 1) { 
+        if (propList.size() == 1) {
             string propertyValue;
             is >> propertyValue;
             if (propList[0] == "speed") {
