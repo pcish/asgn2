@@ -126,7 +126,7 @@ class ShipmentReactor : public Shipment::Notifiee {
     Fwk::Ptr<ActivityNotifiee> activityNotifiee_;
     Fwk::Ptr<Segment> previousSegment_;
 };
-Hour ShipmentReactor::retryTime = Hour(1.0);
+
 
 class SegmentReactor : public Segment::Notifiee {
   public:
@@ -307,6 +307,21 @@ class TerminalReactor : public Terminal::Notifiee {
         return n;
     }
     string name() const { return notifier_->name() + ".TerminalReactor"; }
+};
+
+class ClockReactor: public Clock::Notifiee {
+  public:
+    virtual void onNow() {
+        parent_->now_ = notifier_->now();
+    }
+    static Fwk::Ptr<ClockReactor> clockReactorNew(Fleet* parent) {
+        Fwk::Ptr<ClockReactor> n = new ClockReactor();
+        n->parent_ = parent;
+        return n;
+    }
+    string name() const { return notifier_->name() + ".ClockReactor"; }
+  private:
+    Fleet* parent_;
 };
 
 }

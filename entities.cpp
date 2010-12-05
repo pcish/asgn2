@@ -2,6 +2,8 @@
 #include <string>
 
 #include "entities.h"
+#include "entityReactor.h"
+#include "ActivityImpl.h"
 
 namespace Shipping {
 
@@ -73,8 +75,8 @@ void Terminal::segmentIs(const unsigned int index, WeakPtr<Segment> seg) {
     }
 }
 
-void Segment::sourceIs(const Ptr<Location> source) { 
-    if (source_ == source) return; 
+void Segment::sourceIs(const Ptr<Location> source) {
+    if (source_ == source) return;
     if (source != NULL && source->locationType() == Location::terminal()) {
         Location * src = const_cast<Location*>(source.ptr());
         Terminal * term = (Terminal*) src;
@@ -82,8 +84,8 @@ void Segment::sourceIs(const Ptr<Location> source) {
           return;
         }
     }
-    source_ = source; 
-    if (notifiee_) notifiee_->onSource(); 
+    source_ = source;
+    if (notifiee_) notifiee_->onSource();
 }
 
 void Segment::returnSegmentIs(const Ptr<Segment> returnSegment) {
@@ -91,6 +93,23 @@ void Segment::returnSegmentIs(const Ptr<Segment> returnSegment) {
     if (returnSegment != NULL && returnSegment->transportationMode() != transportationMode_) return;
     returnSegment_ = returnSegment;
     if (notifiee_) notifiee_->onReturnSegment();
+}
+
+Fleet::Fleet(Fwk::String name) : NamedInterface(name), cost_(1), speed_(1), capacity_(100) {
+    for (unsigned int i = 0; i < 24; i++) {
+        scheduledCosts_[i] = -1;
+        scheduledSpeeds_[i] = -1;
+        scheduledCapacitys_[i] = -1;
+    }
+    now_ = 0;
+}
+
+Clock::Clock() : NamedInterface("clock") {
+    Activity::Manager::Ptr manager = activityManagerInstance();
+    if(heartbeatActivity_ == NULL) heartbeatActivity_ = manager->activityNew("ShippingNetwork.onHeartbeatActivity");
+    heartbeatActivity_->nextTimeIs(manager->now().value() + 1);
+    heartbeatActivity_->lastNotifieeIs(new HeartbeatActivityNotifiee(heartbeatActivity_.ptr(), this));
+    manager->lastActivityIs(heartbeatActivity_.ptr());
 }
 
 } /* end namespace */

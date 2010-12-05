@@ -224,13 +224,6 @@ ShippingNetwork::ShippingNetwork() : isConnAttributeChange(false), expedite_(Seg
     clock_ = new Clock();
 }
 
-ShippingNetwork::Clock::Clock() : NamedInterface("clock") {
-    Activity::Manager::Ptr manager = activityManagerInstance();
-    if(heartbeatActivity_ == NULL) heartbeatActivity_ = manager->activityNew("ShippingNetwork.onHeartbeatActivity");
-    heartbeatActivity_->nextTimeIs(manager->now().value() + 1);
-    heartbeatActivity_->lastNotifieeIs(new HeartbeatActivityNotifiee(heartbeatActivity_.ptr(), this));
-    manager->lastActivityIs(heartbeatActivity_.ptr());
-}
 /*
 void ShippingNetwork::onHeartbeat() {
     Activity::Manager::Ptr manager = activityManagerInstance();
@@ -292,6 +285,8 @@ Ptr<Port> ShippingNetwork::portNew(const string name){
 Ptr<PlaneFleet> ShippingNetwork::planeFleetNew(const string name) {
     Ptr<PlaneFleet> m = new PlaneFleet(name);
     planeFleet_ = m;
+    Fwk::Ptr<ClockReactor> r = ClockReactor::clockReactorNew(m.ptr());
+    r->notifierIs(clock_);
     if (notifiee_) notifiee_->onPlaneFleetNew(m);
     return m;
 }
@@ -299,6 +294,8 @@ Ptr<PlaneFleet> ShippingNetwork::planeFleetNew(const string name) {
 Ptr<TruckFleet> ShippingNetwork::truckFleetNew(const string name) {
     Ptr<TruckFleet> m = new TruckFleet(name);
     truckFleet_ = m;
+    Fwk::Ptr<ClockReactor> r = ClockReactor::clockReactorNew(m.ptr());
+    r->notifierIs(clock_);
     if (notifiee_) notifiee_->onTruckFleetNew(m);
     return m;
 }
@@ -306,6 +303,8 @@ Ptr<TruckFleet> ShippingNetwork::truckFleetNew(const string name) {
 Ptr<BoatFleet> ShippingNetwork::boatFleetNew(const string name) {
     Ptr<BoatFleet> m = new BoatFleet(name);
     boatFleet_ = m;
+    Fwk::Ptr<ClockReactor> r = ClockReactor::clockReactorNew(m.ptr());
+    r->notifierIs(clock_);
     if (notifiee_) notifiee_->onBoatFleetNew(m);
     return m;
 }

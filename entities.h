@@ -16,6 +16,9 @@ using namespace std;
 #include "types.h"
 #include "fwk/BaseNotifiee.h"
 #include "fwk/NamedInterface.h"
+#include "ActivityImpl.h"
+#include "Log.h"
+
 using Fwk::WeakPtr;
 namespace Shipping {
 
@@ -30,6 +33,64 @@ class BoatFleet;
 class Fleet;
 class Segment;
 class Port;
+
+class Clock : public Fwk::NamedInterface {
+  public:
+    Clock();
+    Hour now() const { return now_; }
+    class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
+      public:
+        virtual void notifierIs(Fwk::Ptr<Clock> notifier) {
+            if (notifier_ == notifier) return;
+            if (notifier_) notifier->notifieeIs(0);
+            notifier_ = notifier;
+            notifier_->notifieeIs(this);
+        }
+        static Fwk::Ptr<Clock::Notifiee> notifieeNew() {
+            Fwk::Ptr<Clock::Notifiee> n = new Notifiee();
+            return n;
+        }
+        virtual void onNow() {}
+      protected:
+        Fwk::WeakPtr<Clock> notifier_;
+        Notifiee() : notifier_(0) {}
+    };
+  protected:
+    vector<Ptr<Clock::Notifiee> > notifiee_;
+    void notifieeIs(Clock::Notifiee* n) {
+        notifiee_.push_back(n);
+    }
+  private:
+    Hour now_;
+    void nowInc() {
+        Activity::Manager::Ptr manager = activityManagerInstance();
+        now_ = now_.value() + 1;
+        LOG_INFO("nowInc", "now = " + STR(now_.value()));
+        for(vector<Ptr<Clock::Notifiee> >::iterator i = notifiee_.begin(); i != notifiee_.end(); i++) {
+            (*i)->onNow();
+        }
+        heartbeatActivity_->nextTimeIs(manager->now().value() + 1);
+        //heartbeatActivity_->lastNotifieeIs(new HeartbeatActivityNotifiee(heartbeatActivity_.ptr(), this));
+        manager->lastActivityIs(heartbeatActivity_.ptr());
+    }
+    Activity::Activity::Ptr heartbeatActivity_;
+    class HeartbeatActivityNotifiee : public Activity::Activity::Notifiee {
+      public:
+        HeartbeatActivityNotifiee(Activity::Activity *activity, Clock *_parent) :
+            Activity::Activity::Notifiee(activity), activity_(activity),
+            parent_(_parent) {}
+        virtual void onStatus() {
+            Activity::Activity::Status status = activity_->status();
+            if (status == Activity::Activity::executing) {
+                parent_->nowInc();
+            }
+        }
+        virtual void onNextTime() {}
+      private:
+        Activity::Activity *activity_;
+        Clock *parent_;
+    };
+};
 
 class Shipment : public Fwk::NamedInterface {
     friend class ShippingNetwork;
@@ -379,19 +440,23 @@ class Terminal : public Location {
 
 class Fleet : public Fwk::NamedInterface {
     friend class ShippingNetwork;
+    friend class ClockReactor;
   public:
     ~Fleet() { if (notifiee_) notifiee_->onDel(this); }
-    USD cost() const { return cost_; }
+    USD cost() const { if (scheduledCosts_[((int) now_.value()) % 24] < 0) return cost_; else return scheduledCosts_[((int) now_.value()) % 24]; }
     void costIs(const USD cost) { if (cost_ == cost) return; cost_ = cost; if (notifiee_) notifiee_->onCost(); }
     USD scheduledCost(const unsigned int index) const { return scheduledCosts_[index]; }
     void scheduledCostIs(const unsigned int index, USD cost) { scheduledCosts_[index] = cost; }
-    PackageUnit capacity() const { return capacity_; }
+
+    PackageUnit capacity() const { if (scheduledCapacitys_[((int) now_.value()) % 24] < 0) return capacity_; else return scheduledCapacitys_[((int) now_.value()) % 24]; }
     void capacityIs(const PackageUnit capacity) { if (capacity_ == capacity) return; capacity_ = capacity; if (notifiee_) notifiee_->onCapacity(); }
     PackageUnit scheduledCapacity(const unsigned int index) const { return scheduledCapacitys_[index]; }
     void scheduledCapacityIs(const unsigned int index, PackageUnit capacity) { scheduledCapacitys_[index] = capacity; }
+
     Segment::TransportationMode transportationMode() const { return transportationMode_; }
     void transportationModeIs(const Segment::TransportationMode transportationMode) { if (transportationMode_ == transportationMode) return; transportationMode_ = transportationMode; if (notifiee_) notifiee_->onTransportationMode(); }
-    Mile speed() const { return speed_; }
+
+    Mile speed() const { if (scheduledSpeeds_[((int) now_.value()) % 24] < 0) return speed_; else return scheduledSpeeds_[((int) now_.value()) % 24]; }
     void speedIs(const Mile speed) { if (speed_ == speed) return; speed_ = speed; if (notifiee_) notifiee_->onSpeed(); }
     Mile scheduledSpeed(const unsigned int index) const { return scheduledSpeeds_[index]; }
     void scheduledSpeedIs(const unsigned int index, Mile speed) { scheduledSpeeds_[index] = speed; }
@@ -418,13 +483,7 @@ class Fleet : public Fwk::NamedInterface {
     };
     Ptr<Fleet::Notifiee> notifiee() const { return notifiee_; }
   protected:
-    Fleet(Fwk::String name) : NamedInterface(name), cost_(1), speed_(1), capacity_(100) {
-        for (unsigned int i = 0; i < 24; i++) {
-            scheduledCosts_[i] = 1;
-            scheduledSpeeds_[i] = 1;
-            scheduledCapacitys_[i] = 100;
-        }
-    }
+    Fleet(Fwk::String name);
     Ptr<Fleet::Notifiee> notifiee_;
     void notifieeIs(Fleet::Notifiee* n) const {
         Fleet* me = const_cast<Fleet*>(this);
@@ -439,6 +498,7 @@ class Fleet : public Fwk::NamedInterface {
     PackageUnit capacity_;
     PackageUnit scheduledCapacitys_[24];
     Segment::TransportationMode transportationMode_;
+    Hour now_;
     Fleet(const Fleet& o);
 };
 
