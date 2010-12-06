@@ -62,10 +62,10 @@ I. New in Assignment 3
      	     "average shipments received by segments": the value of "shipments received by segments" divided by the number of segments in the network (at the time of the query)
      	     "average shipments refused by segments": the value of "shipments refused by segments" divided by the number of segments in the network (at the time of the query)
      c. Routing Algorithms
-        We implemented three routing algorithms: Bfs, Dijkstra's shortest path, and Random Walk. We decouple the routing algorithm from the Shipping Network by providing a base class for all routing algorithms and three subclasses (Bfs, Dijkstra and RandomWalk) that overrides the routing behavior of the base class. 
+        We implemented three routing algorithms: Bfs, Dijkstra's shortest path, and Random Walk (used primarily for testing). We decouple the routing algorithm from the Shipping Network by providing a base class for all routing algorithms and three subclasses (Bfs, Dijkstra and RandomWalk) that overrides the routing behavior of the base class. 
         i. In Bfs, it finds the path that passes through the least number of Segments (and also Locations) by spanning the path out from the source. 
         ii. In Dijkstra, it uses the lengths of the Segments as the distance metric. For each iteration, it finds the nearest Location X to the source currently and updates all that Location's neighboring Locations to be the minimum between those Locations' distance from the origin and the distance X from the origin plus the length of the segment between X and this Location.
-        iii. In RandomWalk, the next location of the path toward destination is randomly picked. 
+        iii. In RandomWalk, the next location to travel to is randomly picked from all locations connected to the current location.
 
     D. Scheduled Changes to Fleet Attributes
         
