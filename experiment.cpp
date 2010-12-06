@@ -82,29 +82,41 @@ class ExperimentNetwork {
 };
 
 int main(int argc, char* argv[]) {
-    CerrLog::instance()->logLevelIs(Log::Debug);
-    Activity::Manager::Ptr activityManager = activityManagerInstance();
+    ExperimentNetwork * network;
+    try {
+        CerrLog::instance()->logLevelIs(Log::Null);
+        Activity::Manager::Ptr activityManager = activityManagerInstance();
+        Ptr<Instance> stats;
 
-    cout << "Simulation 1: all sources send 100 packages" << endl;
-    ExperimentNetwork * network = new ExperimentNetwork();
-    network->setup();
-    network->startShipments();
-    activityManager->nowIs(23.0);
-    cout << "Shipments received at destination: " << network->destination->attribute("shipments received") << endl;
-    cout << "Average latency of received shipments: " << network->destination->attribute("average latency") << endl;
-    delete network;
+        cout << "Simulation 1: all sources send 100 packages" << endl;
+        network = new ExperimentNetwork();
+        network->setup();
+        network->startShipments();
+        activityManager->nowIs(23.0);
+        cout << "Shipments received at destination: " << network->destination->attribute("shipments received") << endl;
+        cout << "Average latency of received shipments: " << network->destination->attribute("average latency") << endl;
+        stats = network->manager->instanceNew("stats", "Stats");
+        cout << "Average shipments received by segments: " << stats->attribute("average shipments received by segments") << endl;
+        cout << "Average shipments refused by segments: " << stats->attribute("average shipments refused by segments") << endl;
+        if (network) delete network;
 
-    activityManager = activityManagerInstance();
-    activityManager = NULL;
-    activityManagerInstanceIs(NULL);
-    activityManager = activityManagerInstance();
-    cout << "Simulation 2: all sources send rand(1, 1000) packages" << endl;
-    network = new ExperimentNetwork();
-    network->setup();
-    network->startShipments(true);
-    activityManager->nowIs(23.0);
-    cout << "Shipments received at destination: " << network->destination->attribute("shipments received") << endl;
-    cout << "Average latency of received shipments: " << network->destination->attribute("average latency") << endl;
-    delete network;
+        activityManager = activityManagerInstance();
+        activityManager = NULL;
+        activityManagerInstanceIs(NULL);
+        activityManager = activityManagerInstance();
+        cout << "Simulation 2: all sources send rand(1, 1000) packages" << endl;
+        network = new ExperimentNetwork();
+        network->setup();
+        network->startShipments(true);
+        activityManager->nowIs(23.0);
+        cout << "Shipments received at destination: " << network->destination->attribute("shipments received") << endl;
+        cout << "Average latency of received shipments: " << network->destination->attribute("average latency") << endl;
+        stats = network->manager->instanceNew("stats", "Stats");
+        cout << "Average shipments received by segments: " << stats->attribute("average shipments received by segments") << endl;
+        cout << "Average shipments refused by segments: " << stats->attribute("average shipments refused by segments") << endl;
+        delete network;
+    } catch (Fwk::Exception e) {
+        cerr << e.what() << endl;
+    }
     return 0;
 }
