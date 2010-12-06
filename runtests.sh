@@ -19,9 +19,14 @@ do
   cp $f test.cpp
   make clean -s
   make test -s
-  ./$exename > test.out
-  diff -y --suppress-common-lines -W 80 testcases/$folder`basename $f .cpp`.refout test.out
-  rm -f test.out
+  if [ -e testcases/$folder`basename $f .cpp`.refout ]
+  then
+    ./$exename > test.out
+    diff -y --suppress-common-lines -W 80 testcases/$folder`basename $f .cpp`.refout test.out
+    rm -f test.out
+  else
+    ./$exename
+  fi
   echo ----
 done
 
