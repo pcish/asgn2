@@ -443,23 +443,23 @@ class Fleet : public Fwk::NamedInterface {
     friend class ClockReactor;
   public:
     ~Fleet() { if (notifiee_) notifiee_->onDel(this); }
-    USD cost() const { if (scheduledCosts_[((int) now_.value()) % 24] < 0) return cost_; else return scheduledCosts_[((int) now_.value()) % 24]; }
+    USD cost() const;
     void costIs(const USD cost) { if (cost_ == cost) return; cost_ = cost; if (notifiee_) notifiee_->onCost(); }
-    USD scheduledCost(const unsigned int index) const { return scheduledCosts_[index]; }
-    void scheduledCostIs(const unsigned int index, USD cost) { scheduledCosts_[index] = cost; }
+    USD scheduledCost(const unsigned int index) const;
+    void scheduledCostIs(const unsigned int index, USD cost);
 
-    PackageUnit capacity() const { if (scheduledCapacitys_[((int) now_.value()) % 24] < 0) return capacity_; else return scheduledCapacitys_[((int) now_.value()) % 24]; }
+    PackageUnit capacity() const;
     void capacityIs(const PackageUnit capacity) { if (capacity_ == capacity) return; capacity_ = capacity; if (notifiee_) notifiee_->onCapacity(); }
-    PackageUnit scheduledCapacity(const unsigned int index) const { return scheduledCapacitys_[index]; }
-    void scheduledCapacityIs(const unsigned int index, PackageUnit capacity) { scheduledCapacitys_[index] = capacity; }
+    PackageUnit scheduledCapacity(const unsigned int index) const;
+    void scheduledCapacityIs(const unsigned int index, PackageUnit capacity);
 
     Segment::TransportationMode transportationMode() const { return transportationMode_; }
     void transportationModeIs(const Segment::TransportationMode transportationMode) { if (transportationMode_ == transportationMode) return; transportationMode_ = transportationMode; if (notifiee_) notifiee_->onTransportationMode(); }
 
-    Mile speed() const { if (scheduledSpeeds_[((int) now_.value()) % 24] < 0) return speed_; else return scheduledSpeeds_[((int) now_.value()) % 24]; }
+    Mile speed() const;
     void speedIs(const Mile speed) { if (speed_ == speed) return; speed_ = speed; if (notifiee_) notifiee_->onSpeed(); }
-    Mile scheduledSpeed(const unsigned int index) const { return scheduledSpeeds_[index]; }
-    void scheduledSpeedIs(const unsigned int index, Mile speed) { scheduledSpeeds_[index] = speed; }
+    Mile scheduledSpeed(const unsigned int index) const;
+    void scheduledSpeedIs(const unsigned int index, Mile speed);
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
         virtual void notifierIs(Fwk::Ptr<Fleet> notifier) {
@@ -492,11 +492,23 @@ class Fleet : public Fwk::NamedInterface {
 
   private:
     USD cost_;
-    USD scheduledCosts_[24];
+    struct ScheduledCostsEntry {
+        bool valid;
+        USD value;
+    };
+    ScheduledCostsEntry scheduledCosts_[24];
     Mile speed_;
-    Mile scheduledSpeeds_[24];
+    struct ScheduledSpeedsEntry {
+        bool valid;
+        Mile value;
+    };
+    ScheduledSpeedsEntry scheduledSpeeds_[24];
     PackageUnit capacity_;
-    PackageUnit scheduledCapacitys_[24];
+    struct ScheduledCapacitysEntry {
+        bool valid;
+        PackageUnit value;
+    };
+    ScheduledCapacitysEntry scheduledCapacitys_[24];
     Segment::TransportationMode transportationMode_;
     Hour now_;
     Fleet(const Fleet& o);

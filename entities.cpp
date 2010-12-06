@@ -97,11 +97,56 @@ void Segment::returnSegmentIs(const Ptr<Segment> returnSegment) {
 
 Fleet::Fleet(Fwk::String name) : NamedInterface(name), cost_(1), speed_(1), capacity_(100) {
     for (unsigned int i = 0; i < 24; i++) {
-        scheduledCosts_[i] = -1;
-        scheduledSpeeds_[i] = -1;
-        scheduledCapacitys_[i] = -1;
+        scheduledCosts_[i].valid = false;
+        scheduledSpeeds_[i].valid = false;
+        scheduledCapacitys_[i].valid = false;
     }
     now_ = 0;
+}
+
+USD Fleet::cost() const {
+    if (scheduledCosts_[((int) now_.value()) % 24].valid) {
+        return scheduledCosts_[((int) now_.value()) % 24].value;
+    } else {
+        return cost_;
+    }
+}
+
+USD Fleet::scheduledCost(const unsigned int index) const { return scheduledCosts_[index].value; }
+
+void Fleet::scheduledCostIs(const unsigned int index, USD cost) {
+    scheduledCosts_[index].valid = true;
+    scheduledCosts_[index].value = cost;
+}
+
+PackageUnit Fleet::capacity() const {
+    if (scheduledCapacitys_[((int) now_.value()) % 24].valid) {
+        return scheduledCapacitys_[((int) now_.value()) % 24].value;
+    } else {
+        return capacity_;
+    }
+}
+
+PackageUnit Fleet::scheduledCapacity(const unsigned int index) const { return scheduledCapacitys_[index].value; }
+
+void Fleet::scheduledCapacityIs(const unsigned int index, PackageUnit capacity) {
+    scheduledCapacitys_[index].valid = true;
+    scheduledCapacitys_[index].value = capacity;
+}
+
+Mile Fleet::speed() const {
+    if (scheduledSpeeds_[((int) now_.value()) % 24].valid) {
+        return scheduledSpeeds_[((int) now_.value()) % 24].value;
+    } else {
+        return speed_;
+    }
+}
+
+Mile Fleet::scheduledSpeed(const unsigned int index) const { return scheduledSpeeds_[index].value; }
+
+void Fleet::scheduledSpeedIs(const unsigned int index, Mile speed) {
+    scheduledSpeeds_[index].valid = true;
+    scheduledSpeeds_[index].value = speed;
 }
 
 Clock::Clock() : NamedInterface("clock") {
