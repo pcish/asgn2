@@ -79,6 +79,7 @@ int main(int argc, char* argv[]) {
     Network * network = new Network();
     network->setup();
     network->startShipments();
+    activityManager->timeSteppingIs(ManagerImpl::realtime__);
     activityManager->nowIs(47.0);
     cout << "Shipments received at destination: " << network->location[1]->attribute("shipments received") << endl;
     cout << "Average latency of received shipments: " << network->location[1]->attribute("average latency") << endl;

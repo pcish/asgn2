@@ -20,6 +20,36 @@ I. New in Assignment 3
 II. Original Assignment 2 README
 ----
 I. New in Assignment 3
+  1. New Features
+    A. Exceptions and Logging
+        Our logging system is implemented pretty much as the textbook does. We have an abstract base class Log with the method entryNew which should be inherited by its subclasses to record the logging message. The class Log's subclass, CerrLog, overrides this method and output the logging message into standard error. Programmers are free to create any subclasses of Log that stores the logging message into different places. 
+        The logging messages are categorized into 6 different types based on their priority. For example, debugging info will be categorized as Debug. In addition, we provide a set of macros (such as LOG_DEBUG(f, x) ) to facilitate the usage of the logging system.
+        Exceptions are utilized in this project. We use exceptions from the classes of fwk/Exceptions.h. These include:
+        Fwk::RangeException - used to indicate out of range exception for value types, such as Mile, Hour, etc.
+        Fwk::NameInUseException - since the whole system supports naming and names are important to access instances of classes, names of different instances shouldn't be the same, and when this occurs, Fwk::NameInUseException will be thrown.
+        Fwk:UnknownArgException - thrown when the commands for the rep layer from client code are unknown.
+        Fwk::EntityNotFoundException - thrown when an instance of the rep layer is not found when requested by name.
+        Fwk::InternalException - thrown when the path returned by the routing function is invalid.
+        
+    B. ActivityManager 
+     a. Virtual Time
+        An activity is associated with a time, indicating when it should be executed in virtual time. When an activity registers to the activity manager, the activity manager puts it to a priority queue sorted by the time it associates with. Then, when the simulation starts, the activity manager pops the queue to get the activity with the earliest time, executes it, and repeats these two steps until the time of the next activity is later than the time the client wants the simulation to stops.
+        There is a special case to deal with. When an activity is waiting in activity manager's queue but has already been marked as deleted (by setting its status), the activity manager has to skip that activiy by simply popping it out so that it won't process an activity that shouldn't be executed.
+     b. Real Time
+        To make the simulation use real time, the activity manager executes normally as the virtual time do except that when it pops out an activity, it sleeps for some time (the difference between now and the time of the activity) before execution.
+    C. Shipment Transfers
+     a. Mechanics
+     b. Statistics Collected
+     c. Routing Algorithms
+    D. Scheduled Changes to Fleet Attributes
+  2. Simulations
+    A. verification.cpp
+    B. experiment.cpp
+
+==
+To be tested:
+Activity manager realtime
+==
 
 
 II. Original Assignment 2 README
