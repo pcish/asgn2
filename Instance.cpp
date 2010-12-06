@@ -186,7 +186,7 @@ class FleetRep : public Instance {
 
     string attribute(const string& name);
     void attributeIs(const string& name, const string& v);
-    ~FleetRep() { cout << "fleetrep destructor" << endl; instance_ = NULL; }
+    ~FleetRep() { /*cout << "fleetrep destructor" << endl;*/ instance_ = NULL; }
 
   protected:
     FleetRep(const string& name, ManagerImpl* manager) :

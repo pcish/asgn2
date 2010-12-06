@@ -81,6 +81,7 @@ int main(int argc, char* argv[]) {
     cout << "Simulation 1: all sources send 100 packages" << endl;
     Network * network = new Network();
     network->setup();
+    network->manager->instance("defaultConn")->attributeIs("routing", "dijkstra");
     network->startShipments();
     activityManager->nowIs(47.0);
     cout << "Shipments received at destination: " << network->location[1]->attribute("shipments received") << endl;
