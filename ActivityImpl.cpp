@@ -7,6 +7,9 @@
 Fwk::Ptr<Activity::Manager> activityManagerInstance(){
     return ActivityImpl::ManagerImpl::activityManagerInstance();
 }
+void activityManagerInstanceIs(Fwk::Ptr<Activity::Manager> _instance) {
+    ActivityImpl::ManagerImpl::activityManagerInstanceIs(_instance);
+}
 
 namespace ActivityImpl {
     //Definition of static member
@@ -18,10 +21,13 @@ namespace ActivityImpl {
         if (activityInstance_ == NULL) {
             activityInstance_ = new ManagerImpl();
         }
+        //cout << "Assign activity instance" << activityInstance_->references() << endl; 
 
         return activityInstance_;
     }
-    void ManagerImpl::activityManagerInstanceIs(const Fwk::Ptr<Activity::Manager> _instance) { activityInstance_ = _instance; }
+    void ManagerImpl::activityManagerInstanceIs(const Fwk::Ptr<Activity::Manager> _instance) {
+        activityInstance_ = _instance; 
+    }
 
     Activity::Ptr ManagerImpl::activityNew(const string& name) {
         Activity::Ptr activity = activities_[name];

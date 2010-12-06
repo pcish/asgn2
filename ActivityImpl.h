@@ -14,7 +14,7 @@ Fwk::Ptr<Activity::Manager> activityManagerInstance();
 void activityManagerInstanceIs(Fwk::Ptr<Activity::Manager>);
 
 namespace ActivityImpl {
-
+    class ManagerImpl;
     //Comparison class for activities
     class ActivityComp : public binary_function<Activity::Ptr, Activity::Ptr, bool> {
         public:
@@ -27,9 +27,9 @@ namespace ActivityImpl {
 
     class ActivityImpl : public Activity {
         protected:
-            ActivityImpl(const string& name, Fwk::Ptr<class ManagerImpl> manager)
+            ActivityImpl(const string& name, ManagerImpl* manager)
                 : Activity(name), status_(free), nextTime_(0.0), notifiee_(NULL), manager_(manager) {}
-            Fwk::Ptr<class ManagerImpl> manager() const { return manager_; }
+            ManagerImpl* manager() const { return manager_; }
 
             virtual Status status() const { return status_; }
             virtual void statusIs(Status s) {
@@ -61,7 +61,8 @@ namespace ActivityImpl {
             Status status_;
             Hour nextTime_;
             Fwk::Ptr<Notifiee> notifiee_;
-            Fwk::Ptr<class ManagerImpl> manager_;
+            //Fwk::Ptr<class ManagerImpl> manager_;
+            ManagerImpl*  manager_;
     };
 
     class ManagerImpl : public Activity::Manager {
@@ -96,7 +97,7 @@ namespace ActivityImpl {
             map<string, Activity::Ptr> activities_; //pool of all activities
             Hour now_;
             TimeStepping timeStepping_;
-            ~ManagerImpl() { activityInstance_ = NULL; }
+            ~ManagerImpl() { activityInstance_ = NULL; cout << "manager detructed" << endl; }
 
             //specific to this example
             //Queue::Ptr queue_;
