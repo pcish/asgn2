@@ -37,11 +37,16 @@ I. New in Assignment 3
         There is a special case to deal with. When an activity is waiting in activity manager's queue but has already been marked as deleted (by setting its status), the activity manager has to skip that activiy by simply popping it out so that it won't process an activity that shouldn't be executed.
      b. Real Time
         To make the simulation use real time, the activity manager executes normally as the virtual time do except that when it pops out an activity, it sleeps for some time (the difference between now and the time of the activity) before execution.
+
     C. Shipment Transfers
      a. Mechanics
+        The sequence of actions for shipment transfers occur as follows. 
+        At the beginning, the client set 3 attributes for a Customer node: destination, transfer rate, and shipment size. When any of these is set, Customer notifies its reactor about the change. When the reactor sees that all these are set, it creates an activity, set its time  
      b. Statistics Collected
      c. Routing Algorithms
+
     D. Scheduled Changes to Fleet Attributes
+
   2. Simulations
     A. verification.cpp
     B. experiment.cpp
