@@ -115,8 +115,8 @@ USD Fleet::cost() const {
 USD Fleet::scheduledCost(const unsigned int index) const { return scheduledCosts_[index].value; }
 
 void Fleet::scheduledCostIs(const unsigned int index, USD cost) {
-    scheduledCosts_[index].valid = true;
-    scheduledCosts_[index].value = cost;
+    scheduledCosts_[index%24].valid = true;
+    scheduledCosts_[index%24].value = cost;
 }
 
 PackageUnit Fleet::capacity() const {
@@ -130,8 +130,8 @@ PackageUnit Fleet::capacity() const {
 PackageUnit Fleet::scheduledCapacity(const unsigned int index) const { return scheduledCapacitys_[index].value; }
 
 void Fleet::scheduledCapacityIs(const unsigned int index, PackageUnit capacity) {
-    scheduledCapacitys_[index].valid = true;
-    scheduledCapacitys_[index].value = capacity;
+    scheduledCapacitys_[index%24].valid = true;
+    scheduledCapacitys_[index%24].value = capacity;
 }
 
 Mile Fleet::speed() const {
@@ -145,8 +145,8 @@ Mile Fleet::speed() const {
 Mile Fleet::scheduledSpeed(const unsigned int index) const { return scheduledSpeeds_[index].value; }
 
 void Fleet::scheduledSpeedIs(const unsigned int index, Mile speed) {
-    scheduledSpeeds_[index].valid = true;
-    scheduledSpeeds_[index].value = speed;
+    scheduledSpeeds_[index%24].valid = true;
+    scheduledSpeeds_[index%24].value = speed;
 }
 
 Clock::Clock() : NamedInterface("clock") {
