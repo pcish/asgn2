@@ -42,6 +42,7 @@ I. New in Assignment 3
     C. Shipment Transfers
      a. Mechanics
         The sequence of actions for shipment transfers occur as follows. 
+
         Each Customer location has the following three 'source attributes': 'destination", "transfer rate" and "shipment size". 
         
         As soon as all three 'source attributes' have valid values, "transfer rate" shipments are created at the Customer location and every 24 hours starting from the current time another "transfer rate" shipments will be created. As soon as a shipment is created, it begins to move through the network. 
@@ -61,10 +62,14 @@ I. New in Assignment 3
      	     "average shipments received by segments": the value of "shipments received by segments" divided by the number of segments in the network (at the time of the query)
      	     "average shipments refused by segments": the value of "shipments refused by segments" divided by the number of segments in the network (at the time of the query)
      c. Routing Algorithms
-        We implemented two routing algorithms: Bfs and Dijkstra's shortest path. We decouple the routing algorithm from the Shipping Network by providing a base class for all routing algorithms and two subclasses (Bfs and Dijkstra) that overrides the routing behavior of the base class. 
-        For the Bfs, it finds the path that passes through the least number of Segments (and also Locations) by spanning out from the source. For the Dijkstra one, it uses the lengths of the Segments as the distance metric. For each iteration, it finds the nearest Location X to the source currently and updates all that Location's neighboring Locations to be the minimum between those Locations' distance from the origin and the distance X from the origin plus the length of the segment between X and this Location.
+        We implemented three routing algorithms: Bfs, Dijkstra's shortest path, and Random Walk. We decouple the routing algorithm from the Shipping Network by providing a base class for all routing algorithms and three subclasses (Bfs, Dijkstra and RandomWalk) that overrides the routing behavior of the base class. 
+        i. In Bfs, it finds the path that passes through the least number of Segments (and also Locations) by spanning the path out from the source. 
+        ii. In Dijkstra, it uses the lengths of the Segments as the distance metric. For each iteration, it finds the nearest Location X to the source currently and updates all that Location's neighboring Locations to be the minimum between those Locations' distance from the origin and the distance X from the origin plus the length of the segment between X and this Location.
+        iii. In RandomWalk, the next location of the path toward destination is randomly picked. 
 
     D. Scheduled Changes to Fleet Attributes
+        
+        
 
   2. Simulations
     A. verification.cpp
@@ -73,7 +78,6 @@ I. New in Assignment 3
 ==
 To be tested:
 Activity manager realtime
-random walk
 ==
 
 
