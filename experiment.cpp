@@ -94,7 +94,9 @@ int main(int argc, char* argv[]) {
     cout << "Average latency of received shipments: " << network->destination->attribute("average latency") << endl;
     delete network;
 
+    activityManager = activityManagerInstance();
     activityManager = NULL;
+    activityManagerInstanceIs(NULL);
     activityManager = activityManagerInstance();
     cout << "Simulation 2: all sources send rand(1, 1000) packages" << endl;
     network = new ExperimentNetwork();

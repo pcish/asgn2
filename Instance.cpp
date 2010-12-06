@@ -137,6 +137,7 @@ class StatsRep : public Instance {
         }
         return instance_;
     }
+    static void instanceIs(Ptr<StatsRep> _instance) { instance_ = _instance; }
     ~StatsRep() { instance_ = NULL; }
 
     string attribute(const string &name);
@@ -161,6 +162,7 @@ class ConnRep : public Instance {
             instance_ = new ConnRep(name, manager);
         return instance_;
     }
+    static void instanceIs(Ptr<ConnRep> _instance) { instance_ = _instance; }
     ~ConnRep() { instance_ = NULL; }
 
   protected:
@@ -180,10 +182,11 @@ class FleetRep : public Instance {
             instance_ = new FleetRep(name, manager);
         return instance_;
     }
+    static void instanceIs(Ptr<FleetRep> _instance) { instance_ = _instance; }
 
     string attribute(const string& name);
     void attributeIs(const string& name, const string& v);
-    ~FleetRep() { instance_ = NULL; }
+    ~FleetRep() { cout << "fleetrep destructor" << endl; instance_ = NULL; }
 
   protected:
     FleetRep(const string& name, ManagerImpl* manager) :
@@ -211,12 +214,15 @@ ManagerImpl::ManagerImpl() {
 
 ManagerImpl::~ManagerImpl() {
     instance_.clear();
-    /*
-    for (map<string, Ptr<Instance> >::iterator i = instance_.begin(); i != instance_.end(); i++) {
+    
+    /*for (map<string, Ptr<Instance> >::iterator i = instance_.begin(); i != instance_.end(); i++) {
         (*i).second->deleteRef();
         instance_.erase(i);
     }
     */
+    FleetRep::instanceIs(NULL);
+    ConnRep::instanceIs(NULL);
+    StatsRep::instanceIs(NULL);
 }
 
 Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {

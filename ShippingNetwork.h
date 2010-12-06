@@ -20,7 +20,7 @@ class ShipmentReactor;
 
 class Path : public Fwk::PtrInterface<Path> {
 public:
-    static Ptr<Path> pathNew() { return new Path(); }
+    static Ptr<Path> pathNew() { Path *p = new Path(); Path *q = new Path(); delete p; return q; }
     void locationIs (Ptr<Location> _location) {
         if (_location) location_.push_back(_location);
         else if (location_.size() > 0) location_.pop_back();
