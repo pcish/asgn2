@@ -96,9 +96,11 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
         int truckTerminals() const { return truckTerminals_; }
         int planeTerminals() const { return planeTerminals_; }
         int boatTerminals() const { return boatTerminals_; }
+        int shipmentsRefusedByAllSegments() const;
+        int shipmentsReceivedByAllSegments() const;
         Segment::ExpediteSupport expedite() const { return expedite_; }
         void expediteIs(const Segment::ExpediteSupport expedite) { if (expedite_ == expedite) return; expedite_ = expedite; }
-        Statistics(Fwk::String name);
+        Statistics(Fwk::String name, ShippingNetwork* shippingNetwork);
 
       private:
         void customersInc() { customers_++; }
@@ -114,6 +116,7 @@ class ShippingNetwork : public Fwk::PtrInterface<ShippingNetwork> {
         int planeSegmentsExpediteAvailable_;
         int boatSegmentsExpediteAvailable_;
         Segment::ExpediteSupport expedite_;
+        ShippingNetwork* shippingNetwork_;
     };
     Ptr<ShippingNetwork::Statistics> statistics() const { return statistics_; }
 

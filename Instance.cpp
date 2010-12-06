@@ -214,7 +214,7 @@ ManagerImpl::ManagerImpl() {
 
 ManagerImpl::~ManagerImpl() {
     instance_.clear();
-    
+
     /*for (map<string, Ptr<Instance> >::iterator i = instance_.begin(); i != instance_.end(); i++) {
         (*i).second->deleteRef();
         instance_.erase(i);
@@ -445,6 +445,8 @@ string StatsRep::attribute(const string& name) {
         os << manager_->shippingNetwork()->statistics()->planeSegments();
     } else if (name == "Boat segment") {
         os << manager_->shippingNetwork()->statistics()->boatSegments();
+    } else if (name == "segments") {
+        os << manager_->shippingNetwork()->statistics()->segments();
     } else if (name == "expedite percentage") {
         int expediteAvailable = 0;
         manager_->shippingNetwork()->statistics()->expediteIs(Segment::available());
@@ -459,6 +461,14 @@ string StatsRep::attribute(const string& name) {
         os.setf(ios::fixed,ios::floatfield);
         os.precision(2);
         os << ((float) expediteAvailable / (float) totalSegments) * 100.0;
+    } else if (name == "shipments received by segments") {
+        os << manager_->shippingNetwork()->statistics()->shipmentsReceivedByAllSegments();
+    } else if (name == "shipments refused by segments") {
+        os << manager_->shippingNetwork()->statistics()->shipmentsRefusedByAllSegments();
+    } else if (name == "average shipments received by segments") {
+        os << (double) manager_->shippingNetwork()->statistics()->shipmentsReceivedByAllSegments() / (double) manager_->shippingNetwork()->statistics()->segments();
+    } else if (name == "average shipments refused by segments") {
+        os << (double) manager_->shippingNetwork()->statistics()->shipmentsRefusedByAllSegments() / (double) manager_->shippingNetwork()->statistics()->segments();
     } else {
         throw Fwk::UnknownArgException("Unsupported attribute: " + name);
         //return "";

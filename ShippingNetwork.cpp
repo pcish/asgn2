@@ -207,12 +207,31 @@ class ShippingNetworkReactor : public ShippingNetwork::Notifiee {
     }
 };
 
-ShippingNetwork::Statistics::Statistics(Fwk::String name) :
+ShippingNetwork::Statistics::Statistics(Fwk::String name, ShippingNetwork* shippingNetwork) :
     NamedInterface(name), customers_(0), ports_(0),
     truckTerminals_(0), planeTerminals_(0), boatTerminals_(0),
     truckSegments_(0), planeSegments_(0), boatSegments_(0),
     truckSegmentsExpediteAvailable_(0), planeSegmentsExpediteAvailable_(0),
-    boatSegmentsExpediteAvailable_(0), expedite_(Segment::allAvailabilities()) {
+    boatSegmentsExpediteAvailable_(0), expedite_(Segment::allAvailabilities()),
+    shippingNetwork_(shippingNetwork) {
+}
+
+int ShippingNetwork::Statistics::shipmentsRefusedByAllSegments() const {
+    int refused = 0;
+    for (map<string, Ptr<Segment> >::iterator i = shippingNetwork_->segment_.begin();
+         i != shippingNetwork_->segment_.end(); i++) {
+        refused += (*i).second->shipmentsRefused().value();
+    }
+    return refused;
+}
+
+int ShippingNetwork::Statistics::shipmentsReceivedByAllSegments() const {
+    int received = 0;
+    for (map<string, Ptr<Segment> >::iterator i = shippingNetwork_->segment_.begin();
+         i != shippingNetwork_->segment_.end(); i++) {
+        received += (*i).second->shipmentsReceived().value();
+    }
+    return received;
 }
 
 ShippingNetwork::ShippingNetwork() : isConnAttributeChange(false), expedite_(Segment::allAvailabilities()), routing_(bfs__) {
@@ -220,28 +239,10 @@ ShippingNetwork::ShippingNetwork() : isConnAttributeChange(false), expedite_(Seg
     r->notifierIs(this);
     stringstream name;
     name << "shippingNetwork" << " " << "Statistics" << endl;
-    statistics_ = new Statistics(name.str());
+    statistics_ = new Statistics(name.str(), this);
     clock_ = new Clock();
 }
 
-/*
-void ShippingNetwork::onHeartbeat() {
-    Activity::Manager::Ptr manager = activityManagerInstance();
-    planeFleet_->costIs(planeFleet_->scheduledCost((int) manager->now().value()));
-    planeFleet_->speedIs(planeFleet_->scheduledSpeed((int) manager->now().value()));
-    planeFleet_->capacityIs(planeFleet_->scheduledCapacity((int) manager->now().value()));
-    truckFleet_->costIs(truckFleet_->scheduledCost((int) manager->now().value()));
-    truckFleet_->speedIs(truckFleet_->scheduledSpeed((int) manager->now().value()));
-    truckFleet_->capacityIs(truckFleet_->scheduledCapacity((int) manager->now().value()));
-    boatFleet_->costIs(boatFleet_->scheduledCost((int) manager->now().value()));
-    boatFleet_->speedIs(boatFleet_->scheduledSpeed((int) manager->now().value()));
-    boatFleet_->capacityIs(boatFleet_->scheduledCapacity((int) manager->now().value()));
-
-    heartbeatActivity_->nextTimeIs(manager->now().value() + 1);
-    heartbeatActivity_->lastNotifieeIs(new HeartbeatActivityNotifiee(heartbeatActivity_.ptr(), this));
-    manager->lastActivityIs(heartbeatActivity_.ptr());
-}
-*/
 Ptr<Customer> ShippingNetwork::customerNew(const string name) {
     Ptr<Customer> m = new Customer(name);
     m->shippingNetworkIs(this);
