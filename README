@@ -41,9 +41,12 @@ I. New in Assignment 3
     C. Shipment Transfers
      a. Mechanics
         The sequence of actions for shipment transfers occur as follows. 
-        At the beginning, the client set 3 attributes for a Customer node: destination, transfer rate, and shipment size. When any of these is set, Customer notifies its reactor about the change. When the reactor sees that all these are set, it creates an activity, set its time  
+        At the beginning, the client set 3 attributes for a Customer node: destination, transfer rate, and shipment size. When any of these is set, Customer notifies its reactor about the change. When the reactor sees that all these are set, it creates an activity, set its time to now so that it will be executed immediately when the simulation starts. This activity carries a notifiee that asks Customer Reactor to inject shipments into shipping network, based on Customer's destination and shipment size. Then, the Customer Reactor reschedule the activity by setting its time based on the transfer rate and then push into the activity manager's queue.
+        When a shipment is created, its reactor creates a forward activity. This forward activity asks the reactor to find the next Location along the path to the destination for the shipment. If the Segment to the next Location is fully occupied, it reschedules the activity at the next hour to try again. Otherwise, it occupies one unit of the segment capacity and schedules the activity at several hours later (depending on the time to travel along a segment) and when the activity is executed by that time, it tells the reactor to change the shipment's location and releases the capacity of the segment it travels along. These process is repeated until the shipment reaches the destination.
      b. Statistics Collected
      c. Routing Algorithms
+        We implemented two routing algorithms: Bfs and Dijkstra's shortest path. We decouple the routing algorithm from the Shipping Network by providing a base class for all routing algorithms and two subclasses (Bfs and Dijkstra) that overrides the routing behavior of the base class. 
+        For the Bfs, it finds the path that passes through the least number of Segments (and also Locations) by spanning out from the source. For the Dijkstra one, it uses the lengths of the Segments as the distance metric. For each iteration, it finds the nearest Location X to the source currently and updates all that Location's neighboring Locations to be the minimum between those Locations' distance from the origin and the distance X from the origin plus the length of the segment between X and this Location.
 
     D. Scheduled Changes to Fleet Attributes
 
@@ -54,6 +57,7 @@ I. New in Assignment 3
 ==
 To be tested:
 Activity manager realtime
+random walk
 ==
 
 
