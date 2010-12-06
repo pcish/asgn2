@@ -288,7 +288,7 @@ Ptr<Instance> ManagerImpl::instance(const string& name) {
 void ManagerImpl::instanceDel(const string& name) {
     map<string,Ptr<Instance> >::iterator t = instance_.find(name);
     if (t != instance_.end()) {
-        while (instance_[name]->references() > 1) instance_[name]->referencesDec();
+        instance_[name]->deleteRef();
         instance_.erase(t);
     } else {
 //        cerr << "attempting to delete non-existant instance " << name << endl;
