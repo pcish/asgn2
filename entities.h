@@ -40,6 +40,7 @@ class Clock : public Fwk::NamedInterface {
     Hour now() const { return now_; }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
       public:
+        enum Status {Active__, Deleted__ };
         virtual void notifierIs(Fwk::Ptr<Clock> notifier) {
             if (notifier_ == notifier) return;
             if (notifier_) notifier->notifieeIs(0);
@@ -51,23 +52,39 @@ class Clock : public Fwk::NamedInterface {
             return n;
         }
         virtual void onNow() {}
+        Status status() const { return status_; }
+        void statusIs(const Status _status) { status_ = _status; }
       protected:
+        friend class Clock;
         Fwk::WeakPtr<Clock> notifier_;
-        Notifiee() : notifier_(0) {}
+        Notifiee() : notifier_(0), status_(Active__) {}
+        Status status_;
     };
   protected:
-    vector<Ptr<Clock::Notifiee> > notifiee_;
+    list<Ptr<Clock::Notifiee> > notifiee_;
     void notifieeIs(Clock::Notifiee* n) {
         notifiee_.push_back(n);
     }
   private:
     Hour now_;
+    class StatusDeletedValue {
+      public:
+        bool operator() (const Ptr<Clock::Notifiee> a) {
+            return a->status() == Clock::Notifiee::Deleted__;
+        }
+    };
     void nowInc() {
         Activity::Manager::Ptr manager = activityManagerInstance();
         now_ = now_.value() + 1;
         LOG_INFO("nowInc", "now = " + STR(now_.value()));
-        for(vector<Ptr<Clock::Notifiee> >::iterator i = notifiee_.begin(); i != notifiee_.end(); i++) {
-            (*i)->onNow();
+        notifiee_.remove_if(StatusDeletedValue());
+        for(list<Ptr<Clock::Notifiee> >::iterator i = notifiee_.begin(); i != notifiee_.end(); i++) {
+            if ((*i)->status_ == Clock::Notifiee::Deleted__) {
+                cout << "Should not appear anymore" << endl;
+            }
+            else {
+                (*i)->onNow();
+            }
         }
         heartbeatActivity_->nextTimeIs(manager->now().value() + 1);
         //heartbeatActivity_->lastNotifieeIs(new HeartbeatActivityNotifiee(heartbeatActivity_.ptr(), this));
@@ -489,6 +506,7 @@ class Fleet : public Fwk::NamedInterface {
         Fleet* me = const_cast<Fleet*>(this);
         me->notifiee_ = n;
     }
+    //Fwk::Ptr<ClockReactor> clockReactor;
 
   private:
     USD cost_;

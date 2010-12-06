@@ -310,7 +310,7 @@ class TerminalReactor : public Terminal::Notifiee {
 };
 
 class ClockReactor: public Clock::Notifiee {
-  public:
+  public:    
     virtual void onNow() {
         parent_->now_ = notifier_->now();
     }
@@ -322,6 +322,50 @@ class ClockReactor: public Clock::Notifiee {
     string name() const { return notifier_->name() + ".ClockReactor"; }
   private:
     Fleet* parent_;
+};
+class PlaneFleetReactor: public PlaneFleet::Notifiee {
+  public:
+    virtual ~PlaneFleetReactor() {
+        if (clockReactor_)
+            clockReactor_->statusIs(Clock::Notifiee::Deleted__);
+    }
+    static Fwk::Ptr<PlaneFleetReactor> planeFleetReactorNew(Fwk::Ptr<ClockReactor> _clockReactor) {
+        Fwk::Ptr<PlaneFleetReactor> pr = new PlaneFleetReactor(_clockReactor);
+        return pr;
+    }
+  private:
+    PlaneFleetReactor(Fwk::Ptr<ClockReactor> _clockReactor) : clockReactor_(_clockReactor) {}
+    Fwk::Ptr<ClockReactor> clockReactor_;
+};
+
+class TruckFleetReactor: public TruckFleet::Notifiee {
+  public:
+    virtual ~TruckFleetReactor() {
+        if (clockReactor_)
+            clockReactor_->statusIs(Clock::Notifiee::Deleted__);
+    }
+    static Fwk::Ptr<TruckFleetReactor> truckFleetReactorNew(Fwk::Ptr<ClockReactor> _clockReactor) {
+        Fwk::Ptr<TruckFleetReactor> pr = new TruckFleetReactor(_clockReactor);
+        return pr;
+    }
+  private:
+    TruckFleetReactor(Fwk::Ptr<ClockReactor> _clockReactor) : clockReactor_(_clockReactor) {}
+    Fwk::Ptr<ClockReactor> clockReactor_;
+};
+
+class BoatFleetReactor: public BoatFleet::Notifiee {
+  public:
+    virtual ~BoatFleetReactor() {
+        if (clockReactor_)
+            clockReactor_->statusIs(Clock::Notifiee::Deleted__);
+    }
+    static Fwk::Ptr<BoatFleetReactor> boatFleetReactorNew(Fwk::Ptr<ClockReactor> _clockReactor) {
+        Fwk::Ptr<BoatFleetReactor> pr = new BoatFleetReactor(_clockReactor);
+        return pr;
+    }
+  private:
+    BoatFleetReactor(Fwk::Ptr<ClockReactor> _clockReactor) : clockReactor_(_clockReactor) {}
+    Fwk::Ptr<ClockReactor> clockReactor_;
 };
 
 }

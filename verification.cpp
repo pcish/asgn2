@@ -42,6 +42,8 @@ class Network {
             createSegmentPair(9, "location7", "location0", "Truck segment");
             Ptr<Instance> fleet = manager->instanceNew("fleet", "Fleet");
             fleet->attributeIs("Truck, cost from 3 to 4", "100");
+            fleet->attributeIs("Plane, cost from 5 to 13", "100");
+            fleet->attributeIs("Boat, cost from 1 to 20", "100");
         } catch (Fwk::Exception e) {
             cout << e.what() << endl;
         } catch (...) {}

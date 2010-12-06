@@ -287,6 +287,8 @@ Ptr<PlaneFleet> ShippingNetwork::planeFleetNew(const string name) {
     planeFleet_ = m;
     Fwk::Ptr<ClockReactor> r = ClockReactor::clockReactorNew(m.ptr());
     r->notifierIs(clock_);
+    Fwk::Ptr<PlaneFleetReactor> pr = PlaneFleetReactor::planeFleetReactorNew(r);
+    pr->notifierIs(planeFleet_);
     if (notifiee_) notifiee_->onPlaneFleetNew(m);
     return m;
 }
@@ -296,6 +298,8 @@ Ptr<TruckFleet> ShippingNetwork::truckFleetNew(const string name) {
     truckFleet_ = m;
     Fwk::Ptr<ClockReactor> r = ClockReactor::clockReactorNew(m.ptr());
     r->notifierIs(clock_);
+    Fwk::Ptr<TruckFleetReactor> pr = TruckFleetReactor::truckFleetReactorNew(r);
+    pr->notifierIs(truckFleet_);
     if (notifiee_) notifiee_->onTruckFleetNew(m);
     return m;
 }
@@ -305,6 +309,8 @@ Ptr<BoatFleet> ShippingNetwork::boatFleetNew(const string name) {
     boatFleet_ = m;
     Fwk::Ptr<ClockReactor> r = ClockReactor::clockReactorNew(m.ptr());
     r->notifierIs(clock_);
+    Fwk::Ptr<BoatFleetReactor> pr = BoatFleetReactor::boatFleetReactorNew(r);
+    pr->notifierIs(boatFleet_);
     if (notifiee_) notifiee_->onBoatFleetNew(m);
     return m;
 }
