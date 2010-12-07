@@ -100,7 +100,7 @@ int main(int argc, char* argv[]) {
         cout << "Average shipments refused by segments: " << stats->attribute("average shipments refused by segments") << endl;
         cout << "Total cost of received shipments: " << network->destination->attribute("total cost") << endl;
         if (network) delete network;
-
+        cout << "========================================" << endl;
         activityManager = activityManagerInstance();
         activityManager = NULL;
         activityManagerInstanceIs(NULL);
