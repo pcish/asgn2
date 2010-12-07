@@ -37,7 +37,11 @@ I. New in Assignment 3
         An activity is associated with a time, indicating when it should be executed in virtual time. When an activity registers to the activity manager, the activity manager puts it to a priority queue sorted by the time it associates with. Then, when the simulation starts, the activity manager pops the queue to get the activity with the earliest time, executes it, and repeats these two steps until the time of the next activity is later than the time the client wants the simulation to stops.
         There is a special case to deal with. When an activity is waiting in activity manager's queue but has already been marked as deleted (by setting its status), the activity manager has to skip that activiy by simply popping it out so that it won't process an activity that shouldn't be executed.
      b. Real Time
-        To make the simulation use real time, the activity manager executes normally as the virtual time do except that when it pops out an activity, it sleeps for some time (the difference between now and the time of the activity) before execution.
+        To make the simulation use real time, the activity manager executes normally as the virtual time do except that when it pops out an activity, it sleeps for some time (the difference between now and the time of the activity) before execution. To specify this behavior, the cliend should call::
+        activityManager->timeSteppingIs(Activity::Manager::realtime()); 
+        To change back to virtual time, call
+        activityManager->timeSteppingIs(Activity::Manager::virtualtime()); 
+
 
     C. Shipment Transfers
      a. Mechanics
