@@ -18,11 +18,14 @@ namespace Shipping {
 
 class Clock : public Fwk::NamedInterface {
   public:
+    typedef Fwk::Ptr<Clock> Ptr;
+
     Clock();
     Hour now() const { return now_; }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
         friend class Clock;
       public:
+        typedef Fwk::Ptr<Notifiee> Ptr;
         enum Status {
             Active__,
             Deleted__
@@ -48,7 +51,7 @@ class Clock : public Fwk::NamedInterface {
     };
 
   protected:
-    list<Ptr<Clock::Notifiee> > notifiee_;
+    list<Clock::Notifiee::Ptr> notifiee_;
     void notifieeIs(Clock::Notifiee* n) {
         notifiee_.push_back(n);
     }
@@ -57,7 +60,7 @@ class Clock : public Fwk::NamedInterface {
     Hour now_;
     class StatusDeletedValue {
       public:
-        bool operator() (const Ptr<Clock::Notifiee> a) {
+        bool operator() (const Clock::Notifiee::Ptr a) {
             return a->status() == Clock::Notifiee::Deleted__;
         }
     };
@@ -66,7 +69,7 @@ class Clock : public Fwk::NamedInterface {
         now_ = now_.value() + 1;
         LOG_INFO("nowInc", "now = " + STR(now_.value()));
         notifiee_.remove_if(StatusDeletedValue());
-        for(list<Ptr<Clock::Notifiee> >::iterator i = notifiee_.begin(); i != notifiee_.end(); i++) {
+        for(list<Clock::Notifiee::Ptr>::iterator i = notifiee_.begin(); i != notifiee_.end(); i++) {
             if ((*i)->status_ == Clock::Notifiee::Deleted__) {
                 cout << "Should not appear anymore" << endl;
             }
@@ -99,11 +102,12 @@ class Clock : public Fwk::NamedInterface {
 
 class ClockReactor: public Clock::Notifiee {
   public:
+    typedef Fwk::Ptr<ClockReactor> Ptr;
     virtual void onNow() {
         parent_->now_ = notifier_->now();
     }
-    static Fwk::Ptr<ClockReactor> clockReactorNew(Fleet* parent) {
-        Fwk::Ptr<ClockReactor> n = new ClockReactor();
+    static ClockReactor::Ptr clockReactorNew(Fleet* parent) {
+        ClockReactor::Ptr n = new ClockReactor();
         n->parent_ = parent;
         return n;
     }
