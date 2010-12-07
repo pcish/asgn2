@@ -557,6 +557,8 @@ string ConnRep::attribute(const string& name) {
                 return "Dijkstra";
             case ShippingNetwork::bfs__:
                 return "BFS";
+            case ShippingNetwork::randomwalk__:
+                return "Random Walk";
             default:
             //this shouldn't happen
                 return "Unspecified";

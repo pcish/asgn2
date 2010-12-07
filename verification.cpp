@@ -41,9 +41,9 @@ class Network {
             createSegmentPair(8, "location6", "location7", "Truck segment");
             createSegmentPair(9, "location7", "location0", "Truck segment");
             Ptr<Instance> fleet = manager->instanceNew("fleet", "Fleet");
-            fleet->attributeIs("Truck, cost from 3 to 4", "100");
-            fleet->attributeIs("Plane, cost from 5 to 13", "100");
-            fleet->attributeIs("Boat, cost from 1 to 20", "100");
+            fleet->attributeIs("Truck, speed from 20 to 23", "100");
+            fleet->attributeIs("Plane, speed from 0 to 23", "100");
+            fleet->attributeIs("Boat, speed from 10 to 23", "100");
         } catch (Fwk::Exception e) {
             cout << e.what() << endl;
         } catch (...) {}
@@ -77,7 +77,7 @@ class Network {
 };
 
 int main(int argc, char* argv[]) {
-    CerrLog::instance()->logLevelIs(Log::Debug);
+    CerrLog::instance()->logLevelIs(Log::Null);
     Activity::Manager::Ptr activityManager = activityManagerInstance();
 
     cout << "Simulation 1: all sources send 100 packages" << endl;
