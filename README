@@ -145,9 +145,22 @@ I. New in Assignment 3
          In addition, the latency in simulation 2 is also higher than in simulation 1. That is also due to unbalanced traffic flow. In simulation 1, the latency is amortized by the higher throughput of the shipments, while in simulation 2, shipments may be stuck at some bottleneck terminals and thus have to wait longer to be sent than in the case when all terminals receive and send the same number of shipments.
 
   3. Summary of Rep Layer Interface Changes
-    "Stats"
-    "Customer"
-    new attributes
+    StatsRep
+    New attributes:
+        shipments received by segments
+        shipments refused by segments
+        average shipments received by segments
+        average shipments refused by segments
+    
+    ConnRep
+    New attribute: routing   value: [Dijkstra | BFS | Random Walk]
+
+    FleetRep
+    transportationType, property from x to y
+    transportationType: [Truck | Plane | Boat]
+    property: [cost | speed | capacity]
+    
+    Customer"
 
 
 II. Original Assignment 2 README
