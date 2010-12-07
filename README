@@ -68,7 +68,8 @@ I. New in Assignment 3
         iii. In RandomWalk, the next location to travel to is randomly picked from all locations connected to the current location.
 
     D. Scheduled Changes to Fleet Attributes
-        
+        We associate Fleet with time. Fleet may have different cost/speed/capacity at different hours. To use scheduled changes feature, client should call 
+        fleetRep->attributeIs("FleetType, attribute from x to y", "value"); whereas FleetType is one of Truck/Plane/Boat, attribute is either cost/speed/capacity, x is the start time and y is the end time for this scheduled changes. The attribute of the Fleet engine between time x and y is changed to the new value. Thus, during simulation, when time steps forward, Fleet returns the attribute value at that time.
         
 
   2. Simulations
