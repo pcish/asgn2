@@ -21,8 +21,6 @@ namespace ActivityImpl {
         if (activityInstance_ == NULL) {
             activityInstance_ = new ManagerImpl();
         }
-        //cout << "Assign activity instance" << activityInstance_->references() << endl;
-
         return activityInstance_;
     }
     void ManagerImpl::activityManagerInstanceIs(const Fwk::Ptr<Activity::Manager> _instance) {
@@ -34,8 +32,6 @@ namespace ActivityImpl {
 
         if (activity != NULL) {
             throw Fwk::NameInUseException ("Activity already exists: " + name);
-//            cerr << "Activity already exists!" << endl;
-//            return NULL;
         }
 
         activity = new ActivityImpl(name, this);
@@ -71,8 +67,6 @@ namespace ActivityImpl {
             Activity::Ptr nextToRun = scheduledActivities_.top();
 
             if (nextToRun->status() == Activity::deleted) {
-                //LOG_DEBUG("ManagerImpl::nowIs", "Remove activity because it's status is deleted: " + nextToRun->name());
-                //cout << "ManagerImpl::nowIs" <<  "Remove activity because it's status is deleted: " <<  nextToRun->name() << " ref count=" << nextToRun->references() << endl;
                 scheduledActivities_.pop();
                 activityDel(nextToRun->name());
                 continue;
@@ -87,13 +81,9 @@ namespace ActivityImpl {
             Hour diff = Hour(nextToRun->nextTime().value() - now_.value());
 
             if (timeStepping_ == realtime())
-                //sleep 100ms (100,000 microseconds) for every unit of time
                 usleep(( ((int)diff.value()) * 1000000));
 
             now_ = nextToRun->nextTime();
-
-            //print out size of queue
-            //cout << "size of queue: " << scheduledActivities_.size() << endl;
 
             //run the minimum Hour activity and remove it from the queue
             scheduledActivities_.pop();

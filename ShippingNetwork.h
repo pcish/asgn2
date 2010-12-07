@@ -19,7 +19,7 @@ class TerminalReactor;
 class ShipmentReactor;
 
 class Path : public Fwk::PtrInterface<Path> {
-public:
+  public:
     static Ptr<Path> pathNew() { Path *p = new Path(); Path *q = new Path(); delete p; return q; }
     void locationIs (Ptr<Location> _location) {
         if (_location) location_.push_back(_location);
@@ -54,7 +54,8 @@ public:
     }
     bool reversed() const { return reversed_; }
     Ptr<Path> clone();
-private:
+
+  private:
     Path() : reversed_(false) {}
     Path(Path&) {}
     vector<Ptr<Location> > location_;

@@ -38,74 +38,7 @@ class ShipmentReactor : public Shipment::Notifiee {
 
   private:
     ShipmentReactor() { previousSegment_ = NULL; }
-    void forwardShipment() {
-        Fwk::Ptr<Path> nextHop = notifier_->shippingNetwork()->nextHop(notifier_);
-        if (nextHop == NULL) {
-            notifier_->shippingNetwork()->dropShipment(notifier_);
-            return;
-        }
-        WeakPtr<Segment> nextSegment = nextHop->segment(0);
-        LOG_DEBUG("forwardShipment", nextSegment->name());
-        if (nextSegment == NULL || nextHop->location(1) == NULL) {
-            throw Fwk::InternalException("nextHop return invalid path");
-        }
-        LOG_DEBUG("forwardShipment", "nextLocation = " + nextHop->location(1)->name());
-        LOG_DEBUG("forwardShipment", "capacity = " + STR(nextSegment->availableCapacity().value()));
-        if (nextSegment->availableCapacity() > 0) {
-            Fwk::Ptr<Fleet> fleet;
-            if (nextSegment->transportationMode() == Segment::truck()) {
-                fleet = notifier_->shippingNetwork()->truckFleet_;
-            } else if (nextSegment->transportationMode() == Segment::plane()) {
-                fleet = notifier_->shippingNetwork()->planeFleet_;
-            } else if (nextSegment->transportationMode() == Segment::boat()) {
-                fleet = notifier_->shippingNetwork()->boatFleet_;
-            }
-            if (fleet == NULL) {
-                LOG_ERROR("forwardShipment", "cannot find fleet for seg "+nextSegment->name()+" tmode="+STR(nextSegment->transportationMode()));
-            }
-            Hour transitTime = ceil(
-                ceil((double) notifier_->load().value() / (double) fleet->capacity().value()) *
-                (nextSegment->length().value() / fleet->speed().value())
-            );
-            LOG_DEBUG("forwardShipment", "transit time = ceil(" +
-                      STR(notifier_->load().value()) + " / " +
-                      STR(fleet->capacity().value()) + ") * (" +
-                      STR(nextSegment->length().value()) + " / " +
-                      STR(fleet->speed().value()) + ") = " +
-                      STR(transitTime.value()));
-
-            Activity::Manager::Ptr manager = activityManagerInstance();
-            if (activity_ == NULL) {
-                try {
-                    activity_ = manager->activityNew(notifier_->name());
-                } catch(Fwk::Exception& e) {
-                    LOG_INFO("forwardShipment", "attempting to new activity with name = " + notifier_->name()+"returned: "+e.what());
-                }
-            }
-            activityNotifiee_ = new ActivityNotifiee(
-                activity_.ptr(), this, nextHop->location(1));
-            activity_->nextTimeIs(manager->now().value() + transitTime.value());
-            LOG_DEBUG("forwardShipment", "ETA: " + STR(manager->now().value() + transitTime.value()));
-            activity_->lastNotifieeIs(activityNotifiee_.ptr());
-            manager->lastActivityIs(activity_.ptr());
-
-            previousSegment_ = nextSegment.ptr();
-            nextSegment->usedCapacityInc();
-            nextSegment->shipmentsReceivedInc();
-            notifier_->costInc(fleet->cost().value() * nextSegment->difficulty().value() * nextSegment->length().value());
-            notifier_->transitTimeInc(transitTime);
-        } else {
-            nextSegment->shipmentsRefusedInc();
-            notifier_->transitTimeInc(retryTime);
-            Activity::Manager::Ptr manager = activityManagerInstance();
-            if(activity_ == NULL) activity_ = manager->activityNew(notifier_->name());
-            activityNotifiee_ = new ActivityNotifiee(
-                activity_.ptr(), this, notifier_->currentLocation());
-            activity_->nextTimeIs(manager->now().value() + retryTime.value());
-            activity_->lastNotifieeIs(activityNotifiee_.ptr());
-            manager->lastActivityIs(activity_.ptr());
-        }
-    }
+    void forwardShipment();
     class ActivityNotifiee : public Activity::Activity::Notifiee {
       public:
         ActivityNotifiee(Activity::Activity *activity, ShipmentReactor *_parent, Fwk::Ptr<Location> nextLocation) :
@@ -118,6 +51,7 @@ class ShipmentReactor : public Shipment::Notifiee {
             }
         }
         virtual void onNextTime() {}
+
       private:
         Activity::Activity *activity_;
         ShipmentReactor *parent_;
@@ -127,7 +61,6 @@ class ShipmentReactor : public Shipment::Notifiee {
     Fwk::Ptr<ActivityNotifiee> activityNotifiee_;
     Fwk::Ptr<Segment> previousSegment_;
 };
-
 
 class SegmentReactor : public Segment::Notifiee {
   public:
@@ -187,6 +120,7 @@ class SegmentReactor : public Segment::Notifiee {
         return n;
     }
     string name() const { return notifier_->name() + ".SegmentReactor"; }
+
   protected:
     SegmentReactor() {
         previousSource_ = NULL;
@@ -220,14 +154,14 @@ class CustomerReactor : public Customer::Notifiee {
         return n;
     }
     string name() const { return notifier_->name() + ".CustomerReactor"; }
+
   private:
     class ActivityNotifiee : public Activity::Activity::Notifiee {
       public:
-      //Pointer here may need to be refined
         ActivityNotifiee(Activity::Activity *activity, CustomerReactor *_parent) : Activity::Activity::Notifiee(activity), activity_(activity), parent_(_parent){}
         virtual void onStatus() {
             Activity::Activity::Status status = activity_->status();
-            if (status == Activity::Activity::executing) { //run
+            if (status == Activity::Activity::executing) {
                 parent_->shipmentNew();
             }
         }
@@ -240,19 +174,14 @@ class CustomerReactor : public Customer::Notifiee {
         if (!started) {
             if (destSet && shipmentSizeSet && transferRateSet && notifier_) {
                 started = true;
-                //lauch the shipment
                 Activity::Manager::Ptr manager = activityManagerInstance();
-                //name here
                 try {
-                    activity_ = manager->activityNew(notifier_->name()); //use what name?
+                    activity_ = manager->activityNew(notifier_->name());
                 } catch(Fwk::Exception& e) {
                     LOG_INFO("checkAndLaunch", "attempting to new activity with name="+notifier_->name()+"returned: "+e.what());
-                    //There is some problem with the logging system that it doesn't output on cerr
-                    //cerr << "attempting to new activity with name=" << notifier_->name() << "returned: ";
                     return;
                 }
                 activity_->nextTimeIs(manager->now());
-                //here we need to set the time for activity
                 activityNotifiee_ = new ActivityNotifiee(activity_.ptr(), this);
                 activity_->lastNotifieeIs(activityNotifiee_.ptr());
                 manager->lastActivityIs(activity_.ptr());
@@ -324,6 +253,7 @@ class ClockReactor: public Clock::Notifiee {
   private:
     Fleet* parent_;
 };
+
 class PlaneFleetReactor: public PlaneFleet::Notifiee {
   public:
     virtual ~PlaneFleetReactor() {

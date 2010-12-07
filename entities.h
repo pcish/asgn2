@@ -39,6 +39,7 @@ class Clock : public Fwk::NamedInterface {
     Clock();
     Hour now() const { return now_; }
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
+        friend class Clock;
       public:
         enum Status {Active__, Deleted__ };
         virtual void notifierIs(Fwk::Ptr<Clock> notifier) {
@@ -54,17 +55,19 @@ class Clock : public Fwk::NamedInterface {
         virtual void onNow() {}
         Status status() const { return status_; }
         void statusIs(const Status _status) { status_ = _status; }
+
       protected:
-        friend class Clock;
         Fwk::WeakPtr<Clock> notifier_;
         Notifiee() : notifier_(0), status_(Active__) {}
         Status status_;
     };
+
   protected:
     list<Ptr<Clock::Notifiee> > notifiee_;
     void notifieeIs(Clock::Notifiee* n) {
         notifiee_.push_back(n);
     }
+
   private:
     Hour now_;
     class StatusDeletedValue {
@@ -87,7 +90,6 @@ class Clock : public Fwk::NamedInterface {
             }
         }
         heartbeatActivity_->nextTimeIs(manager->now().value() + 1);
-        //heartbeatActivity_->lastNotifieeIs(new HeartbeatActivityNotifiee(heartbeatActivity_.ptr(), this));
         manager->lastActivityIs(heartbeatActivity_.ptr());
     }
     Activity::Activity::Ptr heartbeatActivity_;
@@ -103,6 +105,7 @@ class Clock : public Fwk::NamedInterface {
             }
         }
         virtual void onNextTime() {}
+
       private:
         Activity::Activity *activity_;
         Clock *parent_;
@@ -149,6 +152,7 @@ class Shipment : public Fwk::NamedInterface {
         Notifiee() : notifier_(0) {}
     };
     Ptr<Shipment::Notifiee> notifiee() const { return notifiee_; }
+
   protected:
     Shipment(Fwk::String name) : NamedInterface(name) {}
     Ptr<Shipment::Notifiee> notifiee_;
@@ -237,6 +241,7 @@ class Segment : public Fwk::NamedInterface {
         Notifiee() : notifier_(0) {}
     };
     Ptr<Segment::Notifiee> notifiee() const { return notifiee_; }
+
   protected:
     Segment(const string name, const TransportationMode transportationMode) : NamedInterface(name), transportationMode_(transportationMode) {
         expediteSupport_ = unavailable_;
@@ -305,6 +310,7 @@ class Location : public Fwk::NamedInterface {
         Notifiee() : notifier_(0) {}
     };
     Ptr<Location::Notifiee> notifiee() const { return notifiee_; }
+
   protected:
     LocationType locationType_;
     Location(const string name) : NamedInterface(name) {
@@ -359,6 +365,7 @@ class Customer : public Location {
         Notifiee() : notifier_(0) {}
     };
     Ptr<Customer::Notifiee> notifiee() const { return notifiee_; }
+
   protected:
     Customer(const string name) : Location(name) {
         locationType_ = customer_;
@@ -401,6 +408,7 @@ class Port : public Location {
         Notifiee() : notifier_(0) {}
     };
     Ptr<Port::Notifiee> notifiee() const { return notifiee_; }
+
   protected:
     Port(const string name) : Location(name) {
         locationType_ = port_;
@@ -440,6 +448,7 @@ class Terminal : public Location {
         Notifiee() : notifier_(0) {}
     };
     Ptr<Terminal::Notifiee> notifiee() const { return notifiee_; }
+
   protected:
     Terminal(const string name, const Segment::TransportationMode transportationMode) : Location(name), transportationMode_(transportationMode) {
         locationType_ = terminal_;
@@ -499,6 +508,7 @@ class Fleet : public Fwk::NamedInterface {
         Notifiee() : notifier_(0) {}
     };
     Ptr<Fleet::Notifiee> notifiee() const { return notifiee_; }
+
   protected:
     Fleet(Fwk::String name);
     Ptr<Fleet::Notifiee> notifiee_;
@@ -506,7 +516,6 @@ class Fleet : public Fwk::NamedInterface {
         Fleet* me = const_cast<Fleet*>(this);
         me->notifiee_ = n;
     }
-    //Fwk::Ptr<ClockReactor> clockReactor;
 
   private:
     USD cost_;
@@ -554,6 +563,7 @@ class TruckFleet : public Fleet {
         Notifiee() : notifier_(0) {}
     };
     Ptr<TruckFleet::Notifiee> notifiee() const { return notifiee_; }
+
   protected:
     TruckFleet(Fwk::String name) : Fleet(name) {}
     Ptr<TruckFleet::Notifiee> notifiee_;
@@ -588,6 +598,7 @@ class BoatFleet : public Fleet {
         Notifiee() : notifier_(0) {}
     };
     Ptr<BoatFleet::Notifiee> notifiee() const { return notifiee_; }
+
   protected:
     BoatFleet(Fwk::String name) : Fleet(name) {}
     Ptr<BoatFleet::Notifiee> notifiee_;
@@ -622,6 +633,7 @@ class PlaneFleet : public Fleet {
         Notifiee() : notifier_(0) {}
     };
     Ptr<PlaneFleet::Notifiee> notifiee() const { return notifiee_; }
+
   protected:
     PlaneFleet(Fwk::String name) : Fleet(name) {}
     Ptr<PlaneFleet::Notifiee> notifiee_;

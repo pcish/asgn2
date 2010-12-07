@@ -72,8 +72,6 @@ void ShippingNetwork::explore(const Ptr<Location> curLocation, set<string> visit
     for (unsigned int i = 0; i < curLocation->segments(); ++i) {
         WeakPtr<Segment> seg = curLocation->segment(i);
         if (!seg->returnSegment() ) {
-//            cout << "Invalid return segment" << endl;
-            //do we need to handle exception here?
             continue;
         }
         Ptr<Location> nextLocation = seg->returnSegment()->source();
@@ -253,7 +251,7 @@ Ptr<Customer> ShippingNetwork::customerNew(const string name) {
     return m;
 }
 
-Ptr<Terminal> ShippingNetwork::terminalNew(const string name, const Segment::TransportationMode transportationMode){
+Ptr<Terminal> ShippingNetwork::terminalNew(const string name, const Segment::TransportationMode transportationMode) {
     Ptr<Terminal> m = new Terminal(name, transportationMode);
     m->shippingNetworkIs(this);
     Fwk::Ptr<TerminalReactor> r = TerminalReactor::terminalReactorNew();
@@ -263,7 +261,7 @@ Ptr<Terminal> ShippingNetwork::terminalNew(const string name, const Segment::Tra
     return m;
 }
 
-Ptr<Segment> ShippingNetwork::segmentNew(const Segment::TransportationMode transportationMode, const string name){
+Ptr<Segment> ShippingNetwork::segmentNew(const Segment::TransportationMode transportationMode, const string name) {
     Ptr<Segment> m = new Segment(name, transportationMode);
     m->shippingNetworkIs(this);
     Fwk::Ptr<SegmentReactor> r = SegmentReactor::segmentReactorNew();
@@ -273,7 +271,7 @@ Ptr<Segment> ShippingNetwork::segmentNew(const Segment::TransportationMode trans
     return m;
 }
 
-Ptr<Port> ShippingNetwork::portNew(const string name){
+Ptr<Port> ShippingNetwork::portNew(const string name) {
     Ptr<Port> m = new Port(name);
     m->shippingNetworkIs(this);
     Fwk::Ptr<PortReactor> r = PortReactor::portReactorNew();

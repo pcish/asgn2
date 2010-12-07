@@ -186,7 +186,7 @@ class FleetRep : public Instance {
 
     string attribute(const string& name);
     void attributeIs(const string& name, const string& v);
-    ~FleetRep() { /*cout << "fleetrep destructor" << endl;*/ instance_ = NULL; }
+    ~FleetRep() { instance_ = NULL; }
 
   protected:
     FleetRep(const string& name, ManagerImpl* manager) :
@@ -214,12 +214,6 @@ ManagerImpl::ManagerImpl() {
 
 ManagerImpl::~ManagerImpl() {
     instance_.clear();
-
-    /*for (map<string, Ptr<Instance> >::iterator i = instance_.begin(); i != instance_.end(); i++) {
-        (*i).second->deleteRef();
-        instance_.erase(i);
-    }
-    */
     FleetRep::instanceIs(NULL);
     ConnRep::instanceIs(NULL);
     StatsRep::instanceIs(NULL);
@@ -251,9 +245,7 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
         return t;
     }
     if (instance_.find(name) != instance_.end()) {
-//        cerr << "Attempt to new instances of the same names!" << endl;
         throw Fwk::NameInUseException("Attempt to new instances of the same name: "+name);
-//        return NULL;
     }
     if (type == "Truck terminal") {
         t = new TerminalRep(name, this, Segment::truck());
@@ -272,9 +264,7 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
     } else if (type == "Customer") {
         t = new CustomerRep(name, this);
     } else {
-        //No matching type
         throw Fwk::UnknownArgException("Unsupported type: " + type);
-//        return NULL;
     }
     instance_[t->name()] = t;
     return t;
@@ -291,7 +281,6 @@ void ManagerImpl::instanceDel(const string& name) {
         instance_[name]->deleteRef();
         instance_.erase(t);
     } else {
-//        cerr << "attempting to delete non-existant instance " << name << endl;
     }
 }
 
@@ -300,7 +289,6 @@ Ptr<T> ManagerImpl::cast_instance(const string& v) {
     Ptr<Instance> ins = instance(v);
     if (ins == NULL)
         throw Fwk::EntityNotFoundException("Instance lookup for "+v + " failed");
-        //cerr << "instance lookup for " << v << " failed" << endl;
     return Ptr<TRep>((TRep*) ins.ptr())->engineObject();
 }
 
@@ -471,7 +459,6 @@ string StatsRep::attribute(const string& name) {
         os << (double) manager_->shippingNetwork()->statistics()->shipmentsRefusedByAllSegments() / (double) manager_->shippingNetwork()->statistics()->segments();
     } else {
         throw Fwk::UnknownArgException("Unsupported attribute: " + name);
-        //return "";
     }
     return os.str();
 }
@@ -510,7 +497,6 @@ string ConnRep::attribute(const string& name) {
             if (attr.compare("expedited") == 0)
                 expedite = Segment::available();
             else {
-                //is >> val;
                 if (attr.compare("distance") == 0) {
                     double raw;
                     is >> raw;
@@ -560,7 +546,6 @@ string ConnRep::attribute(const string& name) {
             case ShippingNetwork::randomwalk__:
                 return "Random Walk";
             default:
-            //this shouldn't happen
                 return "Unspecified";
         }
     }
@@ -618,68 +603,60 @@ string FleetRep::attribute(const string& name) {
 }
 
 void FleetRep::attributeIs(const string& name, const string& v) {
-    //try {
-        int commaPos = name.find_first_of(',');
-        string mode = name.substr(0, commaPos);
-        string property = name.substr(commaPos + 1, name.length());
-        //trim the string
-        mode = mode.substr(mode.find_first_not_of(' '));
-        mode = mode.substr(0, mode.find_last_not_of (' ') + 1);
-        property = property.substr(property.find_first_not_of(' '));
-        property = property.substr(0, property.find_last_not_of(' ') + 1);
-        Ptr<Fleet> fleet_;
-        if (mode == "Truck") fleet_ = manager_->shippingNetwork()->truckFleet();
-        if (mode == "Plane") fleet_ = manager_->shippingNetwork()->planeFleet();
-        if (mode == "Boat") fleet_ = manager_->shippingNetwork()->boatFleet();
+    int commaPos = name.find_first_of(',');
+    string mode = name.substr(0, commaPos);
+    string property = name.substr(commaPos + 1, name.length());
+    //trim the string
+    mode = mode.substr(mode.find_first_not_of(' '));
+    mode = mode.substr(0, mode.find_last_not_of (' ') + 1);
+    property = property.substr(property.find_first_not_of(' '));
+    property = property.substr(0, property.find_last_not_of(' ') + 1);
+    Ptr<Fleet> fleet_;
+    if (mode == "Truck") fleet_ = manager_->shippingNetwork()->truckFleet();
+    if (mode == "Plane") fleet_ = manager_->shippingNetwork()->planeFleet();
+    if (mode == "Boat") fleet_ = manager_->shippingNetwork()->boatFleet();
 
+    istringstream is(v);
+    istringstream issprop(property);
+    vector<string> propList;
+    string temp;
+    while(issprop >> temp) {
+        propList.push_back(temp);
+    }
 
-        istringstream is(v);
-        istringstream issprop(property);
-        vector<string> propList;
-        string temp;
-        while(issprop >> temp) {
-            propList.push_back(temp);
+    if (propList.size() == 1) {
+        string propertyValue;
+        is >> propertyValue;
+        if (propList[0] == "speed") {
+            fleet_->speedIs(Mile(atof(propertyValue.c_str())));
         }
-
-        if (propList.size() == 1) {
+        if (propList[0] == "cost") {
+            fleet_->costIs(USD(atof(propertyValue.c_str())));
+        }
+        if (propList[0] == "capacity") {
+            fleet_->capacityIs(PackageUnit(atoi(propertyValue.c_str())));
+        }
+    }
+    else if (propList.size() == 5) {
+        if (propList[1] == "from" && propList[3] == "to") {
             string propertyValue;
             is >> propertyValue;
-            if (propList[0] == "speed") {
-                fleet_->speedIs(Mile(atof(propertyValue.c_str())));
-            }
-            if (propList[0] == "cost") {
-                fleet_->costIs(USD(atof(propertyValue.c_str())));
-            }
-            if (propList[0] == "capacity") {
-                fleet_->capacityIs(PackageUnit(atoi(propertyValue.c_str())));
-            }
-        }
-        else if (propList.size() == 5) {
-            if (propList[1] == "from" && propList[3] == "to") {
-                string propertyValue;
-                is >> propertyValue;
-                int from, to;
-                from = atoi(propList[2].c_str());
-                to = atoi(propList[4].c_str());
-                //cout << propList[0] << " from " << from << " to " << to << endl;
-                //LOG_DEBUG("FleetRep::attributeIs", "scheduled " + mode);
-                for (int i = from; i <= to; i ++) {
-                    if (propList[0] == "speed") {
-                        fleet_->scheduledSpeedIs(i, Mile(atof(propertyValue.c_str())));
-                    }
-                    if (propList[0] == "cost") {
-                        fleet_->scheduledCostIs(i, USD(atof(propertyValue.c_str())));
-                    }
-                    if (propList[0] == "capacity") {
-                        fleet_->scheduledCapacityIs(i, PackageUnit(atoi(propertyValue.c_str())));
-                    }
+            int from, to;
+            from = atoi(propList[2].c_str());
+            to = atoi(propList[4].c_str());
+            for (int i = from; i <= to; i ++) {
+                if (propList[0] == "speed") {
+                    fleet_->scheduledSpeedIs(i, Mile(atof(propertyValue.c_str())));
+                }
+                if (propList[0] == "cost") {
+                    fleet_->scheduledCostIs(i, USD(atof(propertyValue.c_str())));
+                }
+                if (propList[0] == "capacity") {
+                    fleet_->scheduledCapacityIs(i, PackageUnit(atoi(propertyValue.c_str())));
                 }
             }
         }
-
-        //} catch (ValueError e) {
-        //    cerr << e.what() << endl;
-        //}
+    }
 }
 
 }

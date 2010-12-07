@@ -10,8 +10,6 @@ namespace Shipping {
 void Location::segmentIs(const WeakPtr<Segment> seg) {
     if (seg == NULL) {
         throw Fwk::RangeException ("Can't add NULL segment: "+seg->name() );
-//        cerr << "Can't add NULL segment" << endl;
-        //return;
     }
     segments_.push_back(seg.ptr());
     if (notifiee_) notifiee_->onSegment();
@@ -20,23 +18,16 @@ void Location::segmentIs(const WeakPtr<Segment> seg) {
 void Location::segmentIs(const unsigned int index, WeakPtr<Segment> seg) {
     if (index < 0 || index >= segments_.size()) {
         throw Fwk::RangeException ("Index out of bound: " + index);
-//       cerr <<  "Index out of bound exception" << endl;
-        //return;
     }
     if (seg == NULL) {
         segments_.erase(segments_.begin() + index);
-    }
-    else {
+    } else {
         segments_.insert(segments_.begin() + index, seg.ptr());
     }
 }
 
 WeakPtr<Segment> Location::segment(const unsigned int index) const {
     if (index < 0 || index >= segments_.size()) {
-        //accessor should be exception-free
-//        throw Fwk::RangeException
-//         cerr << "Segment # out of bound exception" << endl;
-
          return NULL;
     }
     return segments_[index];
@@ -44,14 +35,9 @@ WeakPtr<Segment> Location::segment(const unsigned int index) const {
 
 void Terminal::segmentIs(const WeakPtr<Segment> seg) {
     if (seg == NULL) {
-        throw Fwk::RangeException ("Can't add NULL segment: "+seg->name() );
-        //cerr << "Can't add NULL segment" << endl;
-        //return;
-    }
-    else if (seg->transportationMode() != transportationMode_) {
+        throw Fwk::RangeException ("Can't add NULL segment: "+seg->name());
+    } else if (seg->transportationMode() != transportationMode_) {
         throw Fwk::RangeException ("Terminal must connect two segments with the same transportation mode");
-        //cerr << "Terminal must connect two segments with the same transportation mode" << endl;
-        //return;
     }
     Location::segmentIs(seg);
 }
@@ -59,17 +45,12 @@ void Terminal::segmentIs(const WeakPtr<Segment> seg) {
 void Terminal::segmentIs(const unsigned int index, WeakPtr<Segment> seg) {
     if (index < 0 || index >= segments()) {
         throw Fwk::RangeException ("Index out of bound: " + index);
-        //cerr <<  "Index out of bound exception" << endl;
-        //return;
     }
     if (seg == NULL) {
         Location::segmentIs(index, seg);
-    }
-    else {
+    } else {
         if (seg->transportationMode() != transportationMode_) {
             throw Fwk::RangeException ("Terminal must connect two segments with the same transportation mode");
-            //cerr << "Terminal must connect two segments with the same transportation mode" << endl;
-            //return;
         }
         Location::segmentIs(index, seg);
     }
@@ -112,11 +93,13 @@ USD Fleet::cost() const {
     }
 }
 
-USD Fleet::scheduledCost(const unsigned int index) const { return scheduledCosts_[index].value; }
+USD Fleet::scheduledCost(const unsigned int index) const {
+    return scheduledCosts_[index % 24].value;
+}
 
 void Fleet::scheduledCostIs(const unsigned int index, USD cost) {
-    scheduledCosts_[index%24].valid = true;
-    scheduledCosts_[index%24].value = cost;
+    scheduledCosts_[index % 24].valid = true;
+    scheduledCosts_[index % 24].value = cost;
 }
 
 PackageUnit Fleet::capacity() const {
@@ -127,11 +110,13 @@ PackageUnit Fleet::capacity() const {
     }
 }
 
-PackageUnit Fleet::scheduledCapacity(const unsigned int index) const { return scheduledCapacitys_[index].value; }
+PackageUnit Fleet::scheduledCapacity(const unsigned int index) const {
+    return scheduledCapacitys_[index % 24].value;
+}
 
 void Fleet::scheduledCapacityIs(const unsigned int index, PackageUnit capacity) {
-    scheduledCapacitys_[index%24].valid = true;
-    scheduledCapacitys_[index%24].value = capacity;
+    scheduledCapacitys_[index % 24].valid = true;
+    scheduledCapacitys_[index % 24].value = capacity;
 }
 
 Mile Fleet::speed() const {
@@ -142,11 +127,13 @@ Mile Fleet::speed() const {
     }
 }
 
-Mile Fleet::scheduledSpeed(const unsigned int index) const { return scheduledSpeeds_[index].value; }
+Mile Fleet::scheduledSpeed(const unsigned int index) const {
+    return scheduledSpeeds_[index % 24].value;
+}
 
 void Fleet::scheduledSpeedIs(const unsigned int index, Mile speed) {
-    scheduledSpeeds_[index%24].valid = true;
-    scheduledSpeeds_[index%24].value = speed;
+    scheduledSpeeds_[index % 24].valid = true;
+    scheduledSpeeds_[index % 24].value = speed;
 }
 
 Clock::Clock() : NamedInterface("clock") {

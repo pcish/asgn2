@@ -53,7 +53,7 @@ namespace ActivityImpl {
                 ActivityImpl* me = const_cast<ActivityImpl*>(this);
                 me->notifiee_ = n;
             }
-            virtual ~ActivityImpl() { /*cout << "Activity Deleted" << endl;*/ }
+            virtual ~ActivityImpl() {}
 
 
         private:
@@ -61,7 +61,6 @@ namespace ActivityImpl {
             Status status_;
             Hour nextTime_;
             Fwk::Ptr<Notifiee> notifiee_;
-            //Fwk::Ptr<class ManagerImpl> manager_;
             ManagerImpl*  manager_;
     };
 
@@ -85,25 +84,16 @@ namespace ActivityImpl {
             virtual void timeSteppingIs(const TimeStepping _timeStepping) { timeStepping_ = _timeStepping; }
             virtual TimeStepping timeStepping() { return timeStepping_; }
 
-            //specific to this example
-            //Queue::Ptr queue() const { return queue_; }
         protected:
-            ManagerImpl() : now_(0), timeStepping_(virtualtime_) {
-                //queue_ = new Queue();
-            }
+            ManagerImpl() : now_(0), timeStepping_(virtualtime_) {}
 
             //Data members
             priority_queue<Activity::Ptr, vector<Activity::Ptr>, ActivityComp> scheduledActivities_;
             map<string, Activity::Ptr> activities_; //pool of all activities
             Hour now_;
             TimeStepping timeStepping_;
-            ~ManagerImpl() { activityInstance_ = NULL; /*cout << "manager detructed" << endl;*/ }
+            ~ManagerImpl() { activityInstance_ = NULL; }
 
-            //specific to this example
-            //Queue::Ptr queue_;
-
-            //singleton instance
-            //static Fwk::Ptr<Activity::Manager> activityInstance_;
             static Activity::Manager::Ptr activityInstance_;
 
     };
