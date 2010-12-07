@@ -98,6 +98,7 @@ int main(int argc, char* argv[]) {
         stats = network->manager->instanceNew("stats", "Stats");
         cout << "Average shipments received by segments: " << stats->attribute("average shipments received by segments") << endl;
         cout << "Average shipments refused by segments: " << stats->attribute("average shipments refused by segments") << endl;
+        cout << "Total cost of received shipments: " << network->destination->attribute("total cost") << endl;
         if (network) delete network;
 
         activityManager = activityManagerInstance();
@@ -114,6 +115,7 @@ int main(int argc, char* argv[]) {
         stats = network->manager->instanceNew("stats", "Stats");
         cout << "Average shipments received by segments: " << stats->attribute("average shipments received by segments") << endl;
         cout << "Average shipments refused by segments: " << stats->attribute("average shipments refused by segments") << endl;
+        cout << "Total cost of received shipments: " << network->destination->attribute("total cost") << endl;
         delete network;
     } catch (Fwk::Exception e) {
         cerr << e.what() << endl;

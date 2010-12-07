@@ -86,6 +86,7 @@ int main(int argc, char* argv[]) {
     cout << "  Shipments received at destination: " << network->location[1]->attribute("shipments received") << endl;
     cout << "  Average latency of received shipments: " << network->location[1]->attribute("average latency") << endl;
     cout << "  Average shipments refused by segments: " << stats->attribute("average shipments refused by segments") << endl;
+    cout << "  Total cost of received shipments: " << network->location[1]->attribute("total cost") << endl;
     cout << "----" << endl;
     Ptr<Instance> fleet = network->manager->instanceNew("fleet", "Fleet");
     fleet->attributeIs("Plane, capacity from 0 to 23", "50");
@@ -94,6 +95,7 @@ int main(int argc, char* argv[]) {
     cout << "  Shipments received at destination: " << network->location[1]->attribute("shipments received") << endl;
     cout << "  Average latency of received shipments: " << network->location[1]->attribute("average latency") << endl;
     cout << "  Average shipments refused by segments: " << stats->attribute("average shipments refused by segments") << endl;
+    cout << "  Total cost of received shipments: " << network->location[1]->attribute("total cost") << endl;
     cout << "----" << endl;
     activityManager->timeSteppingIs(Activity::Manager::realtime());
     CerrLog::instance()->logLevelIs(Log::Info);
@@ -103,6 +105,7 @@ int main(int argc, char* argv[]) {
     cout << "  Shipments received at destination: " << network->location[1]->attribute("shipments received") << endl;
     cout << "  Average latency of received shipments: " << network->location[1]->attribute("average latency") << endl;
     cout << "  Average shipments refused by segments: " << stats->attribute("average shipments refused by segments") << endl;
+    cout << "  Total cost of received shipments: " << network->location[1]->attribute("total cost") << endl;
     cout << "----" << endl;
     delete network;
 }

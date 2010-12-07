@@ -642,8 +642,12 @@ void FleetRep::attributeIs(const string& name, const string& v) {
             string propertyValue;
             is >> propertyValue;
             int from, to;
-            from = atoi(propList[2].c_str());
-            to = atoi(propList[4].c_str());
+            from = atoi(propList[2].c_str()) % 24;
+            to = atoi(propList[4].c_str()) % 24;
+            if (from > to) {
+                to += 24;
+            }
+ //           cout << from << " " << to << endl;
             for (int i = from; i <= to; i ++) {
                 if (propList[0] == "speed") {
                     fleet_->scheduledSpeedIs(i, Mile(atof(propertyValue.c_str())));
