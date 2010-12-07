@@ -90,16 +90,64 @@ I. New in Assignment 3
    \        /
      5 --- 4
 
+        Verification runs three rounds of tests of sending shipments from location 0 to 1, and each round lasts for 24 hours. Thus, their virtual time period of simulation are 0 to 23, 24 to 47, and 48 to 71. The shipment size is set to 100, and the transfer rate is 10. In the first round, it uses dijkstra's shortest path algorithm to plan routes. In the second round, it shrinks the capacity of segment between location 0 and 1 to be half, also using dijkstra's algorithm. In the final round, it changes its routing algorithm to random walk with capacity being the same as the second round. The following shows the results:
+
+        [Round 1]
+         After 24 hours with plane fleet capacity = 100:
+         Shipments received at destination: 10
+         Average latency of received shipments: 5.7
+         Average shipments refused by segments: 2.35
+         Total cost of received shipments: 10
+         ----
+         [Round 2]
+         After another 24 hours with plane fleet capacity = 50:
+         Shipments received at destination: 20
+         Average latency of received shipments: 8.35
+         Average shipments refused by segments: 6.85
+         Total cost of received shipments: 20
+         ----
+         [Round 3]
+         After another 24 hours using routing = randomwalk:
+         Shipments received at destination: 28
+         Average latency of received shipments: 8.39286
+         Average shipments refused by segments: 7.85
+         Total cost of received shipments: 76
+         ----
+
+         Comparing Round 1 and Round 2, since they both use dijkstra's algorithm, the path is both from location 0 to 1 directly. However, the capacity of the segemnt between location 0 and 1 is halved in the second round, Round 2 takes longer time to send all the shipments to location 1 (average latencies are 5.7 vs 8.35), the congestion situation is more severe (average shipments refused are 2.35 vs 6.85). Also, because they travel along the same path, their costs are the same (10).
+
+         Note that the values 8.35 and 6.85 are averaged for the shipments from both Round 1 and 2. That is, if we only consider the shipments for Round 2, the actual values will be higher.
+
+         Then we compare Round 2 and Round 3. Round 3 applies random walk algorithm, and thus the latency, refused shipments and costs are all higher than Round 2. Moreover, something worth noticing is that not all shipments made it to reach their destination (only 9, not 10) in 24 hours in Round 3. That is because with random walk algorithm the shipments may head for the wrong directions or wander around some locations.
+
+         Besides statistics, Round 3 also demonstrates our realtime activity manager.
+
 
     B. experiment.cpp
+         Based on the requirements of the project, we ran experiment and got the following results:
+
+         Simulation 1: all sources send 100 packages
+         Shipments received at destination: 100
+         Average latency of received shipments: 7.5
+         Average shipments received by segments: 1.35135
+         Average shipments refused by segments: 2.02703
+         Total cost of received shipments: 300
+         ========================================
+         Simulation 2: all sources send rand(1, 1000) packages
+         Shipments received at destination: 49
+         Average latency of received shipments: 10.1837
+         Average shipments received by segments: 1.16667
+         Average shipments refused by segments: 1.96847
+         Total cost of received shipments: 147
+
+         First, we notice that shipments received at destination in simulation 2 is fewer than in simulation 1. That is due to the unbalanced flow of traffic in simulation 2 that some terminals are bottlenecks while some terminals don't have heavy traffic. In simulation 2, the expected value of the number of packages generating by each source is 500, which is more than simulation 1 does; however, only 49 are received at destination. Thus we can see that this unbalanced flow of traffic can result in significant decrease in the performance.
+
+         In addition, the latency in simulation 2 is also higher than in simulation 1. That is also due to unbalanced traffic flow. In simulation 1, the latency is amortized by the higher throughput of the shipments, while in simulation 2, shipments may be stuck at some bottleneck terminals and thus have to wait longer to be sent than in the case when all terminals receive and send the same number of shipments.
+
   3. Summary of Rep Layer Interface Changes
     "Stats"
     "Customer"
-      new attributes
-==
-To be tested:
-Activity manager realtime
-==
+    new attributes
 
 
 II. Original Assignment 2 README
