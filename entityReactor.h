@@ -5,6 +5,7 @@
 #include "ShippingNetwork.h"
 #include "ActivityImpl.h"
 #include "Log.h"
+#include "Clock.h"
 
 namespace Shipping {
 class ShippingNetwork;
@@ -237,21 +238,6 @@ class TerminalReactor : public Terminal::Notifiee {
         return n;
     }
     string name() const { return notifier_->name() + ".TerminalReactor"; }
-};
-
-class ClockReactor: public Clock::Notifiee {
-  public:
-    virtual void onNow() {
-        parent_->now_ = notifier_->now();
-    }
-    static Fwk::Ptr<ClockReactor> clockReactorNew(Fleet* parent) {
-        Fwk::Ptr<ClockReactor> n = new ClockReactor();
-        n->parent_ = parent;
-        return n;
-    }
-    string name() const { return notifier_->name() + ".ClockReactor"; }
-  private:
-    Fleet* parent_;
 };
 
 class PlaneFleetReactor: public PlaneFleet::Notifiee {

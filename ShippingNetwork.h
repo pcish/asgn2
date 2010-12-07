@@ -9,6 +9,7 @@
 #include <map>
 
 #include "Log.h"
+#include "Clock.h"
 
 namespace Shipping {
 class EngineReactor;
