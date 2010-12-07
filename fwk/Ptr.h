@@ -65,7 +65,8 @@ Ptr<T>::operator=( Ptr<T>& mp ) {
     if( save ) save->deleteRef();
   }
 
-}*/
+}
+*/
 //#endif /* PTR_h */
 //=======
 
