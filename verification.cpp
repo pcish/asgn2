@@ -95,6 +95,8 @@ int main(int argc, char* argv[]) {
     cout << "  Average latency of received shipments: " << network->location[1]->attribute("average latency") << endl;
     cout << "  Average shipments refused by segments: " << stats->attribute("average shipments refused by segments") << endl;
     cout << "----" << endl;
+    activityManager->timeSteppingIs(Activity::Manager::realtime());
+    CerrLog::instance()->logLevelIs(Log::Info);
     network->manager->instance("defaultConn")->attributeIs("routing", "randomwalk");
     activityManager->nowIs(71.0);
     cout << "After another 24 hours using routing = randomwalk:" << endl;

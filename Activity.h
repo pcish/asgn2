@@ -68,6 +68,15 @@ public:
 
     virtual void lastActivityIs(Activity::Ptr) = 0;
 
+    enum TimeStepping {
+        virtualtime_,
+        realtime_
+    };
+    static inline TimeStepping virtualtime() { return virtualtime_; }
+    static inline TimeStepping realtime() { return realtime_; }
+    virtual void timeSteppingIs(const TimeStepping _timeStepping) = 0;
+    virtual TimeStepping timeStepping() = 0;
+
     virtual Hour now() const = 0;
     virtual void nowIs(Hour) = 0;
     virtual ~Manager() {}

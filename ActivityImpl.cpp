@@ -21,12 +21,12 @@ namespace ActivityImpl {
         if (activityInstance_ == NULL) {
             activityInstance_ = new ManagerImpl();
         }
-        //cout << "Assign activity instance" << activityInstance_->references() << endl; 
+        //cout << "Assign activity instance" << activityInstance_->references() << endl;
 
         return activityInstance_;
     }
     void ManagerImpl::activityManagerInstanceIs(const Fwk::Ptr<Activity::Manager> _instance) {
-        activityInstance_ = _instance; 
+        activityInstance_ = _instance;
     }
 
     Activity::Ptr ManagerImpl::activityNew(const string& name) {
@@ -69,7 +69,7 @@ namespace ActivityImpl {
 
             //figure out the next activity to run
             Activity::Ptr nextToRun = scheduledActivities_.top();
-            
+
             if (nextToRun->status() == Activity::deleted) {
                 //LOG_DEBUG("ManagerImpl::nowIs", "Remove activity because it's status is deleted: " + nextToRun->name());
                 //cout << "ManagerImpl::nowIs" <<  "Remove activity because it's status is deleted: " <<  nextToRun->name() << " ref count=" << nextToRun->references() << endl;
@@ -85,10 +85,10 @@ namespace ActivityImpl {
 
             //calculate amount of Hour to sleep
             Hour diff = Hour(nextToRun->nextTime().value() - now_.value());
-            
-            if (timeStepping_ == realtime__)
+
+            if (timeStepping_ == realtime())
                 //sleep 100ms (100,000 microseconds) for every unit of time
-                usleep(( ((int)diff.value()) * 100000));
+                usleep(( ((int)diff.value()) * 1000000));
 
             now_ = nextToRun->nextTime();
 
