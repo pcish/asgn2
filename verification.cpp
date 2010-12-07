@@ -40,10 +40,6 @@ class Network {
             createSegmentPair(7, "location5", "location6", "Truck segment");
             createSegmentPair(8, "location6", "location7", "Truck segment");
             createSegmentPair(9, "location7", "location0", "Truck segment");
-            Ptr<Instance> fleet = manager->instanceNew("fleet", "Fleet");
-            fleet->attributeIs("Truck, speed from 20 to 23", "100");
-            fleet->attributeIs("Plane, speed from 0 to 23", "100");
-            fleet->attributeIs("Boat, speed from 10 to 23", "100");
         } catch (Fwk::Exception e) {
             cout << e.what() << endl;
         } catch (...) {}
@@ -80,14 +76,32 @@ int main(int argc, char* argv[]) {
     CerrLog::instance()->logLevelIs(Log::Null);
     Activity::Manager::Ptr activityManager = activityManagerInstance();
 
-    cout << "Simulation 1: all sources send 100 packages" << endl;
     Network * network = new Network();
     network->setup();
     network->manager->instance("defaultConn")->attributeIs("routing", "dijkstra");
+    Ptr<Instance> stats = network->manager->instanceNew("stats", "Stats");
     network->startShipments();
+    activityManager->nowIs(23.0);
+    cout << "After 24 hours with plane fleet capacity = 100:" << endl;
+    cout << "  Shipments received at destination: " << network->location[1]->attribute("shipments received") << endl;
+    cout << "  Average latency of received shipments: " << network->location[1]->attribute("average latency") << endl;
+    cout << "  Average shipments refused by segments: " << stats->attribute("average shipments refused by segments") << endl;
+    cout << "----" << endl;
+    Ptr<Instance> fleet = network->manager->instanceNew("fleet", "Fleet");
+    fleet->attributeIs("Plane, capacity from 0 to 23", "50");
     activityManager->nowIs(47.0);
-    cout << "Shipments received at destination: " << network->location[1]->attribute("shipments received") << endl;
-    cout << "Average latency of received shipments: " << network->location[1]->attribute("average latency") << endl;
+    cout << "After another 24 hours with plane fleet capacity = 50:" << endl;
+    cout << "  Shipments received at destination: " << network->location[1]->attribute("shipments received") << endl;
+    cout << "  Average latency of received shipments: " << network->location[1]->attribute("average latency") << endl;
+    cout << "  Average shipments refused by segments: " << stats->attribute("average shipments refused by segments") << endl;
+    cout << "----" << endl;
+    network->manager->instance("defaultConn")->attributeIs("routing", "randomwalk");
+    activityManager->nowIs(71.0);
+    cout << "After another 24 hours using routing = randomwalk:" << endl;
+    cout << "  Shipments received at destination: " << network->location[1]->attribute("shipments received") << endl;
+    cout << "  Average latency of received shipments: " << network->location[1]->attribute("average latency") << endl;
+    cout << "  Average shipments refused by segments: " << stats->attribute("average shipments refused by segments") << endl;
+    cout << "----" << endl;
     delete network;
 }
 
