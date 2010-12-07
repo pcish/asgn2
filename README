@@ -78,6 +78,19 @@ I. New in Assignment 3
 
   2. Simulations
     A. verification.cpp
+        Network graph:
+     0 --- 1
+   /  \   / \
+ /      8     \
+7              2
+|              |
+|       9      |
+6              3
+ \            /
+   \        /
+     5 --- 4
+
+
     B. experiment.cpp
   3. Summary of Rep Layer Interface Changes
     "Stats"
