@@ -82,6 +82,7 @@ int main(int argc, char* argv[]) {
     Ptr<Instance> stats = network->manager->instanceNew("stats", "Stats");
     network->startShipments();
     activityManager->nowIs(23.0);
+    cout << "[Round 1]" << endl;
     cout << "After 24 hours with plane fleet capacity = 100:" << endl;
     cout << "  Shipments received at destination: " << network->location[1]->attribute("shipments received") << endl;
     cout << "  Average latency of received shipments: " << network->location[1]->attribute("average latency") << endl;
@@ -91,6 +92,7 @@ int main(int argc, char* argv[]) {
     Ptr<Instance> fleet = network->manager->instanceNew("fleet", "Fleet");
     fleet->attributeIs("Plane, capacity from 0 to 23", "50");
     activityManager->nowIs(47.0);
+    cout << "[Round 2]" << endl;
     cout << "After another 24 hours with plane fleet capacity = 50:" << endl;
     cout << "  Shipments received at destination: " << network->location[1]->attribute("shipments received") << endl;
     cout << "  Average latency of received shipments: " << network->location[1]->attribute("average latency") << endl;
@@ -101,6 +103,7 @@ int main(int argc, char* argv[]) {
     CerrLog::instance()->logLevelIs(Log::Info);
     network->manager->instance("defaultConn")->attributeIs("routing", "randomwalk");
     activityManager->nowIs(71.0);
+    cout << "[Round 3]" << endl;
     cout << "After another 24 hours using routing = randomwalk:" << endl;
     cout << "  Shipments received at destination: " << network->location[1]->attribute("shipments received") << endl;
     cout << "  Average latency of received shipments: " << network->location[1]->attribute("average latency") << endl;
