@@ -63,9 +63,10 @@ class ShipmentReactor : public Shipment::Notifiee {
             if (fleet == NULL) {
                 LOG_ERROR("forwardShipment", "cannot find fleet for seg "+nextSegment->name()+" tmode="+STR(nextSegment->transportationMode()));
             }
-            Hour transitTime =
+            Hour transitTime = ceil(
                 ceil((double) notifier_->load().value() / (double) fleet->capacity().value()) *
-                (nextSegment->length().value() / fleet->speed().value());
+                (nextSegment->length().value() / fleet->speed().value())
+            );
             LOG_DEBUG("forwardShipment", "transit time = ceil(" +
                       STR(notifier_->load().value()) + " / " +
                       STR(fleet->capacity().value()) + ") * (" +
@@ -310,7 +311,7 @@ class TerminalReactor : public Terminal::Notifiee {
 };
 
 class ClockReactor: public Clock::Notifiee {
-  public:    
+  public:
     virtual void onNow() {
         parent_->now_ = notifier_->now();
     }
